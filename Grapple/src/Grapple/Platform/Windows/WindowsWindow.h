@@ -1,10 +1,11 @@
 #pragma once
 
-#include <Flare/Core/Window.h>
+#include <Grapple/Core/Window.h>
+#include <Grapple/Renderer/GraphicsContext.h>
 
 #include <GLFW/glfw3.h>
 
-namespace Flare
+namespace Grapple
 {
 	class WindowsWindow : public Window
 	{
@@ -25,6 +26,7 @@ namespace Flare
 		};
 
 		GLFWwindow* m_Window;
+		Scope<GraphicsContext> m_GraphicsContext;
 		WindowData m_Data;
 	};
 }

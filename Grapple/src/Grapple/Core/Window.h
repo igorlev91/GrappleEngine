@@ -1,11 +1,11 @@
 #pragma once
 
-#include <Flare/Core/Core.h>
+#include <Grapple/Core/Core.h>
 
 #include <string>
 #include <stdint.h>
 
-namespace Flare
+namespace Grapple
 {
 	struct WindowProperties
 	{

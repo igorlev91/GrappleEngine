@@ -1,4 +1,4 @@
-project "Flare"
+project "Grapple"
     kind "StaticLib"
 	language "C++"
 	cppdialect "C++17"
@@ -10,15 +10,15 @@ project "Flare"
         "src/**.cpp",
     }
 
-	local flareIncludeDirs = {
+	local GrappleIncludeDirs = {
         "src",
 	}
 
 	for i = 1, #INCLUDE_DIRS do
-		flareIncludeDirs[#flareIncludeDirs+1] = INCLUDE_DIRS[i]
+		GrappleIncludeDirs[#GrappleIncludeDirs+1] = INCLUDE_DIRS[i]
 	end
 
-    includedirs(flareIncludeDirs)
+    includedirs(GrappleIncludeDirs)
 
 	links
 	{
@@ -38,16 +38,16 @@ project "Flare"
 		systemversion "latest"
 	
 	filter "configurations:Debug"
-		defines "FLARE_DEBUG"
+		defines "Grapple_DEBUG"
 		runtime "Debug"
 		symbols "on"
 
 	filter "configurations:Release"
-		defines "FLARE_RELEASE"
+		defines "Grapple_RELEASE"
 		runtime "Release"
 		optimize "on"
 
 	filter "configurations:Dist"
-		defines "FLARE_DIST"
+		defines "Grapple_DIST"
 		runtime "Release"
 		optimize "on"

@@ -1,16 +1,16 @@
 #pragma once
 
-#include <Flare/Core/Platform.h>
+#include <Grapple/Core/Platform.h>
 
 #include <memory>
 
-#ifdef FLARE_DEBUG
+#ifdef Grapple_DEBUG
 	#ifdef FL_PLATFORM_WINDOWS
 		#define FL_DEBUGBREAK __debugbreak()
 	#endif
 #endif
 
-namespace Flare
+namespace Grapple
 {
 	template<typename T>
 	using Ref = std::shared_ptr<T>;

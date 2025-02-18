@@ -1,8 +1,8 @@
 #include "Window.h"
 
-#include <Flare/Platform/Windows/WindowsWindow.h>
+#include <Grapple/Platform/Windows/WindowsWindow.h>
 
-namespace Flare
+namespace Grapple
 {
 	Scope<Window> Window::Create(WindowProperties& properties)
 	{

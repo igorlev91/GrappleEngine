@@ -1,8 +1,8 @@
 #pragma once
 
-#include <Flare/Core/Window.h>
+#include <Grapple/Core/Window.h>
 
-namespace Flare
+namespace Grapple
 {
 	class Application
 	{
