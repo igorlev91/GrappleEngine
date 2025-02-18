@@ -1,5 +1,6 @@
 #include <Grapple/Core/Application.h>
 #include <Grapple/Renderer/RenderCommand.h>
+#include <Grapple/Core/EntryPoint.h>
 
 using namespace Grapple;
 
@@ -18,9 +19,7 @@ public:
 	}
 };
 
-int main()
+Scope<Application> Grapple::CreateGrappleApplication(Grapple::CommandLineArguments arguments)
 {
-	SandboxApplication application;
-	application.Run();
-	return 0;
+	return CreateScope<SandboxApplication>();
 }
