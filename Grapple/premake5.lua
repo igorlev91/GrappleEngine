@@ -1,4 +1,4 @@
-project "Grapple"
+project "Flare"
     kind "StaticLib"
 	language "C++"
 	cppdialect "C++17"
@@ -10,20 +10,25 @@ project "Grapple"
         "src/**.cpp",
     }
 
-	local grappleIncludeDirs = {
+	local flareIncludeDirs = {
         "src",
 	}
 
 	for i = 1, #INCLUDE_DIRS do
-		grappleIncludeDirs[#grappleIncludeDirs+1] = INCLUDE_DIRS[i]
+		flareIncludeDirs[#flareIncludeDirs+1] = INCLUDE_DIRS[i]
 	end
 
-    includedirs(grappleIncludeDirs)
+    includedirs(flareIncludeDirs)
 
 	links
 	{
 		"GLAD",
 		"GLFW"
+	}
+
+	defines
+	{
+		"GLFW_INCLUDE_NONE"
 	}
 
 	targetdir("%{wks.location}/bin/" .. OUTPUT_DIRECTORY .. "/%{prj.name}")
@@ -33,16 +38,16 @@ project "Grapple"
 		systemversion "latest"
 	
 	filter "configurations:Debug"
-		defines "Grapple_DEBUG"
+		defines "FLARE_DEBUG"
 		runtime "Debug"
 		symbols "on"
 
 	filter "configurations:Release"
-		defines "Grapple_RELEASE"
+		defines "FLARE_RELEASE"
 		runtime "Release"
 		optimize "on"
 
 	filter "configurations:Dist"
-		defines "Grapple_DIST"
+		defines "FLARE_DIST"
 		runtime "Release"
 		optimize "on"

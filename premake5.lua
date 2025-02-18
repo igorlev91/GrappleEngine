@@ -18,10 +18,15 @@ workspace "Grapple"
 
 OUTPUT_DIRECTORY = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
-include "Grapple/premake5.lua"
-include "Sandbox/premake5.lua"
-
 group "Dependencies"
-    include "Grapple/vendor/GLAD"
     include "Grapple/vendor/GLFW"
+    include "Grapple/vendor/GLAD"
+group ""
+
+group "Core"
+	include "Grapple"
+group ""
+
+group "Sandbox"
+	include "Sandbox"
 group ""
