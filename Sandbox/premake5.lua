@@ -28,17 +28,17 @@ project "Sandbox"
 		systemversion "latest"
 	
 	filter "configurations:Debug"
-		defines "GRAPPLE_DEBUG"
+		defines "Grapple_DEBUG"
 		runtime "Debug"
 		symbols "on"
 
 	filter "configurations:Release"
-		defines "GRAPPLE_RELEASE"
+		defines "Grapple_RELEASE"
 		runtime "Release"
 		optimize "on"
 
 	filter "configurations:Dist"
-		defines "GRAPPLE_DIST"
+		defines "Grapple_DIST"
 		runtime "Release"
 		optimize "on"
 

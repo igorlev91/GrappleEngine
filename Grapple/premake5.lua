@@ -1,4 +1,4 @@
-project "GRAPPLE"
+project "Grapple"
     kind "StaticLib"
 	language "C++"
 	cppdialect "C++17"
@@ -10,10 +10,21 @@ project "GRAPPLE"
         "src/**.cpp",
     }
 
-    includedirs
-    {
-        "src"
-    }
+	local grappleIncludeDirs = {
+        "src",
+	}
+
+	for i = 1, #INCLUDE_DIRS do
+		grappleIncludeDirs[#grappleIncludeDirs+1] = INCLUDE_DIRS[i]
+	end
+
+    includedirs(grappleIncludeDirs)
+
+	links
+	{
+		"GLAD",
+		"GLFW"
+	}
 
 	targetdir("%{wks.location}/bin/" .. OUTPUT_DIRECTORY .. "/%{prj.name}")
 	objdir("%{wks.location}/bin-int/" .. OUTPUT_DIRECTORY .. "/%{prj.name}")
@@ -22,16 +33,16 @@ project "GRAPPLE"
 		systemversion "latest"
 	
 	filter "configurations:Debug"
-		defines "GRAPPLE_DEBUG"
+		defines "Grapple_DEBUG"
 		runtime "Debug"
 		symbols "on"
 
 	filter "configurations:Release"
-		defines "GRAPPLE_RELEASE"
+		defines "Grapple_RELEASE"
 		runtime "Release"
 		optimize "on"
 
 	filter "configurations:Dist"
-		defines "GRAPPLE_DIST"
+		defines "Grapple_DIST"
 		runtime "Release"
 		optimize "on"
