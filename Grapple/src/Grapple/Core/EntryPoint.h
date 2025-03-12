@@ -15,7 +15,7 @@ namespace Grapple
 		}
 	};
 
-	extern Scope<Application> CreateFlareApplication(CommandLineArguments arguments);
+	extern Scope<Application> CreateGrappleApplication(CommandLineArguments arguments);
 }
 
 int main(int argc, const char* argv[])
@@ -24,7 +24,7 @@ int main(int argc, const char* argv[])
 	arguments.ArgumentsCount = argc;
 	arguments.Arguments = argv;
 
-	Grapple::Scope<Grapple::Application> application = CreateFlareApplication(arguments);
+	Grapple::Scope<Grapple::Application> application = CreateGrappleApplication(arguments);
 	application->Run();
 	return 0;
 }

@@ -10,15 +10,13 @@ project "Grapple"
         "src/**.cpp",
     }
 
-	local GrappleIncludeDirs = {
-        "src",
+    includedirs
+	{
+		"src/",
+		INCLUDE_DIRS.GLAD,
+		INCLUDE_DIRS.GLFW,
+		INCLUDE_DIRS.glm,
 	}
-
-	for i = 1, #INCLUDE_DIRS do
-		GrappleIncludeDirs[#GrappleIncludeDirs+1] = INCLUDE_DIRS[i]
-	end
-
-    includedirs(GrappleIncludeDirs)
 
 	links
 	{

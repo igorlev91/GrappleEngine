@@ -2,6 +2,8 @@
 
 #include <Grapple/Core/Core.h>
 
+#include <Grapple/Renderer/VertexArray.h>
+
 #include <stdint.h>
 
 namespace Grapple
@@ -20,6 +22,8 @@ namespace Grapple
 
 		virtual void SetClearColor(float r, float g, float b, float a) = 0;
 		virtual void Clear() = 0;
+
+		virtual void DrawIndexed(const Ref<VertexArray>& vertexArray) = 0;
 	public:
 		static Scope<RendererAPI> Create();
 		static API GetAPI() { return s_API; }
