@@ -13,7 +13,8 @@ project "Sandbox"
     includedirs
     {
         "src",
-		"%{wks.location}/Grapple/src"
+		"%{wks.location}/Grapple/src",
+		INCLUDE_DIRS.glm,
     }
 
 	links
