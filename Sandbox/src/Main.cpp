@@ -4,6 +4,7 @@
 
 #include <Grapple/Renderer/Shader.h>
 #include <Grapple/Renderer2D/Renderer2D.h>
+#include <Grapple/Renderer/Texture.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -16,6 +17,7 @@ public:
 	SandboxApplication()
 	{
 		Renderer2D::Initialize();
+		m_Texture = Texture::Create("Texture.png");
 		m_QuadShader = Shader::Create("QuadShader.glsl");
 
 		CalculateProjection(2.0f);
@@ -52,10 +54,14 @@ public:
 		Renderer2D::DrawQuad(glm::vec3(-0.5f, 0.2f, 0.0f), glm::vec2(0.08f), glm::vec4(0.1f, 0.8f, 0.2f, 1.0f));
 		Renderer2D::DrawQuad(glm::vec3(-0.5f, -0.3f, 0.0f), glm::vec2(0.12f), glm::vec4(0.1f, 0.8f, 0.2f, 1.0f));
 		Renderer2D::DrawQuad(glm::vec3(-0.2f, 0.7f, 0.0f), glm::vec2(0.4f, 0.2f), glm::vec4(0.8f, 0.2f, 0.1f, 1.0f));
+
+		Renderer2D::DrawQuad(glm::vec3(0.0f), glm::vec2(0.2f), m_Texture, glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+		Renderer2D::DrawQuad(glm::vec3(-0.1f), glm::vec2(0.2f), m_Texture, glm::vec4(1.0f));
 		Renderer2D::End();
 	}
 private:
 	Ref<Shader> m_QuadShader;
+	Ref<Texture> m_Texture;
 	glm::mat4 m_ProjectionMatrix;
 };
 
