@@ -10,7 +10,7 @@ namespace Grapple
 	{
 		WindowProperties properties;
 		properties.Title = "Grapple Engine";
-		properties.Width = 1080;
+		properties.Width = 1280;
 		properties.Height = 720;
 
 		m_Window = Window::Create(properties);

@@ -2,6 +2,8 @@
 
 #include <Grapple/Renderer/Shader.h>
 
+#include <glm/glm.hpp>
+
 #include <string>
 #include <string_view>
 
@@ -14,6 +16,8 @@ namespace Grapple
 		~OpenGLShader();
 	public:
 		virtual void Bind() override;
+
+		virtual void SetMatrix4(const std::string& name, const glm::mat4& matrix) override;
 	private:
 		struct ShaderProgram
 		{

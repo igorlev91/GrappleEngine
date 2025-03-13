@@ -31,7 +31,7 @@ namespace Grapple
 		s_Data->IndexBuffer = IndexBuffer::Create(maxQuads * 6, indices.data());
 
 		s_Data->VertexBuffer->SetLayout({
-			BufferLayoutElement("i_Position", ShaderDataType::Float2),
+			BufferLayoutElement("i_Position", ShaderDataType::Float3),
 			BufferLayoutElement("i_Color", ShaderDataType::Float4),
 		});
 
@@ -39,6 +39,11 @@ namespace Grapple
 		s_Data->VertexArray->AddVertexBuffer(s_Data->VertexBuffer);
 
 		s_Data->VertexArray->Unbind();
+
+		s_Data->QuadVertices[0] = glm::vec3(-0.5f, -0.5f, 0.0f);
+		s_Data->QuadVertices[1] = glm::vec3(-0.5f, 0.5f, 0.0f);
+		s_Data->QuadVertices[2] = glm::vec3(0.5f, 0.5f, 0.0f);
+		s_Data->QuadVertices[3] = glm::vec3(0.5f, -0.5f, 0.0f);
 	}
 
 	void Renderer2D::Shutdown()
@@ -46,11 +51,12 @@ namespace Grapple
 		delete s_Data;
 	}
 
-	void Renderer2D::Begin(const Ref<Shader>& shader)
+	void Renderer2D::Begin(const Ref<Shader>& shader, const glm::mat4& projectionMatrix)
 	{
 		if (s_Data->QuadIndex > 0 && s_Data->CurrentShader != nullptr)
 			Flush();
 
+		s_Data->CameraProjectionMatrix = projectionMatrix;
 		s_Data->CurrentShader = shader;
 	}
 	
@@ -59,12 +65,13 @@ namespace Grapple
 		s_Data->VertexBuffer->SetData(s_Data->Vertices.data(), sizeof(QuadVertex) * s_Data->QuadIndex * 4);
 
 		s_Data->CurrentShader->Bind();
+		s_Data->CurrentShader->SetMatrix4("u_Projection", s_Data->CameraProjectionMatrix);
 		RenderCommand::DrawIndexed(s_Data->VertexArray, s_Data->QuadIndex * 6);
 
 		s_Data->QuadIndex = 0;
 	}
 	
-	void Renderer2D::Submit(glm::vec2 position, glm::vec2 size, glm::vec4 color)
+	void Renderer2D::DrawQuad(glm::vec3 position, glm::vec2 size, glm::vec4 color)
 	{
 		glm::vec2 halfSize = size / 2.0f;
 
@@ -73,28 +80,11 @@ namespace Grapple
 
 		size_t vertexIndex = s_Data->QuadIndex * 4;
 
+		for (uint32_t i = 0; i < 4; i++)
 		{
-			QuadVertex& vertex = s_Data->Vertices[vertexIndex];
+			QuadVertex& vertex = s_Data->Vertices[vertexIndex + i];
+			vertex.Position = s_Data->QuadVertices[i] * glm::vec3(size, 0.0f) + position;
 			vertex.Color = color;
-			vertex.Position = position - halfSize;
-		}
-
-		{
-			QuadVertex& vertex = s_Data->Vertices[vertexIndex + 1];
-			vertex.Color = color;
-			vertex.Position = position + glm::vec2(-halfSize.x, halfSize.y);
-		}
-
-		{
-			QuadVertex& vertex = s_Data->Vertices[vertexIndex + 2];
-			vertex.Color = color;
-			vertex.Position = position + halfSize;
-		}
-
-		{
-			QuadVertex& vertex = s_Data->Vertices[vertexIndex + 3];
-			vertex.Color = color;
-			vertex.Position = position + glm::vec2(halfSize.x, -halfSize.y);
 		}
 
 		s_Data->QuadIndex++;
