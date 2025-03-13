@@ -2,6 +2,8 @@
 
 #include <Grapple/Renderer/RenderCommand.h>
 
+#include <glad/glad.h>
+
 namespace Grapple
 {
 	Application::Application()

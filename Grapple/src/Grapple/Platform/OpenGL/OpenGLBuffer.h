@@ -9,7 +9,8 @@ namespace Grapple
 	class OpenGLVertexBuffer : public VertexBuffer
 	{
 	public:
-		OpenGLVertexBuffer();
+		OpenGLVertexBuffer(size_t size);
+		OpenGLVertexBuffer(size_t size, const void* data);
 		~OpenGLVertexBuffer();
 	public:
 		virtual void Bind() override;
@@ -25,11 +26,12 @@ namespace Grapple
 	class OpenGLIndexBuffer : public IndexBuffer
 	{
 	public:
-		OpenGLIndexBuffer();
+		OpenGLIndexBuffer(size_t count);
+		OpenGLIndexBuffer(size_t count, const void* data);
 		~OpenGLIndexBuffer();
 	public:
 		virtual void Bind() override;
-		virtual void SetData(const void* indices, size_t size) override;
+		virtual void SetData(const void* indices, size_t count) override;
 	private:
 		uint32_t m_Id;
 	};
