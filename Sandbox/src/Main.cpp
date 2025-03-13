@@ -1,13 +1,7 @@
-#include <Grapple/Core/Application.h>
-#include <Grapple/Renderer/RenderCommand.h>
-#include <Grapple/Core/EntryPoint.h>
+#include "Grapple.h"
 
-#include <Grapple/Renderer/Shader.h>
-#include <Grapple/Renderer2D/Renderer2D.h>
-#include <Grapple/Renderer/Texture.h>
-
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+#include "Grapple/Core/EntryPoint.h"
+#include "Grapple/Renderer2D/Renderer2D.h"
 
 using namespace Grapple;
 
@@ -20,7 +14,7 @@ public:
 		m_Texture = Texture::Create("Texture.png");
 		m_QuadShader = Shader::Create("QuadShader.glsl");
 
-		CalculateProjection(2.0f);
+		CalculateProjection(m_CameraSize);
 
 		RenderCommand::SetClearColor(0.1f, 0.2f, 0.3f, 1);
 	}
@@ -36,6 +30,16 @@ public:
 		float aspectRation = width / height;
 
 		m_ProjectionMatrix = glm::ortho(-halfSize * aspectRation, halfSize * aspectRation, -halfSize, halfSize, -0.1f, 10.0f);
+	}
+
+	virtual void OnEvent(Event& event) override
+	{
+		EventDispatcher dispatcher(event);
+		dispatcher.Dispatch<WindowResizeEvent>([this](WindowResizeEvent& event) -> bool
+		{
+			CalculateProjection(m_CameraSize);
+			return true;
+		});
 	}
 
 	~SandboxApplication()
@@ -63,6 +67,8 @@ private:
 	Ref<Shader> m_QuadShader;
 	Ref<Texture> m_Texture;
 	glm::mat4 m_ProjectionMatrix;
+
+	float m_CameraSize = 2.0f;
 };
 
 Scope<Application> Grapple::CreateGrappleApplication(Grapple::CommandLineArguments arguments)

@@ -1,6 +1,7 @@
 #pragma once
 
-#include <Grapple/Core/Core.h>
+#include "Grapple.h"
+#include "Grapple/Core/Events.h"
 
 #include <string>
 #include <stdint.h>
@@ -12,13 +13,15 @@ namespace Grapple
 		std::string Title;
 		uint32_t Width;
 		uint32_t Height;
+		bool IsMinimized;
 	};
 
 	class Window
 	{
 	public:
-		virtual bool ShouldClose() = 0;
-		virtual WindowProperties& GetProperties() = 0;
+		virtual const WindowProperties& GetProperties() const = 0;
+
+		virtual void SetEventCallback(const EventCallback& callback) = 0;
 
 		virtual void OnUpdate() = 0;
 	public:

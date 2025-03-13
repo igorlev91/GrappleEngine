@@ -1,11 +1,6 @@
 #pragma once
 
-#include <Grapple/Renderer/Buffer.h>
-#include <Grapple/Renderer/VertexArray.h>
-#include <Grapple/Renderer/Shader.h>
-#include <Grapple/Renderer/Texture.h>
-
-#include <glm/glm.hpp>
+#include "Grapple.h"
 
 #include <vector>
 

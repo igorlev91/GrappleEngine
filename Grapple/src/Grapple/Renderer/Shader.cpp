@@ -1,7 +1,7 @@
 #include "Shader.h"
 
-#include <Grapple/Platform/OpenGL/OpenGLShader.h>
-#include <Grapple/Renderer/RendererAPI.h>
+#include "Grapple/Platform/OpenGL/OpenGLShader.h"
+#include "Grapple/Renderer/RendererAPI.h"
 
 namespace Grapple
 {

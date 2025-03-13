@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Grapple/Core/Core.h>
+#include "Grapple/Core/Core.h"
 
 #include <spdlog/spdlog.h>
 

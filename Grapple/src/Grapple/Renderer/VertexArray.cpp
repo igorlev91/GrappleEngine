@@ -1,8 +1,7 @@
 #include "VertexArray.h"
 
-#include <Grapple/Renderer/RendererAPI.h>
-
-#include <Grapple/Platform/OpenGL/OpenGLVertexArray.h>
+#include "Grapple/Renderer/RendererAPI.h"
+#include "Grapple/Platform/OpenGL/OpenGLVertexArray.h"
 
 namespace Grapple
 {

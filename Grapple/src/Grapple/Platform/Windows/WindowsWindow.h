@@ -12,8 +12,9 @@ namespace Grapple
 	public:
 		WindowsWindow(WindowProperties& properties);
 	public:
-		virtual bool ShouldClose() override;
-		virtual WindowProperties& GetProperties() override;
+		virtual const WindowProperties& GetProperties() const override { return m_Data.Properties; }
+
+		virtual void SetEventCallback(const EventCallback& callback) override { m_Data.Callback = callback; }
 
 		virtual void OnUpdate() override;
 	private:
@@ -23,6 +24,7 @@ namespace Grapple
 		struct WindowData
 		{
 			WindowProperties Properties;
+			EventCallback Callback;
 		};
 
 		GLFWwindow* m_Window;

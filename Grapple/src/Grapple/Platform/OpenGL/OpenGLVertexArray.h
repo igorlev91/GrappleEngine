@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Grapple/Renderer/VertexArray.h>
+#include "Grapple/Renderer/VertexArray.h"
 
 namespace Grapple
 {
@@ -13,6 +13,7 @@ namespace Grapple
 		virtual void Bind() override;
 		virtual void Unbind() override;
 		virtual void AddVertexBuffer(const Ref<VertexBuffer>& vertexBuffer) override;
+		virtual const VertexBuffers& GetVertexBuffers() const override { return m_VertexBuffers; }
 
 		virtual void SetIndexBuffer(const Ref<IndexBuffer>& indexbuffer) override;
 		virtual const Ref<IndexBuffer> GetIndexBuffer() const override;
@@ -20,5 +21,7 @@ namespace Grapple
 		uint32_t m_Id;
 		uint32_t m_VertexBufferIndex;
 		Ref<IndexBuffer> m_IndexBuffer;
+
+		VertexBuffers m_VertexBuffers;
 	};
 }

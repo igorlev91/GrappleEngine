@@ -1,14 +1,21 @@
 #pragma once
 
-#include <Grapple/Core/Platform.h>
+#include "Grapple/Core/Platform.h"
 
 #include <memory>
 
 #ifdef Grapple_DEBUG
-	#ifdef FL_PLATFORM_WINDOWS
-		#define FL_DEBUGBREAK __debugbreak()
+	#ifdef Grapple_PLATFORM_WINDOWS
+		#define Grapple_DEBUGBREAK __debugbreak()
+	#else
+		#define Grapple_DEBUGBREAK
 	#endif
+#else
+	#define Grapple_DEBUGBREAK
 #endif
+
+#define Grapple_EXPEND_MACRO(a) a
+#define FALRE_STRINGIFY_MACRO(a) #a
 
 namespace Grapple
 {

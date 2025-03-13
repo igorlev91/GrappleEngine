@@ -1,6 +1,6 @@
 #include "RendererAPI.h"
 
-#include <Grapple/Platform/OpenGL/OpenGLRendererAPI.h>
+#include "Grapple/Platform/OpenGL/OpenGLRendererAPI.h"
 
 namespace Grapple
 {

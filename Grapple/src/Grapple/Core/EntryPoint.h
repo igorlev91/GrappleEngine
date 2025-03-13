@@ -1,5 +1,5 @@
-#include <Grapple/Core/Application.h>
-#include <Grapple/Core/Log.h>
+#include "Grapple/Core/Application.h"
+#include "Grapple/Core/Log.h"
 
 #include <stdint.h>
 

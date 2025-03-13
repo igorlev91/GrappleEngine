@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Grapple/Renderer/GraphicsContext.h>
+#include "Grapple/Renderer/GraphicsContext.h"
 
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>

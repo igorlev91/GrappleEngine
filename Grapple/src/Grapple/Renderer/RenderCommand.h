@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Grapple/Renderer/RendererAPI.h>
+#include "Grapple/Renderer/RendererAPI.h"
 
 namespace Grapple
 {
@@ -20,6 +20,11 @@ namespace Grapple
 		static void SetClearColor(float r, float g, float b, float a)
 		{
 			s_API->SetClearColor(r, g, b, a);
+		}
+
+		static void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
+		{
+			s_API->SetViewport(x, y, width, height);
 		}
 
 		static void DrawIndexed(const Ref<VertexArray>& mesh)

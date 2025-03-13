@@ -1,8 +1,7 @@
 #include "Buffer.h"
 
-#include <Grapple/Renderer/RendererAPI.h>
-
-#include <Grapple/Platform/OpenGL/OpenGLBuffer.h>
+#include "Grapple/Renderer/RendererAPI.h"
+#include "Grapple/Platform/OpenGL/OpenGLBuffer.h"
 
 namespace Grapple
 {

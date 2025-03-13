@@ -1,7 +1,7 @@
 #include "GraphicsContext.h"
 
-#include <Grapple/Platform/OpenGL/OpenGLGraphicsContext.h>
-#include <Grapple/Renderer/RendererAPI.h>
+#include "Grapple/Platform/OpenGL/OpenGLGraphicsContext.h"
+#include "Grapple/Renderer/RendererAPI.h"
 
 namespace Grapple
 {

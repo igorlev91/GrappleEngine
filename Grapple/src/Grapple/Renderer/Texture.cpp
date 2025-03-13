@@ -1,8 +1,7 @@
 #include "Texture.h"
 
-#include <Grapple/Renderer/RendererAPI.h>
-
-#include <Grapple/Platform/OpenGL/OpenGLTexture.h>
+#include "Grapple/Renderer/RendererAPI.h"
+#include "Grapple/Platform/OpenGL/OpenGLTexture.h"
 
 namespace Grapple
 {

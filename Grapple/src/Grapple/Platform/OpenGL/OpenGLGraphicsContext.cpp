@@ -1,6 +1,6 @@
 #include "OpenGLGraphicsContext.h"
 
-#include <iostream>
+#include "Grapple.h"
 
 namespace Grapple
 {
@@ -16,9 +16,7 @@ namespace Grapple
 
 		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 		if (!status)
-		{
-			std::cout << "Failed to initialize glad\n";
-		}
+			Grapple_CORE_CRITICAL("Failed to initialize GLAD");
 	}
 
 	void OpenGLGraphicsContext::SwapBuffers()

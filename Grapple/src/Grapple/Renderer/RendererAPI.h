@@ -1,8 +1,7 @@
 #pragma once
 
-#include <Grapple/Core/Core.h>
-
-#include <Grapple/Renderer/VertexArray.h>
+#include "Grapple/Core/Core.h"
+#include "Grapple/Renderer/VertexArray.h"
 
 #include <stdint.h>
 

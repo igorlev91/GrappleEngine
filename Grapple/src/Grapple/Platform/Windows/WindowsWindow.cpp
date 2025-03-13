@@ -1,6 +1,6 @@
 #include "WindowsWindow.h"
 
-#include <iostream>
+#include "Grapple.h"
 
 namespace Grapple
 {
@@ -17,7 +17,7 @@ namespace Grapple
 			int result = glfwInit();
 			if (result == 0)
 			{
-				std::cout << "Failed to initialize glfw\n";
+				Grapple_CORE_CRITICAL("Failed to initialize GLFW");
 				return;
 			}
 		}
@@ -28,17 +28,25 @@ namespace Grapple
 		m_GraphicsContext->Initialize();
 
 		glfwSetWindowUserPointer(m_Window, (void*) &m_Data);
-	}
 
+		glfwSetWindowCloseCallback(m_Window, [](GLFWwindow* window)
+		{
+			WindowData* data = (WindowData*)glfwGetWindowUserPointer(window);
+			
+			WindowCloseEvent event;
+			data->Callback(event);
+		});
 
-	bool WindowsWindow::ShouldClose()
-	{
-		return glfwWindowShouldClose(m_Window);
-	}
-
-	WindowProperties& WindowsWindow::GetProperties()
-	{
-		return m_Data.Properties;
+		glfwSetWindowSizeCallback(m_Window, [](GLFWwindow* window, int width, int height)
+		{
+			WindowData* data = (WindowData*)glfwGetWindowUserPointer(window);
+			data->Properties.Width = width;
+			data->Properties.Height = height;
+			data->Properties.IsMinimized = width == 0 && height == 0;
+			
+			WindowResizeEvent event(width, height);
+			data->Callback(event);
+		});
 	}
 
 	void WindowsWindow::OnUpdate()
