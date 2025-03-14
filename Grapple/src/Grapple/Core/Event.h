@@ -14,8 +14,8 @@ namespace Grapple
 		MouseButtonPressed,
 		MouseButtonReleased,
 
-		MouseMoved,
-		MouseScrolled,
+		MouseMove,
+		MouseScroll,
 
 		KeyPressed,
 		KeyReleased,
