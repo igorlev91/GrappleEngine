@@ -14,6 +14,9 @@
 #include "Grapple/Renderer/Texture.h"
 #include "Grapple/Renderer/VertexArray.h"
 
+#include "Grapple/Renderer/Sprite.h"
+
 #include <stdint.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/compatibility.hpp>
