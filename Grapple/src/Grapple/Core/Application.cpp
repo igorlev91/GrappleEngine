@@ -38,8 +38,13 @@ namespace Grapple
 	{
 		while (m_Running)
 		{
-			OnUpdate();
+			float currentTime = Time::GetTime();
+			float deltaTime = currentTime - m_PreviousFrameTime;
+
+			OnUpdate(deltaTime);
 			m_Window->OnUpdate();
+
+			m_PreviousFrameTime = currentTime;
 		}
 	}
 
