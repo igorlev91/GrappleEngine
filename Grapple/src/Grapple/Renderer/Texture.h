@@ -6,6 +6,12 @@
 
 namespace Grapple
 {
+	enum class TextureWrap
+	{
+		Clamp,
+		Repeat,
+	};
+
 	enum class TextureFormat
 	{
 		RGB8,
