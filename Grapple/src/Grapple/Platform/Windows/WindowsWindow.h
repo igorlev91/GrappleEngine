@@ -18,6 +18,8 @@ namespace Grapple
 		virtual void SetVSync(bool vsync) override;
 
 		virtual void OnUpdate() override;
+
+		GLFWwindow* GetGLFWWindow() const { return m_Window; }
 	private:
 		void Initialize();
 		void Release();

@@ -4,6 +4,8 @@
 #include "Grapple/Core/Log.h"
 #include "Grapple/Core/Assert.h"
 
+#include "Grapple/Core/Time.h"
+
 // Rendering
 
 #include "Grapple/Renderer/Buffer.h"

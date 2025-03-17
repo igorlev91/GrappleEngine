@@ -8,6 +8,9 @@ project "Grapple"
     {
         "src/**.h",
         "src/**.cpp",
+
+		"vendor/stb_image/stb_image/**.h",
+		"vendor/stb_image/stb_image/**.cpp",
     }
 
     includedirs
@@ -16,12 +19,16 @@ project "Grapple"
 		INCLUDE_DIRS.GLAD,
 		INCLUDE_DIRS.GLFW,
 		INCLUDE_DIRS.glm,
+		INCLUDE_DIRS.stb_image,
+		INCLUDE_DIRS.spdlog,
+		INCLUDE_DIRS.imgui,
 	}
 
 	links
 	{
 		"GLAD",
-		"GLFW"
+		"GLFW",
+		"ImGUI",
 	}
 
 	defines

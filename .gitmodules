@@ -7,3 +7,6 @@
 [submodule ".\\Grapple\\vendor\\spdlog"]
 	path = .\\Grapple\\vendor\\spdlog
 	url = https://github.com/gabime/spdlog
+[submodule ".\\Grapple\\vendor\\ImGUI"]
+	path = .\\Grapple\\vendor\\ImGUI
+	url = https://github.com/igorlev91/imgui.git

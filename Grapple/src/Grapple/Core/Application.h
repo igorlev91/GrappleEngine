@@ -2,6 +2,7 @@
 
 #include "Grapple/Core/Window.h"
 #include "Grapple/Core/LayerStack.h"
+#include "Grapple/Core/ImGUILayer.h"
 
 namespace Grapple
 {
@@ -23,6 +24,7 @@ namespace Grapple
 		Ref<Window> m_Window;
 	private:
 		LayerStack m_LayersStack;
+		Ref<ImGUILayer> m_ImGuiLayer;
 
 		bool m_Running;
 		float m_PreviousFrameTime;
