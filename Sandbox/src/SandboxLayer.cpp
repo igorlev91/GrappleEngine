@@ -4,6 +4,8 @@
 #include "Grapple/Core/Application.h"
 #include "Grapple/Renderer2D/Renderer2D.h"
 
+#include <imgui.h>
+
 namespace Grapple
 {
 	SandboxLayer::SandboxLayer()
@@ -55,6 +57,15 @@ namespace Grapple
 			CalculateProjection(m_CameraSize);
 			return false;
 		});
+	}
+
+	void SandboxLayer::OnImGUIRender()
+	{
+		ImGui::Begin("Sandbox Layer Window");
+
+		ImGui::Button("Button");
+
+		ImGui::End();
 	}
 
 	void SandboxLayer::CalculateProjection(float size)

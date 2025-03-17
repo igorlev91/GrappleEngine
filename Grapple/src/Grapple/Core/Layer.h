@@ -18,6 +18,7 @@ namespace Grapple
 		virtual void OnDetach() {}
 
 		virtual void OnUpdate(float deltaTime) {}
+		virtual void OnImGUIRender() {}
 
 		virtual void OnEvent(Event& event) {}
 	public:

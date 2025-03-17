@@ -16,11 +16,13 @@ project "Sandbox"
 		"%{wks.location}/Grapple/src",
 		INCLUDE_DIRS.glm,
 		INCLUDE_DIRS.spdlog,
+		INCLUDE_DIRS.imgui,
     }
 
 	links
 	{
-		"Grapple"
+		"Grapple",
+		"ImGUI"
 	}
 
 	targetdir("%{wks.location}/bin/" .. OUTPUT_DIRECTORY .. "/%{prj.name}")
