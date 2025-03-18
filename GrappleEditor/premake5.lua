@@ -1,4 +1,4 @@
-project "Sandbox"
+project "GrappleEditor"
     kind "ConsoleApp"
 	language "C++"
 	cppdialect "C++17"
@@ -14,6 +14,8 @@ project "Sandbox"
     {
         "src",
 		"%{wks.location}/Grapple/src",
+		"%{wks.location}/GrappleCommon/src",
+		"%{wks.location}/GrappleECS/src",
 		INCLUDE_DIRS.glm,
 		INCLUDE_DIRS.spdlog,
 		INCLUDE_DIRS.imgui,
@@ -22,7 +24,9 @@ project "Sandbox"
 	links
 	{
 		"Grapple",
-		"ImGUI"
+		"ImGUI",
+		"GrappleCommon",
+		"GrappleECS",
 	}
 
 	targetdir("%{wks.location}/bin/" .. OUTPUT_DIRECTORY .. "/%{prj.name}")
