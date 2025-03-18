@@ -1,5 +1,7 @@
 #pragma once
 
+#include "GrappleECS/Archetype.h"
+
 #include <stdint.h>
 #include <xhash>
 
@@ -36,7 +38,7 @@ namespace Grapple
 	struct EntityRecord
 	{
 		size_t RegistryIndex;
-		size_t ArchetypeId;
+		ArchetypeId Archetype;
 		size_t BufferIndex;
 	};
 }
