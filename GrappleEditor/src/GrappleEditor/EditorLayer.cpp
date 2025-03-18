@@ -7,8 +7,27 @@
 
 #include <imgui.h>
 
+
 namespace Grapple
 {
+	struct TestComponent
+	{
+		static ComponentId Id;
+
+		float FloatA;
+		glm::vec4 Vec;
+	};
+
+	struct TransformComponent
+	{
+		static ComponentId Id;
+
+		glm::vec3 Position;
+	};
+
+	size_t TestComponent::Id = 0;
+	size_t TransformComponent::Id = 0;
+
 	EditorLayer::EditorLayer()
 		: Layer("EditorLayer")
 	{
@@ -31,6 +50,36 @@ namespace Grapple
 		RenderCommand::SetClearColor(0.04f, 0.07f, 0.1f, 1.0f);
 
 		CalculateProjection(m_CameraSize);
+
+		TestComponent::Id = m_World.GetRegistry().RegisterComponent(typeid(TestComponent).name(), sizeof(TestComponent));
+		TransformComponent::Id = m_World.GetRegistry().RegisterComponent(typeid(TransformComponent).name(), sizeof(TransformComponent));
+
+		ComponentId components[] = { TestComponent::Id, TransformComponent::Id };
+		Entity ents[2];
+		ents[0] = m_World.GetRegistry().CreateEntity(ComponentSet(components, 2));
+		ents[1] = m_World.GetRegistry().CreateEntity(ComponentSet(components, 2));
+
+		for (uint32_t i = 0; i < 2; i++)
+		{
+			std::optional<void*> result = m_World.GetRegistry().GetEntityComponent(ents[i], TestComponent::Id);
+
+			TestComponent& component = *(TestComponent*)result.value();
+			component.FloatA = 10.0f + (float) i;
+			component.Vec = glm::vec4(1.0f, 0.4f, 0.1f, 0.9f);
+
+			std::optional<void*> transformResult = m_World.GetRegistry().GetEntityComponent(ents[i], TransformComponent::Id);
+			TransformComponent& transform = *(TransformComponent*)transformResult.value();
+			transform.Position = glm::vec3(0.0f, 1.0f, i);
+		}
+
+		for (uint32_t i = 0; i < 2; i++)
+		{
+			std::optional<void*> result = m_World.GetRegistry().GetEntityComponent(ents[i], TestComponent::Id);
+			TestComponent& component = *(TestComponent*)result.value();
+
+			std::optional<void*> transformResult = m_World.GetRegistry().GetEntityComponent(ents[i], TransformComponent::Id);
+			TransformComponent& transform = *(TransformComponent*)transformResult.value();
+		}
 	}
 
 	void EditorLayer::OnUpdate(float deltaTime)
