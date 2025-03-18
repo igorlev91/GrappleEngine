@@ -2,7 +2,7 @@ include "dependencies.lua"
 
 workspace "Grapple"
 	architecture "x86_64"
-	startproject "Sandbox"
+	startproject "GrappleEditor"
 
 	configurations
 	{
@@ -25,7 +25,12 @@ group "Dependencies"
 group ""
 
 group "Core"
+	include "GrappleCommon"
 	include "Grapple"
+group ""
+
+group "Editor"
+	include "GrappleEditor"
 group ""
 
 group "Sandbox"

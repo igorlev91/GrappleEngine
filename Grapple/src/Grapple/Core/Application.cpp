@@ -1,5 +1,6 @@
 #include "Application.h"
 
+#include "Grapple/Renderer2D/Renderer2D.h"
 #include "Grapple/Renderer/RenderCommand.h"
 
 namespace Grapple
@@ -45,6 +46,12 @@ namespace Grapple
 		PushOverlay(m_ImGuiLayer);
 
 		RenderCommand::Initialize();
+		Renderer2D::Initialize();
+	}
+
+	Application::~Application()
+	{
+		Renderer2D::Shutdown();
 	}
 
 	void Application::Run()

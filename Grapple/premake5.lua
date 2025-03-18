@@ -16,6 +16,7 @@ project "Grapple"
     includedirs
 	{
 		"src/",
+		"%{wks.location}/GrappleCommon/src/",
 		INCLUDE_DIRS.GLAD,
 		INCLUDE_DIRS.GLFW,
 		INCLUDE_DIRS.glm,
@@ -29,6 +30,7 @@ project "Grapple"
 		"GLAD",
 		"GLFW",
 		"ImGUI",
+		"GrappleCommon"
 	}
 
 	defines

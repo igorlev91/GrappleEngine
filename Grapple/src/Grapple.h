@@ -15,6 +15,7 @@
 #include "Grapple/Renderer/Shader.h"
 #include "Grapple/Renderer/Texture.h"
 #include "Grapple/Renderer/VertexArray.h"
+#include "Grapple/Renderer/FrameBuffer.h"
 
 #include "Grapple/Renderer/Sprite.h"
 

@@ -76,7 +76,7 @@ namespace Grapple
 	}
 
 	void SandboxLayer::OnImGUIRender()
-	{
+	{		
 		{
 			ImGui::Begin("Renderer 2D");
 

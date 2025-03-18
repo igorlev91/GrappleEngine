@@ -10,6 +10,7 @@ namespace Grapple
 	{
 	public:
 		Application();
+		virtual ~Application();
 
 		void Run();
 		void Close();

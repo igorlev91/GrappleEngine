@@ -1,5 +1,5 @@
-project "GrappleEditor"
-    kind "ConsoleApp"
+project "GrappleCommon"
+    kind "StaticLib"
 	language "C++"
 	cppdialect "C++17"
 	staticruntime "off"
@@ -11,20 +11,9 @@ project "GrappleEditor"
     }
 
     includedirs
-    {
-        "src",
-		"%{wks.location}/Grapple/src",
-		"%{wks.location}/GrappleCommon/src",
-		INCLUDE_DIRS.glm,
-		INCLUDE_DIRS.spdlog,
-		INCLUDE_DIRS.imgui,
-    }
-
-	links
 	{
-		"Grapple",
-		"ImGUI",
-		"GrappleCommon"
+		"src/",
+		INCLUDE_DIRS.spdlog,
 	}
 
 	targetdir("%{wks.location}/bin/" .. OUTPUT_DIRECTORY .. "/%{prj.name}")
@@ -47,4 +36,3 @@ project "GrappleEditor"
 		defines "Grapple_DIST"
 		runtime "Release"
 		optimize "on"
-
