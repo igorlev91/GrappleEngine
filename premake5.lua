@@ -27,6 +27,7 @@ group ""
 group "Core"
 	include "GrappleCommon"
 	include "Grapple"
+	include "GrappleECS"
 group ""
 
 group "Editor"
