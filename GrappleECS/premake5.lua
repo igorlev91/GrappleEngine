@@ -13,12 +13,14 @@ project "GrappleECS"
     includedirs
 	{
 		"src/",
-		"%{wks.location}/GrappleCommon/src/"
+		"%{wks.location}/GrappleCommon/src/",
+		INCLUDE_DIRS.spdlog,
 	}
 
 	links
 	{
 		"GrappleCommon",
+		"GrappleECS",
 	}
 
 	targetdir("%{wks.location}/bin/" .. OUTPUT_DIRECTORY .. "/%{prj.name}")
