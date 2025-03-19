@@ -5,8 +5,13 @@
 
 #include "Grapple/Renderer2D/Renderer2D.h"
 
-#include <imgui.h>
+#include "GrappleECS/Registry.h"
+#include "GrappleECS/Query/EntityView.h"
+#include "GrappleECS/Query/EntityViewIterator.h"
+#include "GrappleECS/Query/EntityRegistryIterator.h"
+#include "GrappleECS/Query/ComponentView.h"
 
+#include <imgui.h>
 
 namespace Grapple
 {
@@ -25,8 +30,16 @@ namespace Grapple
 		glm::vec3 Position;
 	};
 
+	struct TagComponent
+	{
+		static ComponentId Id;
+
+		const char* Name;
+	};
+
 	size_t TestComponent::Id = 0;
 	size_t TransformComponent::Id = 0;
+	size_t TagComponent::Id = 0;
 
 	EditorLayer::EditorLayer()
 		: Layer("EditorLayer")
@@ -51,34 +64,34 @@ namespace Grapple
 
 		CalculateProjection(m_CameraSize);
 
-		TestComponent::Id = m_World.GetRegistry().RegisterComponent(typeid(TestComponent).name(), sizeof(TestComponent));
-		TransformComponent::Id = m_World.GetRegistry().RegisterComponent(typeid(TransformComponent).name(), sizeof(TransformComponent));
 
-		ComponentId components[] = { TestComponent::Id, TransformComponent::Id };
-		Entity ents[2];
-		ents[0] = m_World.GetRegistry().CreateEntity(ComponentSet(components, 2));
-		ents[1] = m_World.GetRegistry().CreateEntity(ComponentSet(components, 2));
 
-		for (uint32_t i = 0; i < 2; i++)
 		{
-			std::optional<void*> result = m_World.GetRegistry().GetEntityComponent(ents[i], TestComponent::Id);
+			TestComponent::Id = m_World.GetRegistry().RegisterComponent(typeid(TestComponent).name(), sizeof(TestComponent));
+			TransformComponent::Id = m_World.GetRegistry().RegisterComponent(typeid(TransformComponent).name(), sizeof(TransformComponent));
+			TagComponent::Id = m_World.GetRegistry().RegisterComponent(typeid(TagComponent).name(), sizeof(TagComponent));
 
-			TestComponent& component = *(TestComponent*)result.value();
-			component.FloatA = 10.0f + (float) i;
-			component.Vec = glm::vec4(1.0f, 0.4f, 0.1f, 0.9f);
+			ComponentId components[] = { TestComponent::Id, TransformComponent::Id };
+			Entity ents[2];
+			ents[0] = m_World.GetRegistry().CreateEntity(ComponentSet(components, 2));
+			ents[1] = m_World.GetRegistry().CreateEntity(ComponentSet(components, 2));
 
-			std::optional<void*> transformResult = m_World.GetRegistry().GetEntityComponent(ents[i], TransformComponent::Id);
-			TransformComponent& transform = *(TransformComponent*)transformResult.value();
-			transform.Position = glm::vec3(0.0f, 1.0f, i);
+			for (uint32_t i = 0; i < 2; i++)
+			{
+				std::optional<void*> result = m_World.GetRegistry().GetEntityComponent(ents[i], TestComponent::Id);
+
+				TestComponent& component = *(TestComponent*)result.value();
+				component.FloatA = 10.0f + (float) i;
+				component.Vec = glm::vec4(1.0f, 0.4f, 0.1f, 0.9f);
+
+				std::optional<void*> transformResult = m_World.GetRegistry().GetEntityComponent(ents[i], TransformComponent::Id);
+				TransformComponent& transform = *(TransformComponent*)transformResult.value();
+				transform.Position = glm::vec3(0.0f, 1.0f, i);
+			}
 		}
 
-		for (uint32_t i = 0; i < 2; i++)
 		{
-			std::optional<void*> result = m_World.GetRegistry().GetEntityComponent(ents[i], TestComponent::Id);
-			TestComponent& component = *(TestComponent*)result.value();
-
-			std::optional<void*> transformResult = m_World.GetRegistry().GetEntityComponent(ents[i], TransformComponent::Id);
-			TransformComponent& transform = *(TransformComponent*)transformResult.value();
+			m_TestEntity = m_World.GetRegistry().CreateEntity(ComponentSet(&TestComponent::Id, 1));
 		}
 	}
 
@@ -201,6 +214,53 @@ namespace Grapple
 
 			ImGui::End();
 			ImGui::PopStyleVar();
+		}
+
+		{
+			ImGui::Begin("ECS");
+
+			if (ImGui::CollapsingHeader("Registry"))
+			{
+				for (Entity entity : m_World.GetRegistry())
+				{
+					ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_FramePadding;
+					bool opened = ImGui::TreeNodeEx((void*)std::hash<Entity>()(entity), flags, "Entity");
+
+					if (opened)
+					{
+						for (ComponentId component : m_World.GetRegistry().GetEntityComponents(entity))
+							ImGui::Text("%s", m_World.GetRegistry().GetComponentInfo(component).Name.c_str());
+						
+						ImGui::TreePop();
+					}
+				}
+			}
+
+			if (ImGui::CollapsingHeader("Components"))
+			{
+				const auto& components = m_World.GetRegistry().GetRegisteredComponents();
+				for (const auto& component : components)
+				{
+					ImGui::Separator();
+					ImGui::Text("Id: %d", component.Id);
+					ImGui::Text("Name: %s", component.Name.c_str());
+					ImGui::Text("Size: %d", component.Size);
+				}
+			}
+
+			if (ImGui::Button("Add transform component"))
+			{
+				TransformComponent transform = TransformComponent{ glm::vec3(1.0f, 0.0f, 234.0f) };
+				m_World.GetRegistry().AddEntityComponent(m_TestEntity, TransformComponent::Id, &transform);
+			}
+
+			if (ImGui::Button("Add tag component"))
+			{
+				TagComponent tag = TagComponent{ "Tag" };
+				m_World.GetRegistry().AddEntityComponent(m_TestEntity, TagComponent::Id, &tag);
+			}
+
+			ImGui::End();
 		}
 
 		ImGui::End();
