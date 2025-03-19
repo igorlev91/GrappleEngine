@@ -21,6 +21,7 @@ namespace Grapple
 	public:
 		Entity CreateEntity(ComponentSet& components);
 		bool AddEntityComponent(Entity entity, ComponentId componentId, const void* componentData);
+		bool RemoveEntityComponent(Entity entity, ComponentId componentId);
 
 		EntityView View(ComponentSet components);
 		const ComponentSet& GetEntityComponents(Entity entity);
