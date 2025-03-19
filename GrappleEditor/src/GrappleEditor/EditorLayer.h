@@ -4,6 +4,7 @@
 #include "Grapple/Core/Layer.h"
 
 #include "GrappleECS/World.h"
+#include "GrappleECS/Registry.h"
 
 namespace Grapple
 {
@@ -37,6 +38,7 @@ namespace Grapple
 		glm::i32vec2 m_ViewportSize = glm::i32vec2(0.0f);
 
 		World m_World;
+		QueryId m_Query;
 		Entity m_TestEntity;
 	};
 }

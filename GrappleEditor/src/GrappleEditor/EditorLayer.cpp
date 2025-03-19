@@ -9,6 +9,7 @@
 #include "GrappleECS/Query/EntityView.h"
 #include "GrappleECS/Query/EntityViewIterator.h"
 #include "GrappleECS/Query/EntityRegistryIterator.h"
+#include "GrappleECS/Query/EntityArchetypesView.h"
 #include "GrappleECS/Query/ComponentView.h"
 
 #include <imgui.h>
@@ -92,6 +93,10 @@ namespace Grapple
 
 		{
 			m_TestEntity = m_World.GetRegistry().CreateEntity(ComponentSet(&TestComponent::Id, 1));
+		}
+
+		{
+			m_Query = m_World.GetRegistry().CreateQuery(ComponentSet(&TransformComponent::Id, 1));
 		}
 	}
 
@@ -219,6 +224,11 @@ namespace Grapple
 		{
 			ImGui::Begin("ECS");
 
+			if (ImGui::Button("Create Entity"))
+			{
+				m_TestEntity = m_World.GetRegistry().CreateEntity(ComponentSet(&TestComponent::Id, 1));
+			}
+
 			if (ImGui::CollapsingHeader("Registry"))
 			{
 				for (Entity entity : m_World.GetRegistry())
@@ -279,6 +289,24 @@ namespace Grapple
 			}
 
 			ImGui::End();
+
+			{
+				ImGui::Begin("ECS Query");
+
+				EntityArchetypesView view = m_World.GetRegistry().ExecuteQuery(m_Query);
+				for (EntityView entityView : view)
+				{
+					ComponentView<TransformComponent> transforms = entityView.View<TransformComponent>();
+
+					for (EntityViewElement entity : entityView)
+					{
+						ImGui::Separator();
+						ImGui::DragFloat3("Position", glm::value_ptr(transforms[entity].Position));
+					}
+				}
+
+				ImGui::End();
+			}
 		}
 
 		ImGui::End();

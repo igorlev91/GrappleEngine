@@ -2,6 +2,7 @@
 
 #include "GrappleECS/Query/EntityView.h"
 #include "GrappleECS/Query/EntityRegistryIterator.h"
+#include "GrappleECS/Query/EntityArchetypesView.h"
 
 #include <algorithm>
 
@@ -46,6 +47,8 @@ namespace Grapple
 
 			for (size_t i = 0; i < newArchetype.Data.Components.size(); i++)
 				m_ComponentToArchetype[newArchetype.Data.Components[i]].emplace(newArchetypeId, i);
+
+			m_QueryCache.OnArchetypeCreated(newArchetypeId);
 		}
 
 		ArchetypeRecord& archetypeRecord = m_Archetypes[record.Archetype];
@@ -111,6 +114,7 @@ namespace Grapple
 				}
 			}
 
+			bool shouldNotifyQueryCache = false;
 			auto it = m_ComponentSetToArchetype.find(ComponentSet(newComponents));
 			if (it != m_ComponentSetToArchetype.end())
 			{
@@ -133,6 +137,8 @@ namespace Grapple
 
 				newArchetype.Storage.SetEntitySize(entitySize);
 				m_ComponentSetToArchetype.emplace(ComponentSet(newArchetype.Data.Components), newArchetypeId);
+
+				shouldNotifyQueryCache = true;
 			}
 
 			m_Archetypes[entityRecord.Archetype].Data.Edges.emplace(componentId, ArchetypeEdge{newArchetypeId, INVALID_ARCHETYPE_ID});
@@ -141,6 +147,9 @@ namespace Grapple
 			ArchetypeRecord& newArchetype = m_Archetypes[newArchetypeId];
 			for (size_t i = 0; i < newArchetype.Data.Components.size(); i++)
 				m_ComponentToArchetype[newArchetype.Data.Components[i]].emplace(newArchetypeId, i);
+
+			if (shouldNotifyQueryCache)
+				m_QueryCache.OnArchetypeCreated(newArchetypeId);
 		}
 
 		Grapple_CORE_ASSERT(insertedComponentIndex != SIZE_MAX);
@@ -314,7 +323,12 @@ namespace Grapple
 		return EntityRegistryIterator(*this, m_EntityRecords.size());
 	}
 
-	EntityView Registry::View(ComponentSet components)
+	QueryId Registry::CreateQuery(const ComponentSet& components)
+	{
+		return m_QueryCache.AddQuery(components);
+	}
+
+	EntityView Registry::QueryArchetype(ComponentSet components)
 	{
 		std::sort(components.GetIds(), components.GetIds() + components.GetCount());
 		auto it = m_ComponentSetToArchetype.find(components);
@@ -323,6 +337,12 @@ namespace Grapple
 
 		size_t archetypeId = it->second;
 		return EntityView(*this, archetypeId);
+	}
+
+	EntityArchetypesView Registry::ExecuteQuery(QueryId query)
+	{
+		const QueryData& data = m_QueryCache[query];
+		return EntityArchetypesView(*this, data.MatchedArchetypes);
 	}
 
 	const ComponentSet& Registry::GetEntityComponents(Entity entity)
