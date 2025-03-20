@@ -15,6 +15,8 @@ namespace Grapple
 	class Registry;
 
 	using QueryId = size_t;
+	constexpr QueryId INVALID_QUERY_ID = SIZE_MAX;
+
 	class QueryCache
 	{
 	public:
