@@ -6,14 +6,14 @@ namespace Grapple
 	{
 		Grapple_CORE_ASSERT(m_EntitySize > 0, "Entity has no size");
 
-		if (!m_Chunk.IsAllocated())
-			m_Chunk.Allocate();
+		if (m_EntitiesCount % m_EntitiesPerChunk == 0)
+		{
+			m_Chunks.emplace_back().Allocate();
+		}
 
 		size_t index = m_EntitiesCount;
-		size_t offset = m_EntitySize * m_EntitiesCount;
-
-		Grapple_CORE_ASSERT(offset < m_Chunk.GetSize());
-		Grapple_CORE_ASSERT(offset + m_EntitySize <= m_Chunk.GetSize());
+		size_t offset = (m_EntitySize * m_EntitiesCount) % DefaultStorageChunkSize;
+		size_t chunkIndex = m_EntitiesCount / m_EntitiesPerChunk;
 
 		m_EntityIndices.push_back(registryIndex);
 
@@ -23,12 +23,11 @@ namespace Grapple
 
 	uint8_t* EntityStorage::GetEntityData(size_t entityIndex)
 	{
-		size_t bytesOffset = entityIndex * m_EntitySize;
+		size_t bytesOffset = (entityIndex * m_EntitySize) % DefaultStorageChunkSize;
+		size_t chunkIndex = entityIndex / m_EntitiesPerChunk;
 
-		Grapple_CORE_ASSERT(m_Chunk.IsAllocated());
-		Grapple_CORE_ASSERT(bytesOffset < m_Chunk.GetSize());
-
-		return m_Chunk.GetBuffer() + bytesOffset;
+		Grapple_CORE_ASSERT(chunkIndex < m_Chunks.size());
+		return m_Chunks[chunkIndex].GetBuffer() + bytesOffset;
 	}
 
 	void EntityStorage::RemoveEntityData(size_t entityIndex)
@@ -47,7 +46,8 @@ namespace Grapple
 
 	void EntityStorage::SetEntitySize(size_t entitySize)
 	{
-		Grapple_CORE_ASSERT(!(m_Chunk.IsAllocated() && m_EntitiesCount > 0), "Entity size can only be set if the storage is empty");
+		Grapple_CORE_ASSERT(m_EntitiesCount == 0, "Entity size can only be set if the storage is empty");
 		m_EntitySize = entitySize;
+		m_EntitiesPerChunk = DefaultStorageChunkSize / entitySize;
 	}
 }

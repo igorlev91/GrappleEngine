@@ -39,5 +39,8 @@ namespace Grapple
 		World m_World;
 		QueryId m_Query;
 		Entity m_TestEntity;
+
+		bool m_ShowECSWindow;
+		bool m_ShowQueryWindow;
 	};
 }
