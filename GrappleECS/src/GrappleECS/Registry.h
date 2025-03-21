@@ -22,9 +22,7 @@ namespace Grapple
 	class Registry
 	{
 	public:
-		Registry()
-			: m_QueryCache(*this) {}
-
+		Registry();
 	public:
 		// Entity operations
 

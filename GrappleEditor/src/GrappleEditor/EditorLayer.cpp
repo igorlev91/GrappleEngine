@@ -12,6 +12,8 @@
 #include "GrappleECS/Query/EntityArchetypesView.h"
 #include "GrappleECS/Query/ComponentView.h"
 
+#include "GrappleECS/EntityStorage/EntityChunksPool.h"
+
 #include <imgui.h>
 
 namespace Grapple

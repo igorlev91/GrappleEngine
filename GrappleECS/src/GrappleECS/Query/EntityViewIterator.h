@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GrappleECS/EntityStorage.h"
+#include "GrappleECS/EntityStorage/EntityStorage.h"
 
 namespace Grapple
 {

@@ -4,10 +4,18 @@
 #include "GrappleECS/Query/EntityRegistryIterator.h"
 #include "GrappleECS/Query/EntityArchetypesView.h"
 
+#include "GrappleECS/EntityStorage/EntityChunksPool.h"
+
 #include <algorithm>
 
 namespace Grapple
 {
+	Registry::Registry()
+		: m_QueryCache(*this)
+	{
+		EntityChunksPool::Initialize(16);
+	}
+
 	Entity Registry::CreateEntity(ComponentSet& components)
 	{
 		Grapple_CORE_ASSERT(components.GetCount() > 0);
