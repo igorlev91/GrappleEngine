@@ -20,29 +20,28 @@ namespace Grapple
 {
 	struct TestComponent
 	{
-		static ComponentId Id;
+		Grapple_COMPONENT;
 
 		float FloatA;
 		glm::vec4 Vec;
 	};
+	Grapple_COMPONENT_IMPL(TestComponent);
 
 	struct TransformComponent
 	{
-		static ComponentId Id;
+		Grapple_COMPONENT;
 
 		glm::vec3 Position;
 	};
+	Grapple_COMPONENT_IMPL(TransformComponent);
 
 	struct TagComponent
 	{
-		static ComponentId Id;
+		Grapple_COMPONENT;
 
 		const char* Name;
 	};
-
-	size_t TestComponent::Id = 0;
-	size_t TransformComponent::Id = 0;
-	size_t TagComponent::Id = 0;
+	Grapple_COMPONENT_IMPL(TagComponent);
 
 	EditorLayer::EditorLayer()
 		: Layer("EditorLayer")

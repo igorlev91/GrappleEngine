@@ -8,6 +8,9 @@
 #include <vector>
 #include <string_view>
 
+#define Grapple_COMPONENT static Grapple::ComponentId Id;
+#define Grapple_COMPONENT_IMPL(name) Grapple::ComponentId name::Id = INVALID_COMPONENT_ID;
+
 namespace Grapple
 {
 	class World

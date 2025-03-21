@@ -11,6 +11,8 @@
 namespace Grapple
 {
 	using ComponentId = size_t;
+	constexpr ComponentId INVALID_COMPONENT_ID = SIZE_MAX;
+
 	struct ComponentInfo
 	{
 		ComponentId Id;
