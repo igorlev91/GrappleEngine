@@ -8,7 +8,7 @@ namespace Grapple
 		: m_EntitySize(0), m_EntitiesCount(0), m_EntitiesPerChunk(0) {}
 	
 	EntityStorage::EntityStorage(EntityStorage&& other) noexcept
-		: m_Chunks(std::move(other.m_Chunks)), m_EntityIndices(std::move(other.m_EntitiesCount)),
+		: m_Chunks(std::move(other.m_Chunks)), m_EntityIndices(std::move(other.m_EntityIndices)),
 		m_EntitySize(other.m_EntitySize), m_EntitiesPerChunk(other.m_EntitiesPerChunk), m_EntitiesCount(other.m_EntitiesCount)
 	{
 		other.m_EntitiesCount = 0;
@@ -33,7 +33,7 @@ namespace Grapple
 		return index;
 	}
 
-	uint8_t* EntityStorage::GetEntityData(size_t entityIndex)
+	uint8_t* EntityStorage::GetEntityData(size_t entityIndex) const
 	{
 		size_t bytesOffset = (entityIndex * m_EntitySize) % ENTITY_CHUNK_SIZE;
 		size_t chunkIndex = entityIndex / m_EntitiesPerChunk;
