@@ -1,7 +1,7 @@
 #pragma once
 
 #include "GrappleECS/Registry.h"
-#include "GrappleECS/Component.h"
+#include "GrappleECS/Entity/Component.h"
 
 #include "GrappleECS/System/System.h"
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GrappleECS/Archetype.h"
+#include "GrappleECS/Entity/Archetype.h"
 
 #include "GrappleECS/Query/EntityView.h"
 #include "GrappleECS/Query/QueryCache.h"

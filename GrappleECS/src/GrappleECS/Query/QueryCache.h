@@ -2,8 +2,8 @@
 
 #include "Grapple/Core/Assert.h"
 
-#include "GrappleECS/Component.h"
-#include "GrappleECS/Archetype.h"
+#include "GrappleECS/Entity/Component.h"
+#include "GrappleECS/Entity/Archetype.h"
 
 #include "GrappleECS/Query/QueryData.h"
 

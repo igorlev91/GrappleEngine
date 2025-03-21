@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GrappleECS/Component.h"
+#include "GrappleECS/Entity/Component.h"
 #include "GrappleECS/EntityStorage/EntityStorage.h"
 
 #include <vector>
