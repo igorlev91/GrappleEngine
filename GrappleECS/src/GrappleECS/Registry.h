@@ -6,6 +6,7 @@
 #include "GrappleECS/Entity/Entity.h"
 #include "GrappleECS/Entity/Component.h"
 #include "GrappleECS/Entity/Archetype.h"
+#include "GrappleECS/Entity/EntityIndex.h"
 
 #include "GrappleECS/Query/QueryCache.h"
 
@@ -27,8 +28,10 @@ namespace Grapple
 		// Entity operations
 
 		Entity CreateEntity(ComponentSet& components);
+		void DeleteEntity(Entity entity);
 		bool AddEntityComponent(Entity entity, ComponentId componentId, const void* componentData);
 		bool RemoveEntityComponent(Entity entity, ComponentId componentId);
+		bool IsEntityAlive(Entity entity) const;
 
 		// Component operations
 
@@ -76,6 +79,7 @@ namespace Grapple
 		std::vector<ComponentInfo> m_RegisteredComponents;
 
 		QueryCache m_QueryCache;
+		EntityIndex m_EntityIndex;
 
 		friend class EntityRegistryIterator;
 		friend class QueryCache;

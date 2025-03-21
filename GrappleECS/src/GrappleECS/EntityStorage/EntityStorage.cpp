@@ -68,4 +68,10 @@ namespace Grapple
 		m_EntitySize = entitySize;
 		m_EntitiesPerChunk = ENTITY_CHUNK_SIZE / entitySize;
 	}
+
+	void EntityStorage::UpdateEntityRegistryIndex(size_t entityIndex, size_t newRegistryIndex)
+	{
+		Grapple_CORE_ASSERT(entityIndex < m_EntityIndices.size());
+		m_EntityIndices[entityIndex] = newRegistryIndex;
+	}
 }
