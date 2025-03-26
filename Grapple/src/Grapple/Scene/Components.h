@@ -23,4 +23,11 @@ namespace Grapple
 		float Near;
 		float Far;
 	};
+
+	struct SpriteComponent
+	{
+		Grapple_COMPONENT;
+
+		glm::vec4 Color;
+	};
 }

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Grapple.h"
+
 namespace Grapple
 {
 	class EditorGUI
@@ -9,5 +11,9 @@ namespace Grapple
 		static void EndPropertyGrid();
 
 		static bool FloatPropertyField(const char* name, float& value);
+		static bool Vector3PropertyField(const char* name, glm::vec3& value);
+		static bool ColorPropertyField(const char* name, glm::vec4& color);
+	private:
+		static void RenderPropertyName(const char* name);
 	};
 }
