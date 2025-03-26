@@ -3,8 +3,8 @@
 #include "Grapple.h"
 #include "Grapple/Core/Layer.h"
 
-#include "GrappleECS/World.h"
-#include "GrappleECS/Registry.h"
+#include "GrappleEditor/UI/SceneWindow.h"
+#include "GrappleEditor/UI/PropertiesWindow.h"
 
 namespace Grapple
 {
@@ -19,28 +19,13 @@ namespace Grapple
 		virtual void OnEvent(Event& event) override;
 		virtual void OnImGUIRender() override;
 	private:
-		void CalculateProjection(float size);
-		void DrawComponent(Entity entity, ComponentId componentId);
-	private:
-		Ref<Shader> m_QuadShader;
 		Ref<FrameBuffer> m_FrameBuffer;
 
-		glm::mat4 m_ProjectionMatrix = glm::mat4(0.0f);
-		glm::mat4 m_InverseProjection = glm::mat4(0.0f);
-
-		float m_CameraSize = 24.0f;
 		float m_PreviousFrameTime = 0.0f;
-
-		int32_t m_Width = 20;
-		int32_t m_Height = 20;
 
 		glm::i32vec2 m_ViewportSize = glm::i32vec2(0.0f);
 
-		World m_World;
-		QueryId m_Query;
-		Entity m_TestEntity;
-
-		bool m_ShowECSWindow;
-		bool m_ShowQueryWindow;
+		SceneWindow m_SceneWindow;
+		PropertiesWindow m_PropertiesWindow;
 	};
 }
