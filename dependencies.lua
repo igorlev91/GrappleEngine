@@ -5,4 +5,5 @@ INCLUDE_DIRS = {
 	stb_image = "%{wks.location}/Grapple/vendor/stb_image",
 	spdlog = "%{wks.location}/Grapple/vendor/spdlog/include",
 	imgui = "%{wks.location}/Grapple/vendor/ImGUI/",
+	yaml_cpp = "%{wks.location}/Grapple/vendor/yaml-cpp/include/",
 }

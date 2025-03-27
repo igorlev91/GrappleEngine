@@ -48,13 +48,14 @@ namespace Grapple
 					ImGui::TreePop();
 				}
 
-				if (ImGui::BeginPopupContextItem())
+				// TODO: fix
+				/*if (ImGui::BeginPopupContextItem())
 				{
 					if (ImGui::MenuItem("Remove"))
 						removedComponent = component;
 
 					ImGui::End();
-				}
+				}*/
 			}
 
 			if (removedComponent.has_value())

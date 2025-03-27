@@ -22,6 +22,7 @@ group "Dependencies"
     include "Grapple/vendor/GLFW"
     include "Grapple/vendor/GLAD"
     include "Grapple/vendor/ImGUI"
+    include "Grapple/vendor/yaml-cpp"
 group ""
 
 group "Core"

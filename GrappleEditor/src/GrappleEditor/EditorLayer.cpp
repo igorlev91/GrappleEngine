@@ -2,8 +2,8 @@
 
 #include "Grapple.h"
 #include "Grapple/Core/Application.h"
-
 #include "Grapple/Renderer2D/Renderer2D.h"
+#include "Grapple/Scene/SceneSerializer.h"
 
 #include "GrappleEditor/EditorContext.h"
 
@@ -23,7 +23,7 @@ namespace Grapple
 		uint32_t height = window->GetProperties().Height;
 
 		FrameBufferSpecifications specifications(width, height, {
-			{FrameBufferTextureFormat::RGB8, TextureWrap::Clamp, TextureFiltering::NoFiltering }
+			{ FrameBufferTextureFormat::RGB8, TextureWrap::Clamp, TextureFiltering::NoFiltering }
 		});
 
 		m_FrameBuffer = FrameBuffer::Create(specifications);
@@ -88,6 +88,20 @@ namespace Grapple
 
 		ImGuiID dockspaceId = ImGui::GetID("DockSpace");
 		ImGui::DockSpace(dockspaceId, ImVec2(0.0f, 0.0f), dockspaceFlags);
+
+		if (ImGui::BeginMenuBar())
+		{
+			if (ImGui::BeginMenu("Scene"))
+			{
+				if (ImGui::MenuItem("Open Scene"))
+					SceneSerializer::Deserialize(EditorContext::Instance.ActiveScene, "Scene.Grapple");
+				if (ImGui::MenuItem("Save Scene"))
+					SceneSerializer::Serialize(EditorContext::Instance.ActiveScene, "Scene.Grapple");
+				ImGui::EndMenu();
+			}
+
+			ImGui::EndMenuBar();
+		}
 
 		{
 			ImGui::Begin("Renderer 2D");
