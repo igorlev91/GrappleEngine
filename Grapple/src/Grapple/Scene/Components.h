@@ -1,8 +1,8 @@
 #pragma once
 
-#include "GrappleECS/World.h"
+#include "Grapple.h"
 
-#include <glm/glm.hpp>
+#include "GrappleECS/World.h"
 
 namespace Grapple
 {
@@ -13,6 +13,8 @@ namespace Grapple
 		glm::vec3 Position;
 		glm::vec3 Rotation;
 		glm::vec3 Scale;
+
+		glm::mat4 GetTransformationMatrix() const;
 	};
 
 	struct CameraComponent
