@@ -5,6 +5,7 @@
 
 #include "GrappleEditor/UI/SceneWindow.h"
 #include "GrappleEditor/UI/PropertiesWindow.h"
+#include "GrappleEditor/UI/AssetManagerWindow.h"
 
 namespace Grapple
 {
@@ -27,5 +28,6 @@ namespace Grapple
 
 		SceneWindow m_SceneWindow;
 		PropertiesWindow m_PropertiesWindow;
+		AssetManagerWindow m_AssetManagerWindow;
 	};
 }

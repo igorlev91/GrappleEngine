@@ -19,6 +19,7 @@ project "GrappleEditor"
 		INCLUDE_DIRS.glm,
 		INCLUDE_DIRS.spdlog,
 		INCLUDE_DIRS.imgui,
+		INCLUDE_DIRS.yaml_cpp,
     }
 
 	links
@@ -27,6 +28,12 @@ project "GrappleEditor"
 		"ImGUI",
 		"GrappleCommon",
 		"GrappleECS",
+		"yaml-cpp",
+	}
+
+	defines
+	{
+		"YAML_CPP_STATIC_DEFINE"
 	}
 
 	targetdir("%{wks.location}/bin/" .. OUTPUT_DIRECTORY .. "/%{prj.name}")

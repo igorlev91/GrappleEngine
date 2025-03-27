@@ -5,7 +5,10 @@
 #include "Grapple/Renderer2D/Renderer2D.h"
 #include "Grapple/Scene/SceneSerializer.h"
 
+#include "Grapple/AssetManager/AssetManager.h"
+
 #include "GrappleEditor/EditorContext.h"
+#include "GrappleEditor/AssetManager/EditorAssetManager.h"
 
 #include <imgui.h>
 
@@ -18,6 +21,8 @@ namespace Grapple
 
 	void EditorLayer::OnAttach()
 	{
+		AssetManager::Intialize(CreateRef<EditorAssetManager>(std::filesystem::current_path()));
+
 		Ref<Window> window = Application::GetInstance().GetWindow();
 		uint32_t width = window->GetProperties().Width;
 		uint32_t height = window->GetProperties().Height;
@@ -152,6 +157,7 @@ namespace Grapple
 
 		m_SceneWindow.OnImGuiRender();
 		m_PropertiesWindow.OnImGuiRender();
+		m_AssetManagerWindow.OnImGuiRender();
 
 		ImGui::End();
 	}
