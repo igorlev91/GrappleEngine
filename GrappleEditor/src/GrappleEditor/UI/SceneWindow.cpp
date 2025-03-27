@@ -1,5 +1,7 @@
 #include "SceneWindow.h"
 
+#include "Grapple/Scene/Components.h"
+
 #include "GrappleECS/World.h"
 #include "GrappleECS/Query/EntityRegistryIterator.h"
 #include "GrappleECS/Registry.h"
@@ -12,9 +14,19 @@ namespace Grapple
 {
 	void SceneWindow::OnImGuiRender()
 	{
+		World& world = EditorContext::Instance.ActiveScene->GetECSWorld();
+
 		ImGui::Begin("Scene");
 
-		World& world = EditorContext::Instance.ActiveScene->GetECSWorld();
+		if (ImGui::BeginPopupContextWindow("Scene Context Menu"))
+		{
+			if (ImGui::MenuItem("Create Entity"))
+				world.CreateEntity<TransformComponent>();
+
+			ImGui::EndMenu();
+		}
+
+		std::optional<Entity> deletedEntity;
 		for (Entity entity : world.GetRegistry())
 		{
 			ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_FramePadding;
@@ -28,7 +40,18 @@ namespace Grapple
 			{
 				ImGui::TreePop();
 			}
+
+			if (ImGui::BeginPopupContextItem())
+			{
+				if (ImGui::MenuItem("Delete entity"))
+					deletedEntity = entity;
+
+				ImGui::EndMenu();
+			}
 		}
+
+		if (deletedEntity.has_value())
+			world.DeleteEntity(deletedEntity.value());
 
 		ImGui::End();
 	}

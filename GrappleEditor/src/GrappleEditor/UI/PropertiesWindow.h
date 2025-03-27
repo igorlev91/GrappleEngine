@@ -12,6 +12,8 @@ namespace Grapple
 	public:
 		void OnImGuiRender();
 	private:
+		void RenderAddComponentMenu(Entity entity);
+		
 		void RenderCameraComponent(CameraComponent& cameraComponent);
 		void RenderTransformComponent(TransformComponent& transform);
 		void RenderSpriteComponent(SpriteComponent& sprite);
