@@ -2,7 +2,8 @@
 
 #include "GrappleECS/Query/EntityView.h"
 #include "GrappleECS/Query/EntityRegistryIterator.h"
-#include "GrappleECS/Query/EntityArchetypesView.h"
+
+#include "GrappleECS/Query/Query.h"
 
 #include "GrappleECS/EntityStorage/EntityChunksPool.h"
 
@@ -87,7 +88,7 @@ namespace Grapple
 
 	void Registry::DeleteEntity(Entity entity)
 	{
-		auto recordIterator = m_EntityToRecord.find(entity);
+		auto recordIterator = FindEntity(entity);
 		if (recordIterator == m_EntityToRecord.end())
 			return;
 
@@ -117,11 +118,11 @@ namespace Grapple
 			return false;
 		}
 
-		auto it = m_EntityToRecord.find(entity);
-		if (it == m_EntityToRecord.end())
+		auto recordIterator = FindEntity(entity);
+		if (recordIterator == m_EntityToRecord.end())
 			return {};
 
-		EntityRecord& entityRecord = m_EntityRecords[it->second];
+		EntityRecord& entityRecord = m_EntityRecords[recordIterator->second];
 		ArchetypeRecord& archetype = m_Archetypes[entityRecord.Archetype];
 
 		// Can only have one instance of a component
@@ -241,11 +242,11 @@ namespace Grapple
 			return false;
 		}
 
-		auto it = m_EntityToRecord.find(entity);
-		if (it == m_EntityToRecord.end())
+		auto recordIterator = FindEntity(entity);
+		if (recordIterator == m_EntityToRecord.end())
 			return {};
 
-		EntityRecord& entityRecord = m_EntityRecords[it->second];
+		EntityRecord& entityRecord = m_EntityRecords[recordIterator->second];
 		ArchetypeRecord& archetype = m_Archetypes[entityRecord.Archetype];
 
 		size_t removedComponentIndex = SIZE_MAX;
@@ -337,12 +338,20 @@ namespace Grapple
 
 	bool Registry::IsEntityAlive(Entity entity) const
 	{
-		return m_EntityToRecord.find(entity) != m_EntityToRecord.end();
+		return FindEntity(entity) != m_EntityToRecord.end();
+	}
+
+	std::optional<Entity> Registry::FindEntityByIndex(uint32_t entityIndex)
+	{
+		auto it = m_EntityToRecord.find(Entity(entityIndex, 0));
+		if (it == m_EntityToRecord.end())
+			return {};
+		return it->first;
 	}
 
 	std::optional<void*> Registry::GetEntityComponent(Entity entity, ComponentId component)
 	{
-		auto it = m_EntityToRecord.find(entity);
+		auto it = FindEntity(entity);
 		if (it == m_EntityToRecord.end())
 			return {};
 
@@ -386,9 +395,8 @@ namespace Grapple
 		return EntityRegistryIterator(*this, m_EntityRecords.size());
 	}
 
-	QueryId Registry::CreateQuery(ComponentSet& components)
+	Query Registry::CreateQuery(const ComponentSet& components)
 	{
-		std::sort(components.GetIds(), components.GetIds() + components.GetCount());
 		return m_QueryCache.AddQuery(components);
 	}
 
@@ -403,22 +411,16 @@ namespace Grapple
 		return EntityView(*this, archetypeId);
 	}
 
-	EntityArchetypesView Registry::ExecuteQuery(QueryId query)
-	{
-		const QueryData& data = m_QueryCache[query];
-		return EntityArchetypesView(*this, data.MatchedArchetypes);
-	}
-
 	const std::vector<ComponentId>& Registry::GetEntityComponents(Entity entity)
 	{
-		auto it = m_EntityToRecord.find(entity);
+		auto it = FindEntity(entity);
 		Grapple_CORE_ASSERT(it != m_EntityToRecord.end());
 		return m_Archetypes[m_EntityRecords[it->second].Archetype].Data.Components;
 	}
 
-	bool Registry::HasComponent(Entity entity, ComponentId component)
+	bool Registry::HasComponent(Entity entity, ComponentId component) const
 	{
-		auto it = m_EntityToRecord.find(entity);
+		auto it = FindEntity(entity);
 		Grapple_CORE_ASSERT(it != m_EntityToRecord.end());
 		return GetArchetypeComponentIndex(m_EntityRecords[it->second].Archetype, component).has_value();
 	}
@@ -444,7 +446,7 @@ namespace Grapple
 		return id;
 	}
 
-	std::optional<size_t> Registry::GetArchetypeComponentIndex(ArchetypeId archetype, ComponentId component)
+	std::optional<size_t> Registry::GetArchetypeComponentIndex(ArchetypeId archetype, ComponentId component) const
 	{
 		auto it = m_ComponentToArchetype.find(component);
 		if (it != m_ComponentToArchetype.end())
@@ -468,5 +470,31 @@ namespace Grapple
 
 		archetypeRecord.Storage.RemoveEntityData(entityBufferIndex);
 		lastEntityRecord.BufferIndex = entityBufferIndex;
+	}
+
+	std::unordered_map<Entity, size_t>::iterator Registry::FindEntity(Entity entity)
+	{
+		auto it = m_EntityToRecord.find(entity);
+
+		if (it == m_EntityToRecord.end())
+			return it;
+
+		if (it->first != entity)
+			return m_EntityToRecord.end();
+
+		return it;
+	}
+
+	std::unordered_map<Entity, size_t>::const_iterator Registry::FindEntity(Entity entity) const
+	{
+		auto it = m_EntityToRecord.find(entity);
+
+		if (it == m_EntityToRecord.cend())
+			return it;
+
+		if (it->first != entity)
+			return m_EntityToRecord.cend();
+
+		return it;
 	}
 }

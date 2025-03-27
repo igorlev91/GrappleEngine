@@ -3,6 +3,8 @@
 #include "GrappleECS/Registry.h"
 #include "GrappleECS/Entity/Component.h"
 
+#include "GrappleECS/Query/Query.h"
+
 #include "GrappleECS/System/System.h"
 
 #include <vector>
@@ -96,7 +98,7 @@ namespace Grapple
 		}
 
 		template<typename... T>
-		constexpr QueryId CreateQuery()
+		constexpr Query CreateQuery()
 		{
 			ComponentId ids[sizeof...(T)];
 			size_t index = 0;
@@ -111,7 +113,7 @@ namespace Grapple
 	public:
 		inline Registry& GetRegistry() { return m_Registry; }
 
-		void RegisterSystem(QueryId query, const SystemFunction& system);
+		void RegisterSystem(const Query& query, const SystemFunction& system);
 
 		void OnUpdate();
 	private:

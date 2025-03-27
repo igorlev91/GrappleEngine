@@ -16,8 +16,9 @@
 
 namespace Grapple
 {
+	class Query;
+
 	class EntityView;
-	class EntityArchetypesView;
 	class EntityRegistryIterator;
 
 	class Registry
@@ -33,6 +34,7 @@ namespace Grapple
 		bool AddEntityComponent(Entity entity, ComponentId componentId, const void* componentData);
 		bool RemoveEntityComponent(Entity entity, ComponentId componentId);
 		bool IsEntityAlive(Entity entity) const;
+		std::optional<Entity> FindEntityByIndex(uint32_t entityIndex);
 
 		// Component operations
 
@@ -40,7 +42,7 @@ namespace Grapple
 
 		std::optional<void*> GetEntityComponent(Entity entity, ComponentId component);
 		const std::vector<ComponentId>& GetEntityComponents(Entity entity);
-		bool HasComponent(Entity entity, ComponentId component);
+		bool HasComponent(Entity entity, ComponentId component) const;
 
 		inline const ComponentInfo& GetComponentInfo(size_t index) const;
 		inline const std::vector<ComponentInfo>& GetRegisteredComponents() const { return m_RegisteredComponents; }
@@ -48,7 +50,7 @@ namespace Grapple
 		// Archetype operations
 
 		inline ArchetypeRecord& GetArchetypeRecord(size_t archetypeId) { return m_Archetypes[archetypeId]; }
-		std::optional<size_t> GetArchetypeComponentIndex(ArchetypeId archetype, ComponentId component);
+		std::optional<size_t> GetArchetypeComponentIndex(ArchetypeId archetype, ComponentId component) const;
 
 		// Iterator
 
@@ -57,10 +59,9 @@ namespace Grapple
 
 		// Querying
 
-		QueryId CreateQuery(ComponentSet& components);
+		Query CreateQuery(const ComponentSet& components);
 
 		EntityView QueryArchetype(ComponentSet components);
-		EntityArchetypesView ExecuteQuery(QueryId query);
 	public:
 		inline EntityRecord& operator[](size_t index);
 		inline const EntityRecord& operator[](size_t index) const;
@@ -68,6 +69,9 @@ namespace Grapple
 		ArchetypeId CreateArchetype();
 
 		void RemoveEntityData(ArchetypeId archetype, size_t entityBufferIndex);
+
+		std::unordered_map<Entity, size_t>::iterator FindEntity(Entity entity);
+		std::unordered_map<Entity, size_t>::const_iterator FindEntity(Entity entity) const;
 	private:
 		std::vector<EntityRecord> m_EntityRecords;
 		std::unordered_map<Entity, size_t> m_EntityToRecord;
