@@ -17,12 +17,14 @@ project "Grapple"
 	{
 		"src/",
 		"%{wks.location}/GrappleCommon/src/",
+		"%{wks.location}/GrappleECS/src/",
 		INCLUDE_DIRS.GLAD,
 		INCLUDE_DIRS.GLFW,
 		INCLUDE_DIRS.glm,
 		INCLUDE_DIRS.stb_image,
 		INCLUDE_DIRS.spdlog,
 		INCLUDE_DIRS.imgui,
+		INCLUDE_DIRS.yaml_cpp,
 	}
 
 	links
@@ -30,12 +32,15 @@ project "Grapple"
 		"GLAD",
 		"GLFW",
 		"ImGUI",
-		"GrappleCommon"
+		"GrappleECS",
+		"GrappleCommon",
+		"yaml-cpp"
 	}
 
 	defines
 	{
-		"GLFW_INCLUDE_NONE"
+		"GLFW_INCLUDE_NONE",
+		"YAML_CPP_STATIC_DEFINE",
 	}
 
 	targetdir("%{wks.location}/bin/" .. OUTPUT_DIRECTORY .. "/%{prj.name}")
