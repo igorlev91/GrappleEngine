@@ -4,6 +4,8 @@
 
 #include "GrappleECS/World.h"
 
+#include "Grapple/AssetManager/Asset.h"
+
 namespace Grapple
 {
 	struct TransformComponent
@@ -31,5 +33,6 @@ namespace Grapple
 		Grapple_COMPONENT;
 
 		glm::vec4 Color;
+		AssetHandle Texture;
 	};
 }

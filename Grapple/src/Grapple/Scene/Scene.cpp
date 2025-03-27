@@ -1,6 +1,7 @@
 #include "Scene.h"
 
 #include "Grapple/Renderer2D/Renderer2D.h"
+#include "Grapple/AssetManager/AssetManager.h"
 
 #include "Grapple/Scene/Components.h"
 
@@ -27,7 +28,9 @@ namespace Grapple
 				TransformComponent& transform = transforms[entity];
 				SpriteComponent& sprite = sprites[entity];
 
-				Renderer2D::DrawQuad(transform.GetTransformationMatrix(), sprite.Color);
+				Renderer2D::DrawQuad(transform.GetTransformationMatrix(), sprite.Color, sprite.Texture == NULL_ASSET_HANDLE 
+					? nullptr 
+					: AssetManager::GetAsset<Texture>(sprite.Texture));
 			}
 		});
 	}
