@@ -14,7 +14,7 @@ namespace Grapple
 {
 	void SceneWindow::OnImGuiRender()
 	{
-		World& world = EditorContext::Instance.ActiveScene->GetECSWorld();
+		World& world = EditorContext::GetActiveScene()->GetECSWorld();
 
 		ImGui::Begin("Scene");
 

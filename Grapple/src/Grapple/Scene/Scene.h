@@ -4,13 +4,15 @@
 
 #include "GrappleECS/World.h"
 
+#include "Grapple/AssetManager/Asset.h"
+
 #include "Grapple/Renderer/Shader.h"
 #include "Grapple/Renderer/CameraData.h"
 
 namespace Grapple
 {
 	class SceneSerializer;
-	class Scene
+	class Scene : public Asset
 	{
 	public:
 		Scene();

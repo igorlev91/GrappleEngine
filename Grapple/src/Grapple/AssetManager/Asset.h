@@ -19,6 +19,7 @@ namespace Grapple
 	};
 
 	std::string_view AssetTypeToString(AssetType type);
+	AssetType AssetTypeFromString(std::string_view string);
 
 	struct AssetMetadata
 	{
