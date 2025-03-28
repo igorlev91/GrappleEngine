@@ -6,6 +6,8 @@
 #include "Grapple/AssetManager/Importers/TextureImporter.h"
 #include "Grapple/AssetManager/Importers/SceneImporter.h"
 
+#include "Grapple/Serialization/Serialization.h"
+
 #include <yaml-cpp/yaml.h>
 
 #include <fstream>
@@ -41,7 +43,7 @@ namespace Grapple
         if (registryIterator == m_Registry.end())
             return nullptr;
 
-        return LoadAsset(registryIterator->second).value_or(nullptr);
+        return LoadAsset(registryIterator->second);
     }
 
     const AssetMetadata* EditorAssetManager::GetAssetMetadata(AssetHandle handle)
@@ -82,12 +84,9 @@ namespace Grapple
 
         AssetHandle handle;
         AssetMetadata metadata;
-        metadata.Handle = handle;
         metadata.Path = path;
         metadata.Type = type;
-
-        if (!LoadAsset(metadata).has_value())
-            return NULL_ASSET_HANDLE;
+        metadata.Handle = handle;
 
         m_Registry.emplace(handle, metadata);
         m_FilepathToAssetHandle.emplace(path, handle);
@@ -117,18 +116,17 @@ namespace Grapple
         }
     }
 
-    std::optional<Ref<Asset>> EditorAssetManager::LoadAsset(const AssetMetadata& metadata)
+    Ref<Asset> EditorAssetManager::LoadAsset(const AssetMetadata& metadata)
     {
         auto importerIterator = m_AssetImporters.find(metadata.Type);
         if (importerIterator == m_AssetImporters.end())
         {
-            Grapple_CORE_WARN("Cannot import '{0}', because an imported for that asset type is not provided");
-            return {};
+            Grapple_CORE_ASSERT("Cannot import '{0}', because an imported for that asset type is not provided");
+            return nullptr;
         }
 
         Ref<Asset> asset = importerIterator->second(metadata);
-        m_LoadedAssets.emplace(metadata.Handle, asset);
-
+        asset->Handle = metadata.Handle;
         return asset;
     }
 
@@ -145,7 +143,7 @@ namespace Grapple
             std::filesystem::path assetPath = std::filesystem::relative(metadata.Path, m_Root);
 
             emitter << YAML::BeginMap;
-            emitter << YAML::Key << "Handle" << YAML::Value << (uint64_t)handle;
+            emitter << YAML::Key << "Handle" << YAML::Value << handle;
             emitter << YAML::Key << "Type" << YAML::Value << AssetTypeToString(metadata.Type);
             emitter << YAML::Key << "Path" << YAML::Value << assetPath.generic_string();
             emitter << YAML::EndMap;
@@ -177,12 +175,12 @@ namespace Grapple
 
         for (auto assetNode : registry)
         {
-            AssetHandle handle = assetNode["Handle"].as<uint64_t>();
+            AssetHandle handle = assetNode["Handle"].as<AssetHandle>();
             std::filesystem::path path = m_Root / std::filesystem::path(assetNode["Path"].as<std::string>());
 
             AssetMetadata metadata;
-            metadata.Handle = handle;
             metadata.Path = path;
+            metadata.Handle = handle;
             metadata.Type = AssetTypeFromString(assetNode["Type"].as<std::string>());
 
             m_Registry.emplace(handle, metadata);

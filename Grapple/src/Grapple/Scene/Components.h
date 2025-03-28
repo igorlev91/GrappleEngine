@@ -23,7 +23,16 @@ namespace Grapple
 	{
 		Grapple_COMPONENT;
 
+		enum class ProjectionType : uint8_t
+		{
+			Orthographic,
+			Perspective,
+		};
+
+		ProjectionType Projection;
+
 		float Size;
+		float FOV;
 		float Near;
 		float Far;
 	};

@@ -1,13 +1,15 @@
 Entities:
   - Components:
       Transform:
-        Position: [0, 0, 0]
-        Rotation: [0, 0, 0]
+        Position: [3.70000005, 0, -3]
+        Rotation: [0, 122.300003, 0]
         Scale: [1, 1, 1]
       Camera:
         Size: 10
         Near: 0.100000001
-        Far: 10
+        Far: 77.1999969
+        Projection: Perspective
+        FOV: 66.9000015
   - Components:
       Transform:
         Position: [-2.20000005, 0, -1.10000002]
@@ -34,9 +36,9 @@ Entities:
         Texture: 0
   - Components:
       Transform:
-        Position: [0, -2.79999995, -0.100000001]
-        Rotation: [0, 0, 0]
+        Position: [-2.9000001, -2.79999995, -0.100000001]
+        Rotation: [0, 0, -28.8999996]
         Scale: [2, 2, 2]
       Sprite:
         Color: [1, 1, 1, 1]
-        Texture: 7247848625752884350
+        Texture: 10180646465309905513

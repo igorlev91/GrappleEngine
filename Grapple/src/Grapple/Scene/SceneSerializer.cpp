@@ -1,6 +1,8 @@
 #include "SceneSerializer.h"
 
 #include "Grapple/Scene/Components.h"
+#include "Grapple/AssetManager/AssetManager.h"
+#include "Grapple/Serialization/Serialization.h"
 
 #include "GrappleECS/Query/EntityRegistryIterator.h"
 
@@ -8,75 +10,6 @@
 #include <glm/glm.hpp>
 
 #include <fstream>
-
-namespace YAML
-{
-	template<>
-	struct convert<glm::vec3>
-	{
-		static Node encode(const glm::vec3& vector)
-		{
-			Node node;
-			node.push_back(vector.x);
-			node.push_back(vector.y);
-			node.push_back(vector.z);
-			node.SetStyle(EmitterStyle::Flow);
-			return node;
-		}
-
-		static bool decode(const Node& node, glm::vec3& out)
-		{
-			if (!node.IsSequence() || node.size() != 3)
-				return false;
-
-			out.x = node[0].as<float>();
-			out.y = node[1].as<float>();
-			out.z = node[2].as<float>();
-			return true;
-		}
-	};
-
-	template<>
-	struct convert<glm::vec4>
-	{
-		static Node encode(const glm::vec4& vector)
-		{
-			Node node;
-			node.push_back(vector.x);
-			node.push_back(vector.y);
-			node.push_back(vector.z);
-			node.push_back(vector.w);
-			node.SetStyle(EmitterStyle::Flow);
-			return node;
-		}
-
-		static bool decode(const Node& node, glm::vec4& out)
-		{
-			if (!node.IsSequence() || node.size() != 4)
-				return false;
-
-			out.x = node[0].as<float>();
-			out.y = node[1].as<float>();
-			out.z = node[2].as<float>();
-			out.w = node[3].as<float>();
-			return true;
-		}
-	};
-}
-
-YAML::Emitter& operator<<(YAML::Emitter& emitter, const glm::vec3& vector)
-{
-	emitter << YAML::Flow;
-	emitter << YAML::BeginSeq << vector.x << vector.y << vector.z << YAML::EndSeq;
-	return emitter;
-}
-
-YAML::Emitter& operator<<(YAML::Emitter& emitter, const glm::vec4& vector)
-{
-	emitter << YAML::Flow;
-	emitter << YAML::BeginSeq << vector.x << vector.y << vector.z << vector.w << YAML::EndSeq;
-	return emitter;
-}
 
 namespace Grapple
 {
@@ -111,6 +44,19 @@ namespace Grapple
 			emitter << YAML::Key << "Size" << YAML::Value << camera.Size;
 			emitter << YAML::Key << "Near" << YAML::Value << camera.Near;
 			emitter << YAML::Key << "Far" << YAML::Value << camera.Far;
+
+			emitter << YAML::Key << "Projection";
+			switch (camera.Projection)
+			{
+			case CameraComponent::ProjectionType::Orthographic:
+				emitter << YAML::Value << "Orthographic";
+				break;
+			case CameraComponent::ProjectionType::Perspective:
+				emitter << YAML::Value << "Perspective";
+				break;
+			}
+
+			emitter << YAML::Key << "FOV" << YAML::Value << camera.FOV;
 			emitter << YAML::EndMap;
 		}
 	}
@@ -128,8 +74,11 @@ namespace Grapple
 		}
 	}
 
-	void SceneSerializer::Serialize(const Ref<Scene>& scene, const std::filesystem::path& path)
+	void SceneSerializer::Serialize(const Ref<Scene>& scene)
 	{
+		Grapple_CORE_ASSERT(AssetManager::IsAssetHandleValid(scene->Handle));
+		const std::filesystem::path& path = AssetManager::GetAssetMetadata(scene->Handle)->Path;
+
 		YAML::Emitter emitter;
 		emitter << YAML::BeginMap;
 		emitter << YAML::Key << "Entities";
@@ -172,6 +121,7 @@ namespace Grapple
 		}
 
 		YAML::Node node = YAML::Load(inputFile);
+		inputFile.close();
 
 		YAML::Node entities = node["Entities"];
 		if (!entities)
@@ -219,6 +169,18 @@ namespace Grapple
 					cameraComponent.Size = cameraNode["Size"].as<float>();
 					cameraComponent.Near = cameraNode["Near"].as<float>();
 					cameraComponent.Far = cameraNode["Far"].as<float>();
+
+					if (YAML::Node fovNode = cameraNode["FOV"])
+						cameraComponent.FOV = fovNode.as<float>();
+
+					if (YAML::Node projectionType = cameraNode["Projection"])
+					{
+						std::string string = projectionType.as<std::string>();
+						if (string == "Orthographic")
+							cameraComponent.Projection = CameraComponent::ProjectionType::Orthographic;
+						else if (string == "Perspective")
+							cameraComponent.Projection = CameraComponent::ProjectionType::Perspective;
+					}
 
 					AddDeserializedComponent<CameraComponent>(scene->m_World, entity, cameraComponent);
 				}
