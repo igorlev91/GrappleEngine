@@ -7,6 +7,9 @@
 
 #include "Grapple/AssetManager/AssetManager.h"
 
+#include "Grapple/Project/Project.h"
+#include "Grapple/Platform/Platform.h"
+
 #include "GrappleEditor/EditorContext.h"
 #include "GrappleEditor/AssetManager/EditorAssetManager.h"
 
@@ -21,7 +24,9 @@ namespace Grapple
 
 	void EditorLayer::OnAttach()
 	{
-		AssetManager::Intialize(CreateRef<EditorAssetManager>(std::filesystem::current_path()));
+		UpdateWindowTitle();
+
+		AssetManager::Intialize(CreateRef<EditorAssetManager>(Project::GetActive()->Location / "Assets"));
 		m_AssetManagerWindow.RebuildAssetTree();
 
 		m_AssetManagerWindow.SetOpenAction(AssetType::Scene, [this](AssetHandle handle)
@@ -81,6 +86,24 @@ namespace Grapple
 
 		if (ImGui::BeginMenuBar())
 		{
+			if (ImGui::BeginMenu("Project"))
+			{
+				if (ImGui::MenuItem("Save"))
+				{
+					Project::Save();
+				}
+
+				if (ImGui::MenuItem("Open"))
+				{
+					std::optional<std::filesystem::path> projectPath = Platform::ShowOpenFileDialog(L"Grapple Project (*.Grappleproj)\0*.Grappleproj\0");
+
+					if (projectPath.has_value())
+						Project::OpenProject(projectPath.value());
+				}
+
+				ImGui::EndMenu();
+			}
+
 			if (ImGui::BeginMenu("Scene"))
 			{
 				if (ImGui::MenuItem("Save"))
@@ -137,5 +160,14 @@ namespace Grapple
 		m_AssetManagerWindow.OnImGuiRender();
 
 		ImGui::End();
+	}
+
+	void EditorLayer::UpdateWindowTitle()
+	{
+		if (Project::GetActive() != nullptr)
+		{
+			std::string name = fmt::format("Grapple Editor - {0} - {1}", Project::GetActive()->Name, Project::GetActive()->Location.generic_string());
+			Application::GetInstance().GetWindow()->SetTitle(name);
+		}
 	}
 }

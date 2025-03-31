@@ -7,6 +7,7 @@
 #include "Grapple/AssetManager/Importers/SceneImporter.h"
 
 #include "Grapple/Serialization/Serialization.h"
+#include "Grapple/Project/Project.h"
 
 #include <yaml-cpp/yaml.h>
 
@@ -24,9 +25,14 @@ namespace YAML
 
 namespace Grapple
 {
+    std::filesystem::path EditorAssetManager::s_RegistryFileName = "AssetRegistry.yaml";
+
     EditorAssetManager::EditorAssetManager(const std::filesystem::path& root)
         : m_Root(root)
     {
+        if (!std::filesystem::exists(root))
+            std::filesystem::create_directories(root);
+
         m_AssetImporters.emplace(AssetType::Texture, TextureImporter::ImportTexture);
         m_AssetImporters.emplace(AssetType::Scene, SceneImporter::ImportScene);
 
@@ -133,7 +139,7 @@ namespace Grapple
 
     void EditorAssetManager::SerializeRegistry()
     {
-        std::filesystem::path path = m_Root / std::filesystem::path("AssetRegistry.yaml");
+        std::filesystem::path path = Project::GetActive()->Location / s_RegistryFileName;
 
         YAML::Emitter emitter;
         emitter << YAML::BeginMap;
@@ -159,7 +165,7 @@ namespace Grapple
 
     void EditorAssetManager::DeserializeRegistry()
     {
-        std::filesystem::path registryPath = m_Root / std::filesystem::path("AssetRegistry.yaml");
+        std::filesystem::path registryPath = Project::GetActive()->Location / s_RegistryFileName;
 
         std::ifstream inputFile(registryPath);
         if (!inputFile)

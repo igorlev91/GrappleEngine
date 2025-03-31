@@ -20,7 +20,6 @@ project "GrappleECS"
 	links
 	{
 		"GrappleCommon",
-		"GrappleECS",
 	}
 
 	targetdir("%{wks.location}/bin/" .. OUTPUT_DIRECTORY .. "/%{prj.name}")

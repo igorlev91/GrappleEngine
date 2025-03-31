@@ -34,7 +34,3 @@ group ""
 group "Editor"
 	include "GrappleEditor"
 group ""
-
-group "Sandbox"
-	include "Sandbox"
-group ""

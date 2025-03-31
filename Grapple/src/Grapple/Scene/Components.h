@@ -42,6 +42,7 @@ namespace Grapple
 		Grapple_COMPONENT;
 
 		glm::vec4 Color;
+		glm::vec2 TextureTiling;
 		AssetHandle Texture;
 	};
 }

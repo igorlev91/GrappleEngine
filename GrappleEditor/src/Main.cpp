@@ -4,5 +4,5 @@
 
 Grapple::Scope<Grapple::Application> Grapple::CreateGrappleApplication(Grapple::CommandLineArguments arguments)
 {
-	return Grapple::CreateScope<Grapple::EditorApplication>();
+	return Grapple::CreateScope<Grapple::EditorApplication>(arguments);
 }

@@ -2,7 +2,6 @@
 
 #include "Grapple/Core/Application.h"
 #include "Grapple/Core/Core.h"
-#include "Grapple/Core/Platform.h"
 
 #ifdef Grapple_PLATFORM_WINDOWS
 	#include "Grapple/Platform/Windows/WindowsWindow.h"
