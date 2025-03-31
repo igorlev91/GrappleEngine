@@ -127,6 +127,7 @@ namespace Grapple
 
         Ref<Asset> asset = importerIterator->second(metadata);
         asset->Handle = metadata.Handle;
+        m_LoadedAssets.emplace(metadata.Handle, asset);
         return asset;
     }
 
