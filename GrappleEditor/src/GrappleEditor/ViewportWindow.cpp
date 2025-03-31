@@ -21,7 +21,10 @@ namespace Grapple
 			const FrameBufferSpecifications frameBufferSpecs = m_FrameBuffer->GetSpecifications();
 
 			if (frameBufferSpecs.Width != m_RenderData.ViewportSize.x || frameBufferSpecs.Height != m_RenderData.ViewportSize.y)
+			{
 				m_FrameBuffer->Resize(m_RenderData.ViewportSize.x, m_RenderData.ViewportSize.y);
+				OnViewportResize();
+			}
 
 			RenderCommand::SetViewport(0, 0, m_RenderData.ViewportSize.x, m_RenderData.ViewportSize.y);
 
@@ -58,6 +61,7 @@ namespace Grapple
 			});
 
 			m_FrameBuffer = FrameBuffer::Create(specifications);
+			OnViewportResize();
 		}
 		else if (newViewportSize != m_RenderData.ViewportSize)
 		{

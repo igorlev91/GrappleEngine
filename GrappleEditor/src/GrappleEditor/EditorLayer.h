@@ -8,6 +8,7 @@
 #include "GrappleEditor/UI/AssetManagerWindow.h"
 
 #include "GrappleEditor/ViewportWindow.h"
+#include "GrappleEditor/EditorCamera.h"
 
 #include <vector>
 
@@ -35,7 +36,9 @@ namespace Grapple
 		PropertiesWindow m_PropertiesWindow;
 		AssetManagerWindow m_AssetManagerWindow;
 
-		std::vector<ViewportWindow> m_Viewports;
+		std::vector<Ref<ViewportWindow>> m_Viewports;
 		glm::vec4 m_ClearColor = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+
+		EditorCamera m_Camera;
 	};
 }

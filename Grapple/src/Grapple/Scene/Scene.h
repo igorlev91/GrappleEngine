@@ -7,7 +7,6 @@
 #include "Grapple/AssetManager/Asset.h"
 
 #include "Grapple/Renderer/Shader.h"
-#include "Grapple/Renderer/CameraData.h"
 #include "Grapple/Renderer/RenderData.h"
 
 namespace Grapple
