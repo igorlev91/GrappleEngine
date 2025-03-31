@@ -7,6 +7,10 @@
 #include "GrappleEditor/UI/PropertiesWindow.h"
 #include "GrappleEditor/UI/AssetManagerWindow.h"
 
+#include "GrappleEditor/ViewportWindow.h"
+
+#include <vector>
+
 namespace Grapple
 {
 	class EditorLayer : public Layer
@@ -20,14 +24,13 @@ namespace Grapple
 		virtual void OnEvent(Event& event) override;
 		virtual void OnImGUIRender() override;
 	private:
-		Ref<FrameBuffer> m_FrameBuffer;
-
 		float m_PreviousFrameTime = 0.0f;
-
-		glm::i32vec2 m_ViewportSize = glm::i32vec2(0.0f);
 
 		SceneWindow m_SceneWindow;
 		PropertiesWindow m_PropertiesWindow;
 		AssetManagerWindow m_AssetManagerWindow;
+
+		std::vector<ViewportWindow> m_Viewports;
+		glm::vec4 m_ClearColor = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
 	};
 }

@@ -61,8 +61,6 @@ namespace Grapple
 
 		while (m_Running)
 		{
-			RenderCommand::Clear();
-
 			float currentTime = Time::GetTime();
 			float deltaTime = currentTime - m_PreviousFrameTime;
 
