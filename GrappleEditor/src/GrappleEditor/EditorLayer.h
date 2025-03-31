@@ -25,6 +25,9 @@ namespace Grapple
 		virtual void OnImGUIRender() override;
 	private:
 		void UpdateWindowTitle();
+
+		void SaveActiveScene();
+		void SaveActiveSceneAs();
 	private:
 		float m_PreviousFrameTime = 0.0f;
 

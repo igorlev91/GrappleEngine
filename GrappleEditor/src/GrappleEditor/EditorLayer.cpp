@@ -107,12 +107,9 @@ namespace Grapple
 			if (ImGui::BeginMenu("Scene"))
 			{
 				if (ImGui::MenuItem("Save"))
-				{
-					if (AssetManager::IsAssetHandleValid(EditorContext::GetActiveScene()->Handle))
-						SceneSerializer::Serialize(EditorContext::GetActiveScene());
-					// else
-					// TODO: Ask for save location
-				}
+					SaveActiveScene();
+				if (ImGui::MenuItem("Save As"))
+					SaveActiveSceneAs();
 
 				ImGui::EndMenu();
 			}
@@ -168,6 +165,29 @@ namespace Grapple
 		{
 			std::string name = fmt::format("Grapple Editor - {0} - {1}", Project::GetActive()->Name, Project::GetActive()->Location.generic_string());
 			Application::GetInstance().GetWindow()->SetTitle(name);
+		}
+	}
+
+	void EditorLayer::SaveActiveScene()
+	{
+		if (AssetManager::IsAssetHandleValid(EditorContext::GetActiveScene()->Handle))
+			SceneSerializer::Serialize(EditorContext::GetActiveScene());
+		else
+			SaveActiveSceneAs();
+	}
+
+	void EditorLayer::SaveActiveSceneAs()
+	{
+		std::optional<std::filesystem::path> scenePath = Platform::ShowSaveFileDialog(L"Grapple Scene (*.Grapple)\0*.Grapple\0");
+		if (scenePath.has_value())
+		{
+			std::filesystem::path& path = scenePath.value();
+			if (!path.has_extension())
+				path.replace_extension(".Grapple");
+
+			SceneSerializer::Serialize(EditorContext::GetActiveScene(), path);
+			AssetHandle handle = As<EditorAssetManager>(AssetManager::GetInstance())->ImportAsset(path);
+			EditorContext::OpenScene(handle);
 		}
 	}
 }

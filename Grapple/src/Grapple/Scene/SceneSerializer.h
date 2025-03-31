@@ -10,6 +10,7 @@ namespace Grapple
 	{
 	public:
 		static void Serialize(const Ref<Scene>& scene);
+		static void Serialize(const Ref<Scene>& scene, const std::filesystem::path& path);
 		static void Deserialize(const Ref<Scene>& scene, const std::filesystem::path& path);
 	};
 }

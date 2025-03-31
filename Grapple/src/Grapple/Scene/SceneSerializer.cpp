@@ -78,8 +78,11 @@ namespace Grapple
 	void SceneSerializer::Serialize(const Ref<Scene>& scene)
 	{
 		Grapple_CORE_ASSERT(AssetManager::IsAssetHandleValid(scene->Handle));
-		const std::filesystem::path& path = AssetManager::GetAssetMetadata(scene->Handle)->Path;
+		Serialize(scene, AssetManager::GetAssetMetadata(scene->Handle)->Path);
+	}
 
+	void SceneSerializer::Serialize(const Ref<Scene>& scene, const std::filesystem::path& path)
+	{
 		YAML::Emitter emitter;
 		emitter << YAML::BeginMap;
 		emitter << YAML::Key << "Entities";
