@@ -4,6 +4,8 @@
 
 #include "Grapple/Project/ProjectSerializer.h"
 
+#include "GrappleScripting/ScriptingEngine.h"
+
 namespace Grapple
 {
 	Ref<Project> Project::s_Active;
@@ -28,10 +30,14 @@ namespace Grapple
 		Grapple_CORE_ASSERT(!std::filesystem::is_directory(path));
 		Grapple_CORE_ASSERT(path.extension() == s_ProjectFileExtension);
 
+		ScriptingEngine::UnloadAllModules();
+
 		Ref<Project> project = CreateRef<Project>(path.parent_path());
 		ProjectSerializer::Deserialize(project, path);
 
 		s_Active = project;
+
+		ScriptingEngine::LoadModule(path.parent_path() / "bin/Debug-windows-x86_64/" / s_Active->Name / fmt::format("{0}.dll", s_Active->Name));
 	}
 
 	void Project::Save()

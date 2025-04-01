@@ -3,6 +3,8 @@
 #include "Grapple/Renderer2D/Renderer2D.h"
 #include "Grapple/Renderer/RenderCommand.h"
 
+#include "GrappleScripting/ScriptingEngine.h"
+
 namespace Grapple
 {
 	Application* Application::s_Instance = nullptr;
@@ -47,10 +49,13 @@ namespace Grapple
 
 		RenderCommand::Initialize();
 		Renderer2D::Initialize();
+
+		ScriptingEngine::Initialize();
 	}
 
 	Application::~Application()
 	{
+		ScriptingEngine::Shutdown();
 		Renderer2D::Shutdown();
 	}
 
