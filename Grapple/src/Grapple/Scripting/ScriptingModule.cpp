@@ -1,6 +1,6 @@
 #include "ScriptingModule.h"
 
-#include "GrappleScripting/Platform/WindowsScriptingModule.h"
+#include "Grapple/Platform/Windows/WindowsScriptingModule.h"
 
 namespace Grapple
 {

@@ -3,7 +3,7 @@
 #include "Grapple/Renderer2D/Renderer2D.h"
 #include "Grapple/Renderer/RenderCommand.h"
 
-#include "GrappleScripting/ScriptingEngine.h"
+#include "Grapple/Scripting/ScriptingEngine.h"
 
 namespace Grapple
 {

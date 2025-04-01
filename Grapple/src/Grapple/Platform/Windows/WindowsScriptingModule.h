@@ -4,7 +4,7 @@
 
 #ifdef Grapple_PLATFORM_WINDOWS
 
-#include "GrappleScripting/ScriptingModule.h"
+#include "Grapple/Scripting/ScriptingModule.h"
 
 #include <windows.h>
 

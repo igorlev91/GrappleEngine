@@ -1,15 +1,25 @@
 #include "GrappleScriptingCore/ScriptingType.h"
+#include "GrappleScriptingCore/SystemInfo.h"
+
+#include "Grapple/Core/Log.h"
 
 #include <stdint.h>
+#include <iostream>
 
 namespace Sandbox
 {
-	struct HealthComponent
+	struct TestSystem : public Grapple::SystemBase
 	{
-		Grapple_DEFINE_SCRIPTING_TYPE(HealthComponent);
+		Grapple_SYSTEM(TestSystem);
 
-		uint32_t Health;
-		uint32_t MaxHealth;
+		virtual void Configure(Grapple::SystemConfiguration& config) override
+		{
+		}
+
+		virtual void Execute() override
+		{
+		}
 	};
-	Grapple_IMPL_SCRIPTING_TYPE(HealthComponent);
+
+	Grapple_SYSTEM_IMPL(TestSystem);
 }

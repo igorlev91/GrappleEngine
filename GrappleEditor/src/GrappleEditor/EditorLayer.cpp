@@ -10,6 +10,8 @@
 #include "Grapple/Project/Project.h"
 #include "Grapple/Platform/Platform.h"
 
+#include "Grapple/Scripting/ScriptingEngine.h"
+
 #include "GrappleEditor/EditorContext.h"
 #include "GrappleEditor/AssetManager/EditorAssetManager.h"
 
@@ -72,7 +74,7 @@ namespace Grapple
 		static bool fullscreen = true;
 		static ImGuiDockNodeFlags dockspaceFlags = ImGuiDockNodeFlags_None;
 
-		ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoDocking;
+		ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_MenuBar;
 		if (fullscreen)
 		{
 			const ImGuiViewport* viewport = ImGui::GetMainViewport();
@@ -143,7 +145,7 @@ namespace Grapple
 					ExitPlayMode();
 			}
 
-			ImGui::EndMainMenuBar();
+			ImGui::EndMenuBar();
 		}
 
 		{
@@ -224,11 +226,21 @@ namespace Grapple
 	{
 		Grapple_CORE_ASSERT(EditorContext::Instance.Mode == EditorMode::Edit);
 
+		ScriptingEngine::UnloadAllModules();
+
 		Ref<Scene> playModeScene = CreateRef<Scene>();
 		playModeScene->CopyFrom(EditorContext::GetActiveScene());
 
 		EditorContext::SetActiveScene(playModeScene);
 		EditorContext::Instance.Mode = EditorMode::Play;
+
+		std::filesystem::path modulePath = Project::GetActive()->Location
+			/ "bin/Debug-windows-x86_64/" 
+			/ Project::GetActive()->Name / fmt::format("{0}.dll", Project::GetActive()->Name);
+
+		ScriptingEngine::SetCurrentECSWorld(EditorContext::GetActiveScene()->GetECSWorld());
+		ScriptingEngine::LoadModule(modulePath);
+		ScriptingEngine::RegisterSystems();
 	}
 
 	void EditorLayer::ExitPlayMode()

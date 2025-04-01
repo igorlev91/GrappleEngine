@@ -1,10 +1,8 @@
 #include "Project.h"
 
 #include "Grapple/Core/Assert.h"
-
 #include "Grapple/Project/ProjectSerializer.h"
-
-#include "GrappleScripting/ScriptingEngine.h"
+#include "Grapple/Scripting/ScriptingEngine.h"
 
 namespace Grapple
 {
