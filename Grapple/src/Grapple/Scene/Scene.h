@@ -1,13 +1,12 @@
 #pragma once
 
 #include "Grapple/Core/Core.h"
-
-#include "GrappleECS/World.h"
-
 #include "Grapple/AssetManager/Asset.h"
 
 #include "Grapple/Renderer/Shader.h"
 #include "Grapple/Renderer/RenderData.h"
+
+#include "GrappleECS.h"
 
 namespace Grapple
 {
@@ -17,6 +16,8 @@ namespace Grapple
 	public:
 		Scene();
 		~Scene();
+
+		void CopyFrom(const Ref<Scene>& scene);
 	public:
 		void OnBeforeRender(RenderData& renderData);
 		void OnRender(const RenderData& renderData);
@@ -32,8 +33,6 @@ namespace Grapple
 		Query m_CameraDataUpdateQuery;
 		Query m_SpritesQuery;
 	private:
-		static Ref<Scene> m_Active;
-
 		friend SceneSerializer;
 	};
 }

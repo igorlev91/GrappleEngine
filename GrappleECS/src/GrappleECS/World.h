@@ -18,6 +18,9 @@ namespace Grapple
 	class World
 	{
 	public:
+		World() = default;
+		World(const World&) = delete;
+
 		template<typename ComponentT>
 		constexpr void RegisterComponent()
 		{
