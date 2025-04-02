@@ -9,6 +9,8 @@
 #include "GrappleScriptingCore/Bindings/ECS/EntityView.h"
 #include "GrappleScriptingCore/Bindings/ECS/World.h"
 
+#include "GrappleScriptingCore/Bindings/Time.h"
+
 #include <vector>
 
 namespace Grapple::Internal
@@ -21,5 +23,6 @@ namespace Grapple::Internal
 
 		Internal::WorldBindings* WorldBindings = nullptr;
 		Internal::EntityViewBindings* EntityViewBindings = nullptr;
+		Internal::TimeData* TimeData = nullptr;
 	};
 }

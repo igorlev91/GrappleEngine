@@ -58,6 +58,8 @@ namespace Grapple
 
 		Renderer2D::ResetStats();
 
+		ScriptingEngine::OnFrameStart(deltaTime);
+
 		EditorContext::GetActiveScene()->OnUpdateRuntime();
 
 		for (auto& viewport : m_Viewports)

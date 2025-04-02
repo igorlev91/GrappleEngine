@@ -4,6 +4,8 @@
 #include "GrappleScriptingCore/Bindings/ECS/World.h"
 #include "GrappleScriptingCore/Bindings/ECS/EntityView.h"
 
+#include "GrappleScriptingCore/Bindings/Time.h"
+
 #include "GrappleScriptingCore/ComponentInfo.h"
 #include "GrappleScriptingCore/SystemInfo.h"
 #include "GrappleScriptingCore/ScriptingType.h"
@@ -22,4 +24,6 @@ namespace Grapple
 	using Internal::SystemBase;
 	using Internal::SystemInfo;
 	using Internal::SystemConfiguration;
+
+	using Internal::Time;
 }

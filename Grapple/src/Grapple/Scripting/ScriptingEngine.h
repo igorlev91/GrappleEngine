@@ -39,10 +39,13 @@ namespace Grapple
 		{
 			World* CurrentWorld = nullptr;
 			std::vector<ScriptingModuleData> Modules;
+			std::vector<ComponentId> TemporaryQueryComponents;
 		};
 	public:
 		static void Initialize();
 		static void Shutdown();
+
+		static void OnFrameStart(float deltaTime);
 
 		static void SetCurrentECSWorld(World& world);
 

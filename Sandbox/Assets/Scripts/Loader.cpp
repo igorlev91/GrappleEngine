@@ -16,6 +16,7 @@ Grapple_API void OnModuleLoaded(Grapple::Internal::ModuleConfiguration& config)
 
 	config.WorldBindings = &Grapple::Internal::WorldBindings::Bindings;
 	config.EntityViewBindings = &Grapple::Internal::EntityViewBindings::Bindings;
+	config.TimeData = &Grapple::Internal::TimeData::Data;
 }
 
 Grapple_API void OnModuleUnloaded(Grapple::Internal::ModuleConfiguration& config)

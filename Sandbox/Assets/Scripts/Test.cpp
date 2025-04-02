@@ -31,6 +31,8 @@ namespace Sandbox
 
 		virtual void Configure(Grapple::SystemConfiguration& config) override
 		{
+			config.Query.Add<Transform>();
+			config.Query.Add<HealthComponent>();
 		}
 
 		virtual void Execute(Grapple::EntityView& chunk) override
@@ -40,7 +42,7 @@ namespace Sandbox
 			for (Grapple::EntityElement entity : chunk)
 			{
 				Transform& transform = transforms[entity];
-				Grapple_INFO("Position: {0}, {1}, {2}", transform.Position.x, transform.Position.y, transform.Position.z);
+				transform.Position += glm::vec3(0.1f, 0.0f, 0.0f) * Grapple::Time::GetDeltaTime();
 			}
 		}
 	};
