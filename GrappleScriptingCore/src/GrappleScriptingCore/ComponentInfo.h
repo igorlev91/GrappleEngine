@@ -2,6 +2,8 @@
 
 #include "GrappleScriptingCore/Bindings/ECS/Component.h"
 
+#include "GrappleScriptingCore/ScriptingType.h"
+
 #include <string_view>
 #include <optional>
 #include <vector>
@@ -35,8 +37,8 @@ namespace Grapple::Internal
 	#define Grapple_COMPONENT(component) \
 		Grapple_DEFINE_SCRIPTING_TYPE(component) \
 		static Grapple::Internal::ComponentInfo Info;
-	#define Grapple_COMPONENT_IMPL(component) \
-		Grapple_IMPL_SCRIPTING_TYPE(component) \
+	#define Grapple_COMPONENT_IMPL(component, ...) \
+		Grapple_IMPL_SCRIPTING_TYPE(component, __VA_ARGS__) \
 		Grapple::Internal::ComponentInfo component::Info = Grapple::Internal::ComponentInfo(typeid(component).name());
 
 	#define Grapple_COMPONENT_ALIAS_IMPL(component, aliasedComponent) \

@@ -15,6 +15,7 @@ project "GrappleScriptingCore"
 		"src/",
 		"%{wks.location}/GrappleCommon/src/",
 		INCLUDE_DIRS.spdlog,
+		INCLUDE_DIRS.glm,
 	}
 
 	links

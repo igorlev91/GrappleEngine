@@ -11,6 +11,8 @@
 #include "GrappleScriptingCore/ScriptingType.h"
 #include "GrappleScriptingCore/SystemConfiguration.h"
 
+#include "GrappleScriptingCore/TypeSerializationSettings.h"
+
 namespace Grapple
 {
 	using Internal::World;
@@ -26,4 +28,6 @@ namespace Grapple
 	using Internal::SystemConfiguration;
 
 	using Internal::Time;
+
+	using Internal::TypeSerializationSettings;
 }
