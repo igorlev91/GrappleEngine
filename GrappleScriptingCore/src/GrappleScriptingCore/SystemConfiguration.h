@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Grapple
+namespace Grapple::Internal
 {
 	class SystemConfiguration
 	{

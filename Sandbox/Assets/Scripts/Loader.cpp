@@ -3,17 +3,21 @@
 #include "GrappleScriptingCore/ModuleConfiguration.h"
 #include "GrappleScriptingCore/ScriptingType.h"
 #include "GrappleScriptingCore/SystemInfo.h"
+#include "GrappleScriptingCore/ComponentInfo.h"
+#include "GrappleScriptingCore/Bindings/ECS/EntityView.h"
 
-Grapple_API void OnModuleLoaded(Grapple::ModuleConfiguration& config)
+Grapple_API void OnModuleLoaded(Grapple::Internal::ModuleConfiguration& config)
 {
 	Grapple::Log::Initialize();
 
-	config.RegisteredTypes = &Grapple::ScriptingType::GetRegisteredTypes();
-	config.RegisteredSystems = &Grapple::SystemInfo::GetRegisteredSystems();
+	config.RegisteredTypes = &Grapple::Internal::ScriptingType::GetRegisteredTypes();
+	config.RegisteredSystems = &Grapple::Internal::SystemInfo::GetRegisteredSystems();
+	config.RegisteredComponents = &Grapple::Internal::ComponentInfo::GetRegisteredComponents();
 
-	config.WorldBindings = &Grapple::Bindings::WorldBindings::Bindings;
+	config.WorldBindings = &Grapple::Internal::WorldBindings::Bindings;
+	config.EntityViewBindings = &Grapple::Internal::EntityViewBindings::Bindings;
 }
 
-Grapple_API void OnModuleUnloaded(Grapple::ModuleConfiguration& config)
+Grapple_API void OnModuleUnloaded(Grapple::Internal::ModuleConfiguration& config)
 {
 }

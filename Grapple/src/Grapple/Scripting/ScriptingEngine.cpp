@@ -4,10 +4,10 @@
 
 #include "Grapple/Scripting/ScriptingModule.h"
 #include "Grapple/Scripting/ScriptingBridge.h"
+#include "Grapple/Scene/Components.h"
 
 #include "GrappleScriptingCore/SystemInfo.h"
-
-#include "Grapple/Scene/Components.h"
+#include "GrappleScriptingCore/ComponentInfo.h"
 
 #include "GrappleECS.h"
 
@@ -30,6 +30,7 @@ namespace Grapple
 	void ScriptingEngine::SetCurrentECSWorld(World& world)
 	{
 		s_Data.CurrentWorld = &world;
+		ScriptingBridge::SetCurrentWorld(world);
 	}
 
 	void ScriptingEngine::ReloadModules()
@@ -45,7 +46,7 @@ namespace Grapple
 				if (instance.Instance != nullptr)
 				{
 					Grapple_CORE_ASSERT(instance.TypeIndex < module.Config.RegisteredTypes->size(), "Instance has invalid type index");
-					const ScriptingType* type = (*module.Config.RegisteredTypes)[instance.TypeIndex];
+					const Internal::ScriptingType* type = (*module.Config.RegisteredTypes)[instance.TypeIndex];
 					type->Destructor(instance.Instance);
 				}
 			}
@@ -61,7 +62,7 @@ namespace Grapple
 			std::optional<ScriptingModuleFunction> onUnload = module->LoadFunction(s_ModuleUnloaderFunctionName);
 
 			ScriptingModuleData moduleData;
-			moduleData.Config = ModuleConfiguration{};
+			moduleData.Config = Internal::ModuleConfiguration{};
 
 			moduleData.Module = module;
 			moduleData.OnLoad = onLoad.has_value() ? (ModuleEventFunction)onLoad.value() : std::optional<ModuleEventFunction>{};
@@ -71,10 +72,10 @@ namespace Grapple
 			{
 				moduleData.OnLoad.value()(moduleData.Config);
 
-				const std::vector<const ScriptingType*>& registeredTypes = *moduleData.Config.RegisteredTypes;
+				const std::vector<const Internal::ScriptingType*>& registeredTypes = *moduleData.Config.RegisteredTypes;
 
 				size_t typeIndex = 0;
-				for (const ScriptingType* type : registeredTypes)
+				for (const Internal::ScriptingType* type : registeredTypes)
 					moduleData.TypeNameToIndex.emplace(type->Name, typeIndex++);
 
 				ScriptingBridge::ConfigureModule(moduleData.Config);
@@ -97,27 +98,64 @@ namespace Grapple
 		s_Data.Modules.clear();
 	}
 
+	void ScriptingEngine::RegisterComponents()
+	{
+		for (ScriptingModuleData& module : s_Data.Modules)
+		{
+			for (Internal::ComponentInfo* component : *module.Config.RegisteredComponents)
+			{
+				auto typeIndexIterator = module.TypeNameToIndex.find(component->Name);
+				Grapple_CORE_ASSERT(typeIndexIterator != module.TypeNameToIndex.end());
+
+				const Internal::ScriptingType* type = (*module.Config.RegisteredTypes)[typeIndexIterator->second];
+
+				if (component->AliasedName.has_value())
+				{
+					std::optional<ComponentId> aliasedComponent = s_Data.CurrentWorld->GetRegistry().FindComponnet(component->AliasedName.value());
+					Grapple_CORE_ASSERT(aliasedComponent.has_value(), "Failed to find component");
+					component->Id = aliasedComponent.value();
+				}
+				else
+				{
+					component->Id = s_Data.CurrentWorld->GetRegistry().RegisterComponent(component->Name, type->Size, type->Destructor);
+				}
+			}
+		}
+	}
+
 	void ScriptingEngine::RegisterSystems()
 	{
 		for (ScriptingModuleData& module : s_Data.Modules)
 		{
-			for (const SystemInfo* systemInfo : *module.Config.RegisteredSystems)
+			for (const Internal::SystemInfo* systemInfo : *module.Config.RegisteredSystems)
 			{
 				auto typeIndexIterator = module.TypeNameToIndex.find(systemInfo->Name);
-
 				Grapple_CORE_ASSERT(typeIndexIterator != module.TypeNameToIndex.end());
 
-				const ScriptingType* type = (*module.Config.RegisteredTypes)[typeIndexIterator->second];
-				SystemBase* systemInstance = (SystemBase*)type->Constructor();
+				const Internal::ScriptingType* type = (*module.Config.RegisteredTypes)[typeIndexIterator->second];
+				Internal::SystemBase* systemInstance = (Internal::SystemBase*)type->Constructor();
 
 				module.ScriptingInstances.push_back(ScriptingTypeInstance{ typeIndexIterator->second, systemInstance });
 
-				SystemConfiguration config;
+				Internal::SystemConfiguration config;
 				systemInstance->Configure(config);
 
 				s_Data.CurrentWorld->RegisterSystem(s_Data.CurrentWorld->CreateQuery<TransformComponent>(), [systemInstance](EntityView view)
 				{
-					systemInstance->Execute();
+					Grapple_CORE_ASSERT(s_Data.CurrentWorld != nullptr);
+					ArchetypeRecord& record = s_Data.CurrentWorld->GetRegistry().GetArchetypeRecord(view.GetArchetype());
+
+					size_t chunksCount = record.Storage.GetChunksCount();
+					for (size_t i = 0; i < chunksCount; i++)
+					{
+						Internal::EntityView chunk(
+							view.GetArchetype(),
+							record.Storage.GetChunkBuffer(i),
+							record.Storage.GetEntitySize(),
+							record.Storage.GetEntitiesCountInChunk(i));
+
+						systemInstance->Execute(chunk);
+					}
 				});
 			}
 		}

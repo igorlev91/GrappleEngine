@@ -3,18 +3,23 @@
 #include "GrappleScriptingCore/Defines.h"
 #include "GrappleScriptingCore/ScriptingType.h"
 #include "GrappleScriptingCore/SystemInfo.h"
+#include "GrappleScriptingCore/ComponentInfo.h"
 
+#include "GrappleScriptingCore/Bindings/ECS/ECS.h"
+#include "GrappleScriptingCore/Bindings/ECS/EntityView.h"
 #include "GrappleScriptingCore/Bindings/ECS/World.h"
 
 #include <vector>
 
-namespace Grapple
+namespace Grapple::Internal
 {
 	struct ModuleConfiguration
 	{
 		const std::vector<const ScriptingType*>* RegisteredTypes = nullptr;
 		const std::vector<const SystemInfo*>* RegisteredSystems = nullptr;
+		const std::vector<ComponentInfo*>* RegisteredComponents = nullptr;
 
-		Bindings::WorldBindings* WorldBindings = nullptr;
+		Internal::WorldBindings* WorldBindings = nullptr;
+		Internal::EntityViewBindings* EntityViewBindings = nullptr;
 	};
 }

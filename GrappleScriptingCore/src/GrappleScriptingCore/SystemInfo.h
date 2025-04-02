@@ -1,13 +1,14 @@
 #pragma once
 
 #include "GrappleScriptingCore/ScriptingType.h"
-#include "GrappleScriptingCore/SytemConfiguration.h"
+#include "GrappleScriptingCore/SystemConfiguration.h"
+#include "GrappleScriptingCore/Bindings/ECS/EntityView.h"
 
 #include <string>
 #include <string_view>
 #include <typeinfo>
 
-namespace Grapple
+namespace Grapple::Internal
 {
 	struct SystemInfo
 	{
@@ -26,7 +27,7 @@ namespace Grapple
 	{
 	public:
 		virtual void Configure(SystemConfiguration& config) = 0;
-		virtual void Execute() = 0;
+		virtual void Execute(Internal::EntityView& chunk) = 0;
 	};
 
 #ifndef Grapple_SCRIPTING_CORE_NO_MACROS

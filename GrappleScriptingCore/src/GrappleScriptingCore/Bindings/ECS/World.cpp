@@ -1,6 +1,6 @@
 #include "World.h"
 
-namespace Grapple::Bindings
+namespace Grapple::Internal
 {
 	WorldBindings WorldBindings::Bindings;
 }

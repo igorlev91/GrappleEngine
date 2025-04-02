@@ -12,7 +12,7 @@
 
 namespace Grapple
 {
-	using ModuleEventFunction = void(*)(ModuleConfiguration&);
+	using ModuleEventFunction = void(*)(Internal::ModuleConfiguration&);
 
 	struct ScriptingTypeInstance
 	{
@@ -22,7 +22,7 @@ namespace Grapple
 
 	struct ScriptingModuleData
 	{
-		ModuleConfiguration Config;
+		Internal::ModuleConfiguration Config;
 		Ref<ScriptingModule> Module;
 
 		std::optional<ModuleEventFunction> OnLoad;
@@ -52,6 +52,7 @@ namespace Grapple
 		static void LoadModule(const std::filesystem::path& modulePath);
 		static void UnloadAllModules();
 
+		static void RegisterComponents();
 		static void RegisterSystems();
 
 		inline static Data& GetData() { return s_Data; }

@@ -8,7 +8,7 @@
 #include <typeinfo>
 #include <iostream>
 
-namespace Grapple
+namespace Grapple::Internal
 {
     class ScriptingType
     {
