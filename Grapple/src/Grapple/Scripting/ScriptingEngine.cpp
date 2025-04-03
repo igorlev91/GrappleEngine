@@ -5,6 +5,7 @@
 #include "Grapple/Scripting/ScriptingModule.h"
 #include "Grapple/Scripting/ScriptingBridge.h"
 #include "Grapple/Scene/Components.h"
+#include "Grapple/Project/Project.h"
 
 #include "GrappleScriptingCore/SystemInfo.h"
 #include "GrappleScriptingCore/ComponentInfo.h"
@@ -41,8 +42,13 @@ namespace Grapple
 		ScriptingBridge::SetCurrentWorld(world);
 	}
 
-	void ScriptingEngine::ReloadModules()
+	void ScriptingEngine::LoadModules()
 	{
+		Grapple_CORE_ASSERT(Project::GetActive());
+		for (const std::filesystem::path& modulePath : Project::GetActive()->ScriptingModules)
+			ScriptingEngine::LoadModule(modulePath);
+
+		s_Data.ShouldRegisterComponents = true;
 	}
 
 	void ScriptingEngine::ReleaseScriptingInstances()
@@ -102,6 +108,7 @@ namespace Grapple
 
 	void ScriptingEngine::UnloadAllModules()
 	{
+		s_Data.ShouldRegisterComponents = false;
 		ReleaseScriptingInstances();
 
 		for (auto& module : s_Data.Modules)
@@ -111,10 +118,18 @@ namespace Grapple
 		}
 
 		s_Data.Modules.clear();
+		s_Data.RegisteredComponentCount = 0;
 	}
 
 	void ScriptingEngine::RegisterComponents()
 	{
+		if (s_Data.Modules.size() == 0)
+			return;
+		if (!s_Data.ShouldRegisterComponents)
+			return;
+
+		Grapple_CORE_ASSERT(s_Data.CurrentWorld != nullptr);
+
 		for (ScriptingModuleData& module : s_Data.Modules)
 		{
 			for (Internal::ComponentInfo* component : *module.Config.RegisteredComponents)
@@ -134,9 +149,12 @@ namespace Grapple
 				{
 					component->Id = s_Data.CurrentWorld->GetRegistry().RegisterComponent(component->Name, type->Size, type->Destructor);
 					module.ComponentIdToTypeIndex.emplace(component->Id, typeIndexIterator->second);
+					s_Data.RegisteredComponentCount++;
 				}
 			}
 		}
+
+		s_Data.ShouldRegisterComponents = false;
 	}
 
 	void ScriptingEngine::RegisterSystems()

@@ -1,6 +1,7 @@
 #include "EditorContext.h"
 
 #include "Grapple/AssetManager/AssetManager.h"
+#include "Grapple/Scripting/ScriptingEngine.h"
 #include "GrappleEditor/AssetManager/EditorAssetManager.h"
 
 namespace Grapple
@@ -11,6 +12,9 @@ namespace Grapple
 	{
 		Instance.m_ActiveScene = CreateRef<Scene>();
 		Instance.m_EditedScene = Instance.m_ActiveScene;
+
+		ScriptingEngine::SetCurrentECSWorld(Instance.m_ActiveScene->GetECSWorld());
+		ScriptingEngine::RegisterComponents();
 	}
 
 	void EditorContext::OpenScene(AssetHandle handle)
@@ -19,13 +23,20 @@ namespace Grapple
 
 		if (AssetManager::IsAssetHandleValid(handle))
 		{
+			ScriptingEngine::UnloadAllModules();
+
 			Ref<EditorAssetManager> editorAssetManager = As<EditorAssetManager>(AssetManager::GetInstance());
 
 			if (AssetManager::IsAssetHandleValid(Instance.m_ActiveScene->Handle))
 				editorAssetManager->UnloadAsset(Instance.m_ActiveScene->Handle);
 			
+			ScriptingEngine::LoadModules();
+
 			Instance.m_ActiveScene = AssetManager::GetAsset<Scene>(handle);
 			Instance.m_EditedScene = Instance.m_ActiveScene;
+
+			ScriptingEngine::SetCurrentECSWorld(Instance.m_ActiveScene->GetECSWorld());
+			ScriptingEngine::RegisterComponents();
 		}
 	}
 }

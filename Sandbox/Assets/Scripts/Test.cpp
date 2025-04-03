@@ -22,8 +22,17 @@ namespace Sandbox
 	struct HealthComponent
 	{
 		Grapple_COMPONENT(HealthComponent);
+
+		glm::vec2 Vector2;
+		glm::vec3 Vector3;
+
+		static void ConfigureSerialization(Grapple::TypeSerializationSettings& settings)
+		{
+			Grapple_SERIALIZE_FIELD(settings, HealthComponent, Vector2);
+			Grapple_SERIALIZE_FIELD(settings, HealthComponent, Vector3);
+		}
 	};
-	Grapple_COMPONENT_IMPL(HealthComponent);
+	Grapple_COMPONENT_IMPL(HealthComponent, HealthComponent::ConfigureSerialization);
 
 	struct TestSystem : public Grapple::SystemBase
 	{
@@ -38,11 +47,12 @@ namespace Sandbox
 		virtual void Execute(Grapple::EntityView& chunk) override
 		{
 			Grapple::ComponentView<Transform> transforms = chunk.View<Transform>();
+			Grapple::ComponentView<HealthComponent> healthComponents = chunk.View<HealthComponent>();
 
 			for (Grapple::EntityElement entity : chunk)
 			{
 				Transform& transform = transforms[entity];
-				transform.Position += glm::vec3(0.1f, 0.0f, 0.0f) * Grapple::Time::GetDeltaTime();
+				transform.Position += healthComponents[entity].Vector3 * Grapple::Time::GetDeltaTime();
 			}
 		}
 	};
