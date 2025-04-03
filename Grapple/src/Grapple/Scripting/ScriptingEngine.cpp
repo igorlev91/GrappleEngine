@@ -64,25 +64,24 @@ namespace Grapple
 					type->Deleter(instance.Instance);
 				}
 			}
+
+			module.ScriptingInstances.clear();
 		}
 	}
 
 	void ScriptingEngine::LoadModule(const std::filesystem::path& modulePath)
 	{
-		Ref<ScriptingModule> module = ScriptingModule::Create(modulePath);
-		if (module->IsLoaded())
-		{
-			std::optional<ScriptingModuleFunction> onLoad = module->LoadFunction(s_ModuleLoaderFunctionName);
-			std::optional<ScriptingModuleFunction> onUnload = module->LoadFunction(s_ModuleUnloaderFunctionName);
+		ScriptingModuleData moduleData;
+		moduleData.Module.Load(modulePath);
 
-			ScriptingModuleData moduleData;
+		if (moduleData.Module.IsLoaded())
+		{
 			moduleData.Config = Internal::ModuleConfiguration{};
 
-			moduleData.Module = module;
-			moduleData.OnLoad = onLoad.has_value() ? (ModuleEventFunction)onLoad.value() : std::optional<ModuleEventFunction>{};
-			moduleData.OnUnload = onLoad.has_value() ? (ModuleEventFunction)onUnload.value() : std::optional<ModuleEventFunction>{};
+			moduleData.OnLoad = moduleData.Module.LoadFunction<ModuleEventFunction>(s_ModuleLoaderFunctionName);
+			moduleData.OnUnload = moduleData.Module.LoadFunction<ModuleEventFunction>(s_ModuleUnloaderFunctionName);
 
-			if (onLoad.has_value())
+			if (moduleData.OnLoad.has_value())
 			{
 				moduleData.OnLoad.value()(moduleData.Config);
 
@@ -94,9 +93,7 @@ namespace Grapple
 					moduleData.TypeNameToIndex.emplace(type->Name, typeIndex++);
 
 					if (type->ConfigureSerialization)
-					{
 						type->ConfigureSerialization(type->GetSerializationSettings());
-					}
 				}
 
 				ScriptingBridge::ConfigureModule(moduleData.Config);
@@ -118,7 +115,6 @@ namespace Grapple
 		}
 
 		s_Data.Modules.clear();
-		s_Data.RegisteredComponentCount = 0;
 	}
 
 	void ScriptingEngine::RegisterComponents()
@@ -130,8 +126,12 @@ namespace Grapple
 
 		Grapple_CORE_ASSERT(s_Data.CurrentWorld != nullptr);
 
+		size_t moduleIndex = 0;
 		for (ScriptingModuleData& module : s_Data.Modules)
 		{
+			Grapple_CORE_ASSERT(module.Module.IsLoaded());
+			Grapple_CORE_ASSERT(module.Config.RegisteredComponents != nullptr);
+			Grapple_CORE_ASSERT(module.Config.RegisteredTypes != nullptr);
 			for (Internal::ComponentInfo* component : *module.Config.RegisteredComponents)
 			{
 				auto typeIndexIterator = module.TypeNameToIndex.find(component->Name);
@@ -148,10 +148,11 @@ namespace Grapple
 				else
 				{
 					component->Id = s_Data.CurrentWorld->GetRegistry().RegisterComponent(component->Name, type->Size, type->Destructor);
-					module.ComponentIdToTypeIndex.emplace(component->Id, typeIndexIterator->second);
-					s_Data.RegisteredComponentCount++;
+					s_Data.ComponentIdToTypeIndex.emplace(component->Id, ScriptingEngine::Data::TypeIndex{ moduleIndex, typeIndexIterator->second });
 				}
 			}
+
+			moduleIndex++;
 		}
 
 		s_Data.ShouldRegisterComponents = false;
@@ -203,15 +204,10 @@ namespace Grapple
 
 	std::optional<const Internal::ScriptingType*> ScriptingEngine::FindComponentType(ComponentId id)
 	{
-		for (ScriptingModuleData& module : s_Data.Modules)
-		{
-			auto it = module.ComponentIdToTypeIndex.find(id);
-			if (it != module.ComponentIdToTypeIndex.end())
-			{
-				return (*module.Config.RegisteredTypes)[it->second];
-			}
-		}
-
+		auto it = s_Data.ComponentIdToTypeIndex.find(id);
+		if (it != s_Data.ComponentIdToTypeIndex.end())
+			return (*s_Data.Modules[it->second.ModuleIndex].Config.RegisteredTypes)[it->second.TypeIndex];
+		
 		return {};
 	}
 }

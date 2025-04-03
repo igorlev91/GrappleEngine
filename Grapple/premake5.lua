@@ -18,6 +18,8 @@ project "Grapple"
 		"src/",
 		"%{wks.location}/GrappleCommon/src/",
 		"%{wks.location}/GrappleECS/src/",
+		"%{wks.location}/GrappleScriptingCore/src/",
+
 		INCLUDE_DIRS.GLAD,
 		INCLUDE_DIRS.GLFW,
 		INCLUDE_DIRS.glm,
@@ -34,6 +36,7 @@ project "Grapple"
 		"ImGUI",
 		"GrappleECS",
 		"GrappleCommon",
+		"GrappleScriptingCore",
 		"yaml-cpp"
 	}
 
@@ -41,6 +44,7 @@ project "Grapple"
 	{
 		"GLFW_INCLUDE_NONE",
 		"YAML_CPP_STATIC_DEFINE",
+		"Grapple_SCRIPTING_CORE_NO_MACROS",
 	}
 
 	targetdir("%{wks.location}/bin/" .. OUTPUT_DIRECTORY .. "/%{prj.name}")

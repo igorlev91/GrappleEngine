@@ -22,7 +22,7 @@ namespace Grapple
 
 	struct ScriptingModuleData
 	{
-		Ref<ScriptingModule> Module;
+		ScriptingModule Module;
 		Internal::ModuleConfiguration Config;
 
 		std::optional<ModuleEventFunction> OnLoad;
@@ -30,8 +30,6 @@ namespace Grapple
 
 		std::vector<ScriptingTypeInstance> ScriptingInstances;
 		std::unordered_map<std::string_view, size_t> TypeNameToIndex;
-
-		std::unordered_map<ComponentId, size_t> ComponentIdToTypeIndex;
 	};
 
 	class ScriptingEngine
@@ -40,10 +38,17 @@ namespace Grapple
 		struct Data
 		{
 			World* CurrentWorld = nullptr;
-			size_t RegisteredComponentCount = 0;
 			bool ShouldRegisterComponents = false;
 			std::vector<ScriptingModuleData> Modules;
 			std::vector<ComponentId> TemporaryQueryComponents;
+
+			struct TypeIndex
+			{
+				size_t ModuleIndex;
+				size_t TypeIndex;
+			};
+
+			std::unordered_map<ComponentId, TypeIndex> ComponentIdToTypeIndex;
 		};
 	public:
 		static void Initialize();
