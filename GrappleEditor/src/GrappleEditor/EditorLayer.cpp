@@ -16,6 +16,7 @@
 #include "GrappleEditor/AssetManager/EditorAssetManager.h"
 
 #include "GrappleEditor/UI/SceneViewportWindow.h"
+#include "GrappleEditor/UI/EditorTitleBar.h"
 
 #include <imgui.h>
 #include <imgui_internal.h>
@@ -87,10 +88,10 @@ namespace Grapple
 		static bool fullscreen = true;
 		static ImGuiDockNodeFlags dockspaceFlags = ImGuiDockNodeFlags_None;
 
-		ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_MenuBar;
+		ImGuiViewport* viewport = ImGui::GetMainViewport();
+		ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoDocking;
 		if (fullscreen)
 		{
-			const ImGuiViewport* viewport = ImGui::GetMainViewport();
 			ImGui::SetNextWindowPos(viewport->WorkPos);
 			ImGui::SetNextWindowSize(viewport->WorkSize);
 			ImGui::SetNextWindowViewport(viewport->ID);
@@ -110,6 +111,9 @@ namespace Grapple
 
 		ImGuiID dockspaceId = ImGui::GetID("DockSpace");
 		ImGui::DockSpace(dockspaceId, ImVec2(0.0f, 0.0f), dockspaceFlags);
+
+		EditorTitleBar titleBar;
+		titleBar.OnRenderImGui();
 
 		if (ImGui::BeginMenuBar())
 		{

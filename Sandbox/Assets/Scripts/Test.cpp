@@ -9,30 +9,18 @@
 
 namespace Sandbox
 {
-	struct Transform
+	struct MovingQuadComponet
 	{
-		Grapple_COMPONENT(Transform);
+		Grapple_COMPONENT(MovingQuadComponet);
 
-		glm::vec3 Position;
-		glm::vec3 Rotation;
-		glm::vec3 Scale;
-	};
-	Grapple_COMPONENT_ALIAS_IMPL(Transform, "struct Grapple::TransformComponent");
-
-	struct HealthComponent
-	{
-		Grapple_COMPONENT(HealthComponent);
-
-		glm::vec2 Vector2;
-		glm::vec3 Vector3;
-
+		glm::vec3 Velocity;
+		
 		static void ConfigureSerialization(Grapple::TypeSerializationSettings& settings)
 		{
-			Grapple_SERIALIZE_FIELD(settings, HealthComponent, Vector2);
-			Grapple_SERIALIZE_FIELD(settings, HealthComponent, Vector3);
+			Grapple_SERIALIZE_FIELD(settings, MovingQuadComponet, Velocity);
 		}
 	};
-	Grapple_COMPONENT_IMPL(HealthComponent, HealthComponent::ConfigureSerialization);
+	Grapple_COMPONENT_IMPL(MovingQuadComponet, MovingQuadComponet::ConfigureSerialization);
 
 	struct TestSystem : public Grapple::SystemBase
 	{
@@ -40,19 +28,25 @@ namespace Sandbox
 
 		virtual void Configure(Grapple::SystemConfiguration& config) override
 		{
-			config.Query.Add<Transform>();
-			config.Query.Add<HealthComponent>();
+			config.Query.Add<Grapple::Transform>();
+			config.Query.Add<MovingQuadComponet>();
+			config.Query.Add<Grapple::Sprite>();
 		}
 
 		virtual void Execute(Grapple::EntityView& chunk) override
 		{
-			Grapple::ComponentView<Transform> transforms = chunk.View<Transform>();
-			Grapple::ComponentView<HealthComponent> healthComponents = chunk.View<HealthComponent>();
+			Grapple::ComponentView<Grapple::Transform> transforms = chunk.View<Grapple::Transform>();
+			Grapple::ComponentView<Grapple::Sprite> sprites = chunk.View<Grapple::Sprite>();
+			Grapple::ComponentView<MovingQuadComponet> quadComponents = chunk.View<MovingQuadComponet>();
 
 			for (Grapple::EntityElement entity : chunk)
 			{
-				Transform& transform = transforms[entity];
-				transform.Position += healthComponents[entity].Vector3 * Grapple::Time::GetDeltaTime();
+				Grapple::Transform& transform = transforms[entity];
+				Grapple::Sprite& sprite = sprites[entity];
+
+				transform.Position += quadComponents[entity].Velocity * Grapple::Time::GetDeltaTime();
+				sprite.Color.r = glm::sin(transform.Position.x * 10.0f);
+				sprite.Color.g = glm::cos(transform.Position.y * 10.0f);
 			}
 		}
 	};

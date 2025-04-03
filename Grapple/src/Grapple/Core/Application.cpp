@@ -18,6 +18,7 @@ namespace Grapple
 		properties.Title = "Grapple Engine";
 		properties.Width = 1280;
 		properties.Height = 720;
+		properties.CustomTitleBar = true;
 
 		m_Window = Window::Create(properties);
 		m_Window->SetEventCallback([this](Event& event)

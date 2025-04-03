@@ -17,7 +17,7 @@ namespace Grapple
 		m_Library = library.value_or(nullptr);
 	}
 
-	ScriptingModule::ScriptingModule(ScriptingModule&& other)
+	ScriptingModule::ScriptingModule(ScriptingModule&& other) noexcept
 		: m_Library(other.m_Library)
 	{
 		other.m_Library = nullptr;

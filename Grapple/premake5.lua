@@ -52,6 +52,8 @@ project "Grapple"
 
 	filter "system:windows"
 		systemversion "latest"
+
+		links { "dwmapi.lib" }
 	
 	filter "configurations:Debug"
 		defines "Grapple_DEBUG"
