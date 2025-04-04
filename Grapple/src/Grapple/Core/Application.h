@@ -2,7 +2,7 @@
 
 #include "Grapple/Core/Window.h"
 #include "Grapple/Core/LayerStack.h"
-#include "Grapple/Core/ImGUILayer.h"
+#include "Grapple/ImGui/ImGUILayer.h"
 
 namespace Grapple
 {

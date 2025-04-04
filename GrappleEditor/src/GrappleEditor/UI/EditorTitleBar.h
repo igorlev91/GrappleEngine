@@ -5,6 +5,7 @@
 
 namespace Grapple
 {
+	class EditorLayer;
 	class EditorTitleBar
 	{
 	public:
