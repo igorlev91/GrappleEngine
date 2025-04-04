@@ -98,7 +98,8 @@ namespace Grapple
 				emitter << YAML::EndMap;
 			}
 			else
-				Grapple_CORE_ERROR("Componnet with id {0} cannot be serialized because it's type infomation cannot be found", component);
+				Grapple_CORE_ERROR("Componnet with id={{0};{1}} cannot be serialized because it's type infomation cannot be found",
+					component.GetIndex(), component.GetGeneration());
 		}
 	}
 

@@ -3,6 +3,8 @@
 #include "Grapple/Core/Assert.h"
 #include "Grapple/Core/Core.h"
 
+#include "GrappleECS/ComponentId.h"
+
 #include <string>
 #include <vector>
 #include <xhash>
@@ -10,12 +12,10 @@
 
 namespace Grapple
 {
-	using ComponentId = uint32_t;
-	constexpr ComponentId INVALID_COMPONENT_ID = UINT32_MAX;
-
 	struct ComponentInfo
 	{
 		ComponentId Id;
+		uint32_t RegistryIndex;
 		std::string Name;
 		size_t Size;
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GrappleScriptingCore/Bindings/ECS/Component.h"
+#include "GrappleECS/ComponentId.h"
 
 #include <vector>
 

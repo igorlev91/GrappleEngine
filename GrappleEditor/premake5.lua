@@ -16,6 +16,7 @@ project "GrappleEditor"
 		"%{wks.location}/Grapple/src",
 		"%{wks.location}/GrappleCommon/src",
 		"%{wks.location}/GrappleECS/src",
+		"%{wks.location}/GrappleECS/include",
 		"%{wks.location}/GrappleScriptingCore/src/",
 		INCLUDE_DIRS.glm,
 		INCLUDE_DIRS.spdlog,

@@ -1,7 +1,8 @@
 #pragma once
 
+#include "GrappleECS/ComponentId.h"
+
 #include "GrappleScriptingCore/Bindings/ECS/ECS.h"
-#include "GrappleScriptingCore/Bindings/ECS/Component.h"
 
 namespace Grapple::Internal
 {

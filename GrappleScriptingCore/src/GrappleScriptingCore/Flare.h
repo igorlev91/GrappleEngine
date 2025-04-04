@@ -2,7 +2,8 @@
 
 #include "Grapple/Core/UUID.h"
 
-#include "GrappleScriptingCore/Bindings/ECS/Component.h"
+#include "GrappleECS/ComponentId.h"
+
 #include "GrappleScriptingCore/Bindings/ECS/World.h"
 #include "GrappleScriptingCore/Bindings/ECS/EntityView.h"
 
