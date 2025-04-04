@@ -11,6 +11,7 @@
 #include "Grapple/Platform/Platform.h"
 
 #include "Grapple/Scripting/ScriptingEngine.h"
+#include "Grapple/Input/InputManager.h"
 
 #include "GrappleEditor/EditorContext.h"
 #include "GrappleEditor/AssetManager/EditorAssetManager.h"
@@ -89,6 +90,7 @@ namespace Grapple
 	void EditorLayer::OnEvent(Event& event)
 	{
 		m_Camera.ProcessEvents(event);
+		InputManager::ProcessEvent(event);
 	}
 
 	void EditorLayer::OnImGUIRender()
@@ -122,26 +124,6 @@ namespace Grapple
 
 		EditorTitleBar titleBar;
 		titleBar.OnRenderImGui();
-
-		if (ImGui::BeginMenuBar())
-		{
-			ImGuiWindow* window = ImGui::GetCurrentWindow();
-			float buttonHeight = window->MenuBarHeight() - 4.0f;
-
-			ImVec2 buttonSize = ImVec2(60.0f, buttonHeight);
-			if (EditorContext::Instance.Mode == EditorMode::Edit)
-			{
-				if (ImGui::Button("Play", buttonSize))
-					EnterPlayMode();
-			}
-			else
-			{
-				if (ImGui::Button("Stop", buttonSize))
-					ExitPlayMode();
-			}
-
-			ImGui::EndMenuBar();
-		}
 
 		{
 			ImGui::Begin("Renderer");
