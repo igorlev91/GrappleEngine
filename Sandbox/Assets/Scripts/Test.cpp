@@ -22,14 +22,25 @@ namespace Sandbox
 	};
 	Grapple_COMPONENT_IMPL(MovingQuadComponet, MovingQuadComponet::ConfigureSerialization);
 
+	struct TestComponent
+	{
+		Grapple_COMPONENT(TestComponent);
+
+		static void ConfigureSerialization(Grapple::TypeSerializationSettings& settings)
+		{
+		}
+	};
+	Grapple_COMPONENT_IMPL(TestComponent, TestComponent::ConfigureSerialization);
+
 	struct TestSystem : public Grapple::SystemBase
 	{
 		Grapple_SYSTEM(TestSystem);
 
 		virtual void Configure(Grapple::SystemConfiguration& config) override
 		{
-			config.Query.Add<Grapple::Transform>();
-			config.Query.Add<MovingQuadComponet>();
+			config.Query.With<Grapple::Transform>();
+			config.Query.With<MovingQuadComponet>();
+			config.Query.Without<TestComponent>();
 		}
 
 		virtual void Execute(Grapple::EntityView& chunk) override
