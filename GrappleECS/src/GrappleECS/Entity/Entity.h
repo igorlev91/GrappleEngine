@@ -42,7 +42,7 @@ namespace Grapple
 	{
 		Entity Id;
 
-		size_t RegistryIndex;
+		uint32_t RegistryIndex;
 		ArchetypeId Archetype;
 		size_t BufferIndex;
 	};
