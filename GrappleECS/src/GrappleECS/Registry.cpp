@@ -173,6 +173,7 @@ namespace Grapple
 
 			bool shouldNotifyQueryCache = false;
 			auto it = m_ComponentSetToArchetype.find(ComponentSet(newComponents));
+
 			if (it != m_ComponentSetToArchetype.end())
 			{
 				newArchetypeId = it->second;

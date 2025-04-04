@@ -24,6 +24,8 @@
 #define Grapple_EXPEND_MACRO(a) a
 #define FALRE_STRINGIFY_MACRO(a) #a
 
+#define HAS_BIT(value, bit) ((value & bit) != 0)
+
 namespace Grapple
 {
 	template<typename T>
