@@ -6,7 +6,7 @@
 #include "GrappleECS/World.h"
 
 #include "GrappleScriptingCore/ModuleConfiguration.h"
-#include "GrappleScriptingCore/SystemInfo.h"
+#include "GrappleScriptingCore/Bindings/ECS/SystemInfo.h"
 
 #include <filesystem>
 

@@ -7,8 +7,8 @@
 #include "Grapple/Scene/Components.h"
 #include "Grapple/Project/Project.h"
 
-#include "GrappleScriptingCore/SystemInfo.h"
-#include "GrappleScriptingCore/ComponentInfo.h"
+#include "GrappleScriptingCore/Bindings/ECS/SystemInfo.h"
+#include "GrappleScriptingCore/Bindings/ECS/ComponentInfo.h"
 
 #include "GrappleECS.h"
 
@@ -176,16 +176,24 @@ namespace Grapple
 
 				module.ScriptingInstances.push_back(ScriptingTypeInstance{ typeIndexIterator->second, systemInstance });
 
-				Internal::SystemConfiguration config(&s_Data.TemporaryQueryComponents);
+				SystemsManager& systems = s_Data.CurrentWorld->GetSystemsManager();
+
+				Internal::SystemConfiguration config(&s_Data.TemporaryQueryComponents, defaultGroup.value());
 				systemInstance->Configure(config);
+
+				if (!systems.IsGroupIdValid(config.Group))
+				{
+					Grapple_CORE_ERROR("System '{0}' cannot be registered because the specified system group id '{1}' is not valid", 
+						systemInfo->Name, config.Group);
+					continue;
+				}
 
 				Query query = s_Data.CurrentWorld->GetRegistry().CreateQuery(ComponentSet(
 					s_Data.TemporaryQueryComponents.data(),
 					s_Data.TemporaryQueryComponents.size()));
 
-				SystemsManager& systems = s_Data.CurrentWorld->GetSystemsManager();
-				systems.RegisterSystem((*module.Config.RegisteredTypes)[typeIndexIterator->second]->Name,
-					defaultGroup.value(),
+				systems.RegisterSystem(type->Name,
+					config.Group,
 					query,
 					nullptr,
 					[systemInstance](SystemExecutionContext& context)

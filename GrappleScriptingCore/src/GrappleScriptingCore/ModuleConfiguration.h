@@ -2,12 +2,12 @@
 
 #include "GrappleScriptingCore/Defines.h"
 #include "GrappleScriptingCore/ScriptingType.h"
-#include "GrappleScriptingCore/SystemInfo.h"
-#include "GrappleScriptingCore/ComponentInfo.h"
 
 #include "GrappleScriptingCore/Bindings/ECS/ECS.h"
 #include "GrappleScriptingCore/Bindings/ECS/EntityView.h"
 #include "GrappleScriptingCore/Bindings/ECS/World.h"
+#include "GrappleScriptingCore/Bindings/ECS/ComponentInfo.h"
+#include "GrappleScriptingCore/Bindings/ECS/SystemInfo.h"
 
 #include "GrappleScriptingCore/Bindings/Time.h"
 #include "GrappleScriptingCore/Bindings/Input.h"

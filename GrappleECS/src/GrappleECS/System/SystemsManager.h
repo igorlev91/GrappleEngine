@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GrappleECS/Query/Query.h"
+#include "GrappleECS/System.h"
 
 #include <functional>
 #include <vector>
@@ -10,8 +11,6 @@
 
 namespace Grapple
 {
-	using SystemGroupId = uint32_t;
-
 	class SystemExecutionContext
 	{
 	public:
@@ -63,12 +62,16 @@ namespace Grapple
 			const SystemEventFunction& onAfterUpdate = nullptr);
 
 		void ExecuteGroup(SystemGroupId id);
+		inline bool IsGroupIdValid(SystemGroupId id)
+		{
+			return id < (SystemGroupId)m_Groups.size();
+		}
 		
 		inline const std::vector<SystemGroup>& GetGroups() const { return m_Groups; }
 		inline const std::vector<SystemData>& GetSystems() const { return m_Systems; }
 	private:
 		std::vector<SystemData> m_Systems;
-		std::unordered_map<std::string_view, SystemGroupId> m_GroupNameToId;
+		std::unordered_map<std::string, SystemGroupId> m_GroupNameToId;
 		std::vector<SystemGroup> m_Groups;
 	};
 }

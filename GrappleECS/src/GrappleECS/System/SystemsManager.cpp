@@ -15,7 +15,7 @@ namespace Grapple
 
 	std::optional<SystemGroupId> SystemsManager::FindGroup(std::string_view name) const
 	{
-		auto it = m_GroupNameToId.find(name);
+		auto it = m_GroupNameToId.find(std::string(name));
 		if (it == m_GroupNameToId.end())
 			return {};
 		return it->second;

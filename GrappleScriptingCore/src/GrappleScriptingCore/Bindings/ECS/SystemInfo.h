@@ -1,7 +1,7 @@
 #pragma once
 
 #include "GrappleScriptingCore/ScriptingType.h"
-#include "GrappleScriptingCore/SystemConfiguration.h"
+#include "GrappleScriptingCore/Bindings/ECS/SystemConfiguration.h"
 #include "GrappleScriptingCore/Bindings/ECS/EntityView.h"
 
 #include <string>
