@@ -1,12 +1,18 @@
 #include "SceneViewportWindow.h"
 
 #include "Grapple/Renderer/RenderCommand.h"
+#include "Grapple/Scene/Components.h"
+#include "Grapple/Math/Math.h"
+
+#include "Grapple/Input/InputManager.h"
 
 #include "GrappleEditor/EditorContext.h"
 #include "GrappleEditor/AssetManager/EditorAssetManager.h"
 #include "GrappleEditor/EditorLayer.h"
 
 #include <imgui.h>
+#include <imgui_internal.h>
+#include <ImGuizmo.h>
 
 namespace Grapple
 {
@@ -32,12 +38,11 @@ namespace Grapple
 	{
 		BeginImGui();
 
+		World& world = EditorContext::GetActiveScene()->GetECSWorld();
 		if (ImGui::BeginDragDropTarget())
 		{
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(ASSET_PAYLOAD_NAME))
 			{
-				World& world = EditorContext::GetActiveScene()->GetECSWorld();
-
 				AssetHandle handle = *(AssetHandle*)payload->Data;
 				const AssetMetadata* metadata = AssetManager::GetAssetMetadata(handle);
 				if (metadata != nullptr)
@@ -69,6 +74,63 @@ namespace Grapple
 		ImGuiIO& io = ImGui::GetIO();
 		if (io.MouseClicked[ImGuiMouseButton_Left] && m_FrameBuffer != nullptr && m_IsHovered && m_RelativeMousePosition.x >= 0 && m_RelativeMousePosition.y >= 0)
 			EditorContext::Instance.SelectedEntity = GetEntityUnderCursor();
+
+		if (world.IsEntityAlive(EditorContext::Instance.SelectedEntity) && EditorContext::Instance.Gizmo != GizmoMode::None)
+		{
+			ImGuizmo::SetOrthographic(false);
+			ImGuizmo::SetDrawlist();
+
+			ImVec2 windowPosition = ImGui::GetWindowPos();
+			ImGuizmo::SetRect(windowPosition.x + m_ViewportOffset.x, 
+				windowPosition.y + m_ViewportOffset.y, 
+				(float)m_RenderData.ViewportSize.x, 
+				(float) m_RenderData.ViewportSize.y);
+
+			std::optional<TransformComponent*> transform = world.TryGetEntityComponent<TransformComponent>(EditorContext::Instance.SelectedEntity);
+			if (transform.has_value())
+			{
+				glm::mat4 transformationMatrix = transform.value()->GetTransformationMatrix();
+
+				// TODO: move snap values to editor settings
+				float snapValue = 0.5f;
+
+				ImGuizmo::OPERATION operation = (ImGuizmo::OPERATION)-1;
+				switch (EditorContext::Instance.Gizmo)
+				{
+				case GizmoMode::Translate:
+					operation = ImGuizmo::TRANSLATE;
+					break;
+				case GizmoMode::Rotate:
+					snapValue = 5.0f;
+					operation = ImGuizmo::ROTATE;
+					break;
+				case GizmoMode::Scale:
+					operation = ImGuizmo::SCALE;
+					break;
+				default:
+					Grapple_CORE_ASSERT("Unhandled Gizmo type");
+				}
+
+				ImGuizmo::MODE mode = ImGuizmo::WORLD;
+
+				bool snappingEnabled = InputManager::IsKeyPressed(KeyCode::LeftControl) || InputManager::IsKeyPressed(KeyCode::RightControl);
+
+				if (ImGuizmo::Manipulate(
+					glm::value_ptr(m_Camera.GetViewMatrix()),
+					glm::value_ptr(m_Camera.GetProjectionMatrix()),
+					operation, mode,
+					glm::value_ptr(transformationMatrix),
+					nullptr, snappingEnabled ? &snapValue : nullptr))
+				{
+					Math::DecomposeTransform(transformationMatrix,
+						transform.value()->Position,
+						transform.value()->Rotation,
+						transform.value()->Scale);
+
+					transform.value()->Rotation = glm::degrees(transform.value()->Rotation);
+				}
+			}
+		}
 
 		EndImGui();
 	}

@@ -13,3 +13,6 @@
 [submodule "Grapple/vendor/yaml-cpp"]
 	path = Grapple/vendor/yaml-cpp
 	url = git@github.com:igorlev91/yaml-cpp.git
+[submodule "Grapple/vendor/ImGuizmo"]
+	path = Grapple/vendor/ImGuizmo
+	url = git@github.com:CedricGuillemet/ImGuizmo.git

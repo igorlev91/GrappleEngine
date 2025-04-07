@@ -74,7 +74,7 @@ namespace Grapple
 	{
 		mouseInput *= m_Settings.RotationSpeed;
 
-		m_Rotation.x -= mouseInput.y;
+		m_Rotation.x += mouseInput.y;
 		m_Rotation.y += mouseInput.x;
 
 		RecalculateViewMatrix();
