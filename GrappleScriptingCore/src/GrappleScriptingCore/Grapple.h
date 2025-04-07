@@ -13,6 +13,8 @@
 #include "GrappleScriptingCore/Bindings/Time.h"
 #include "GrappleScriptingCore/Bindings/Input.h"
 
+#include "GrappleScriptingCore/Bindings/Texture.h"
+
 #include "GrappleScriptingCore/ScriptingType.h"
 
 #include "GrappleScriptingCore/TypeSerializationSettings.h"
@@ -34,6 +36,8 @@ namespace Grapple
 	using Internal::Time;
 	using Internal::Input;
 
+	using Internal::TextureAsset;
+
 	using Internal::TypeSerializationSettings;
 
 	struct Transform
@@ -52,6 +56,6 @@ namespace Grapple
 		glm::vec4 Color;
 		glm::vec2 TextureTiling;
 
-		UUID Texture;
+		TextureAsset Texture;
 	};
 }

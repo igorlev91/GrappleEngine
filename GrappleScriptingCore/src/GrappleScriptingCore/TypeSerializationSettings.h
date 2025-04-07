@@ -1,5 +1,8 @@
 #pragma once
 
+#include "GrappleScriptingCore/Bindings/Asset.h"
+#include "GrappleScriptingCore/Bindings/Texture.h"
+
 #include <glm/glm.hpp>
 
 #include <string>
@@ -23,6 +26,9 @@ namespace Grapple::Internal
 		Float4,
 
 		Color4,
+
+		Asset,
+		Texture,
 	};
 
 	struct DataTypeToFiedType
@@ -38,6 +44,8 @@ namespace Grapple::Internal
 	DATA_TYPE_TO_FIELD_TYPE_CONVERTER(int32_t);
 	DATA_TYPE_TO_FIELD_TYPE_CONVERTER(uint32_t);
 	DATA_TYPE_TO_FIELD_TYPE_CONVERTER(float);
+	DATA_TYPE_TO_FIELD_TYPE_CONVERTER(AssetHandle);
+	DATA_TYPE_TO_FIELD_TYPE_CONVERTER(TextureAsset);
 	DATA_TYPE_TO_FIELD_TYPE_CONVERTER(glm::vec2);
 	DATA_TYPE_TO_FIELD_TYPE_CONVERTER(glm::vec3);
 	DATA_TYPE_TO_FIELD_TYPE_CONVERTER(glm::vec4);

@@ -22,7 +22,7 @@ namespace Grapple
 
 	enum class TextureFiltering
 	{
-		NoFiltering,
+		Closest,
 		Linear,
 	};
 
