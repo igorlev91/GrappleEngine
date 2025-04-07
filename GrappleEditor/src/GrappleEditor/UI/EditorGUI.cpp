@@ -1,6 +1,7 @@
 #include "EditorGUI.h"
 
 #include "Grapple/AssetManager/AssetManager.h"
+#include "GrappleEditor/AssetManager/EditorAssetManager.h"
 
 #include <imgui.h>
 
@@ -108,7 +109,7 @@ namespace Grapple
 		bool result = false;
 		if (ImGui::BeginDragDropTarget())
 		{
-			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_HANDLE"))
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(ASSET_PAYLOAD_NAME))
 			{
 				handle = *(AssetHandle*)payload->Data;
 				result = true;

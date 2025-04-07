@@ -217,10 +217,14 @@ namespace Grapple
 
 		EditorContext::SetActiveScene(playModeScene);
 		EditorContext::Instance.Mode = EditorMode::Play;
+
+		EditorContext::GetActiveScene()->OnRuntimeStart();
 	}
 
 	void EditorLayer::ExitPlayMode()
 	{
+		EditorContext::GetActiveScene()->OnRuntimeEnd();
+
 		Grapple_CORE_ASSERT(EditorContext::Instance.Mode == EditorMode::Play);
 
 		EditorContext::SetActiveScene(EditorContext::GetEditedScene());

@@ -44,7 +44,6 @@ namespace Grapple
 		glm::vec3 Rotation;
 		glm::vec3 Scale;
 	};
-	Grapple_COMPONENT_ALIAS_IMPL(Transform, "struct Grapple::TransformComponent");
 
 	struct Sprite
 	{
@@ -55,5 +54,4 @@ namespace Grapple
 
 		UUID Texture;
 	};
-	Grapple_COMPONENT_ALIAS_IMPL(Sprite, "struct Grapple::SpriteComponent");
 }

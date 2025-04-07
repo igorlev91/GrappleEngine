@@ -35,6 +35,8 @@ namespace Grapple
 		bool RemoveEntityComponent(Entity entity, ComponentId componentId);
 		bool IsEntityAlive(Entity entity) const;
 
+		inline const std::vector<EntityRecord>& GetEntityRecords() const { return m_EntityRecords; }
+
 		std::optional<Entity> FindEntityByIndex(uint32_t entityIndex);
 		std::optional<Entity> FindEntityByRegistryIndex(uint32_t registryIndex);
 
