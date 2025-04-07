@@ -17,8 +17,13 @@ namespace Grapple
 	{
 		World& world = EditorContext::GetActiveScene()->GetECSWorld();
 
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
 		ImGui::Begin("Scene");
+
+		const auto& records = world.GetRegistry().GetEntityRecords();
+
+		ImGui::BeginChild("Scene Entities");
+		ImGuiListClipper clipper;
+		clipper.Begin(records.size());
 
 		if (ImGui::BeginPopupContextWindow("Scene Context Menu"))
 		{
@@ -27,12 +32,6 @@ namespace Grapple
 
 			ImGui::EndMenu();
 		}
-
-		const auto& records = world.GetRegistry().GetEntityRecords();
-
-		ImGui::BeginChild("Scene Entities");
-		ImGuiListClipper clipper;
-		clipper.Begin(records.size());
 
 		std::optional<Entity> deletedEntity;
 		while (clipper.Step())
@@ -72,6 +71,5 @@ namespace Grapple
 			world.DeleteEntity(deletedEntity.value());
 
 		ImGui::End();
-		ImGui::PopStyleVar();
 	}
 }
