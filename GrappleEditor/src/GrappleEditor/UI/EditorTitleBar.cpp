@@ -7,7 +7,9 @@
 
 #include "GrappleEditor/EditorContext.h"
 #include "GrappleEditor/EditorLayer.h"
+
 #include "GrappleEditor/UI/EditorGUI.h"
+#include "GrappleEditor/UI/SystemsInspectorWindow.h"
 
 #include <imgui_internal.h>
 
@@ -66,6 +68,14 @@ namespace Grapple
 				EditorLayer::GetInstance().SaveActiveSceneAs();
 
 			ImGui::EndDisabled();
+			EditorGUI::EndMenu();
+		}
+
+		if (EditorGUI::BeginMenu("Window"))
+		{
+			if (ImGui::MenuItem("Systems Inspector"))
+				SystemsInspectorWindow::Show();
+
 			EditorGUI::EndMenu();
 		}
 

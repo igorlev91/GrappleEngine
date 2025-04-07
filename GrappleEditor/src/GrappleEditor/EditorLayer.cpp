@@ -18,6 +18,7 @@
 
 #include "GrappleEditor/UI/SceneViewportWindow.h"
 #include "GrappleEditor/UI/EditorTitleBar.h"
+#include "GrappleEditor/UI/SystemsInspectorWindow.h"
 
 #include <imgui.h>
 #include <imgui_internal.h>
@@ -159,6 +160,8 @@ namespace Grapple
 
 		for (auto& viewport : m_Viewports)
 			viewport->OnRenderImGui();
+
+		SystemsInspectorWindow::OnImGuiRender();
 
 		m_SceneWindow.OnImGuiRender();
 		m_PropertiesWindow.OnImGuiRender();
