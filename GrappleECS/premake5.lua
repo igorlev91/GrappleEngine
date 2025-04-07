@@ -8,11 +8,14 @@ project "GrappleECS"
     {
         "src/**.h",
         "src/**.cpp",
+
+		"include/**.h",
     }
 
     includedirs
 	{
 		"src/",
+		"include/",
 		"%{wks.location}/GrappleCommon/src/",
 		INCLUDE_DIRS.spdlog,
 	}

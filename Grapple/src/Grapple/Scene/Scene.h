@@ -6,6 +6,8 @@
 #include "Grapple/Renderer/Shader.h"
 #include "Grapple/Renderer/RenderData.h"
 
+#include "Grapple/Scene/SceneRenderer.h"
+
 #include "GrappleECS.h"
 
 namespace Grapple
@@ -33,8 +35,9 @@ namespace Grapple
 		World m_World;
 		Ref<Shader> m_QuadShader;
 
+		SystemGroupId m_2DRenderingGroup;
+
 		Query m_CameraDataUpdateQuery;
-		Query m_SpritesQuery;
 	private:
 		friend SceneSerializer;
 	};

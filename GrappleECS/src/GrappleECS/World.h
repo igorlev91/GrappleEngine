@@ -6,6 +6,7 @@
 #include "GrappleECS/Query/Query.h"
 
 #include "GrappleECS/System/System.h"
+#include "GrappleECS/System/SystemsManager.h"
 
 #include <vector>
 #include <string_view>
@@ -150,10 +151,14 @@ namespace Grapple
 
 		void RegisterSystem(const Query& query, const SystemFunction& system);
 
+		SystemsManager& GetSystemsManager() { return m_SystemsManager; }
+		const SystemsManager& GetSystemsManager() const { return m_SystemsManager; }
+		
 		void OnUpdate();
 	private:
 		Registry m_Registry;
 
 		std::vector<System> m_Systems;
+		SystemsManager m_SystemsManager;
 	};
 }
