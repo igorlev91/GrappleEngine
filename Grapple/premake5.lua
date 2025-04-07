@@ -18,6 +18,7 @@ project "Grapple"
 		"src/",
 		"%{wks.location}/GrappleCommon/src/",
 		"%{wks.location}/GrappleECS/src/",
+		"%{wks.location}/GrappleECS/include/",
 		"%{wks.location}/GrappleScriptingCore/src/",
 
 		INCLUDE_DIRS.GLAD,

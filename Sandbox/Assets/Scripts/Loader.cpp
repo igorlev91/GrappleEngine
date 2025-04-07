@@ -2,8 +2,9 @@
 
 #include "GrappleScriptingCore/ModuleConfiguration.h"
 #include "GrappleScriptingCore/ScriptingType.h"
-#include "GrappleScriptingCore/SystemInfo.h"
-#include "GrappleScriptingCore/ComponentInfo.h"
+
+#include "GrappleScriptingCore/Bindings/ECS/ComponentInfo.h"
+#include "GrappleScriptingCore/Bindings/ECS/SystemInfo.h"
 #include "GrappleScriptingCore/Bindings/ECS/EntityView.h"
 
 Grapple_API void OnModuleLoaded(Grapple::Internal::ModuleConfiguration& config)

@@ -61,7 +61,7 @@ namespace Grapple
 			Grapple_CORE_ASSERT(m_Count, "Components count shouldn't been 0");
 		}
 
-		constexpr ComponentSet(ComponentId* ids, size_t count)
+		constexpr ComponentSet(const ComponentId* ids, size_t count)
 			: m_Ids(ids), m_Count(count) {}
 
 		constexpr const ComponentId* GetIds() { return m_Ids; }
