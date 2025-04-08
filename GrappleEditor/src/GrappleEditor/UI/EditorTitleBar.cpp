@@ -10,6 +10,7 @@
 
 #include "GrappleEditor/UI/EditorGUI.h"
 #include "GrappleEditor/UI/SystemsInspectorWindow.h"
+#include "GrappleEditor/UI/ProjectSettingsWindow.h"
 
 #include <imgui_internal.h>
 
@@ -54,6 +55,10 @@ namespace Grapple
 				if (projectPath.has_value())
 					Project::OpenProject(projectPath.value());
 			}
+
+			if (ImGui::MenuItem("Settings"))
+				ProjectSettingsWindow::Show();
+			
 			ImGui::EndDisabled();
 
 			EditorGUI::EndMenu();

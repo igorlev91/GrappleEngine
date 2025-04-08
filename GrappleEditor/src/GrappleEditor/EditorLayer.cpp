@@ -19,6 +19,7 @@
 #include "GrappleEditor/UI/SceneViewportWindow.h"
 #include "GrappleEditor/UI/EditorTitleBar.h"
 #include "GrappleEditor/UI/SystemsInspectorWindow.h"
+#include "GrappleEditor/UI/ProjectSettingsWindow.h"
 
 #include <imgui.h>
 #include <imgui_internal.h>
@@ -201,6 +202,7 @@ namespace Grapple
 			viewport->OnRenderImGui();
 
 		SystemsInspectorWindow::OnImGuiRender();
+		ProjectSettingsWindow::OnRenderImGui();
 
 		m_SceneWindow.OnImGuiRender();
 		m_PropertiesWindow.OnImGuiRender();
@@ -227,6 +229,9 @@ namespace Grapple
 
 		UpdateWindowTitle();
 		m_AssetManagerWindow.RebuildAssetTree();
+
+		AssetHandle startScene = Project::GetActive()->StartScene;
+		EditorContext::OpenScene(startScene);
 	}
 
 	void EditorLayer::SaveActiveScene()
