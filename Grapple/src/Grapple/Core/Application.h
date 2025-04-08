@@ -2,6 +2,7 @@
 
 #include "Grapple/Core/Window.h"
 #include "Grapple/Core/LayerStack.h"
+#include "Grapple/Core/CommandLineArguments.h"
 #include "Grapple/ImGui/ImGUILayer.h"
 
 namespace Grapple
@@ -9,7 +10,7 @@ namespace Grapple
 	class Application
 	{
 	public:
-		Application();
+		Application(CommandLineArguments arguments);
 		virtual ~Application();
 
 		void Run();
@@ -19,10 +20,12 @@ namespace Grapple
 		void PushOverlay(const Ref<Layer>& layer);
 
 		Ref<Window> GetWindow() const { return m_Window; }
+		CommandLineArguments GetCommandLineArguments() const { return m_CommandLineArguments; }
 
 		static Application& GetInstance();
 	protected:
 		Ref<Window> m_Window;
+		CommandLineArguments m_CommandLineArguments;
 	private:
 		LayerStack m_LayersStack;
 		Ref<ImGUILayer> m_ImGuiLayer;

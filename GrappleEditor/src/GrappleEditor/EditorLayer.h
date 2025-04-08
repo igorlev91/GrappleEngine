@@ -2,6 +2,7 @@
 
 #include "Grapple.h"
 #include "Grapple/Core/Layer.h"
+#include "Grapple/Core/CommandLineArguments.h"
 
 #include "GrappleEditor/UI/SceneWindow.h"
 #include "GrappleEditor/UI/PropertiesWindow.h"
@@ -33,9 +34,13 @@ namespace Grapple
 		void EnterPlayMode();
 		void ExitPlayMode();
 
+		inline bool IsPlaymodePaused() const { return m_PlaymodePaused; }
+		inline void SetPlaymodePaused(bool value) { m_PlaymodePaused = value; }
+
 		static EditorLayer& GetInstance();
 	private:
 		void UpdateWindowTitle();
+		void OnOpenProject();
 	private:
 		float m_PreviousFrameTime = 0.0f;
 
@@ -47,6 +52,7 @@ namespace Grapple
 		glm::vec4 m_ClearColor = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
 
 		EditorCamera m_Camera;
+		bool m_PlaymodePaused;
 
 		static EditorLayer* s_Instance;
 	};

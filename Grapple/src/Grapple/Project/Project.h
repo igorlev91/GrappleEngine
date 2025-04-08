@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Grapple/AssetManager/Asset.h"
+#include "Grapple/Core/Signal.h"
 
 #include <filesystem>
 #include <string>
@@ -32,6 +33,8 @@ namespace Grapple
 		std::vector<std::string> ScriptingModules;
 	public:
 		static Ref<Project> s_Active;
+		static Signal<> OnProjectOpen;
+		static Signal<> OnUnloadActiveProject;
 		static std::filesystem::path s_ProjectFileExtension;
 	};
 }

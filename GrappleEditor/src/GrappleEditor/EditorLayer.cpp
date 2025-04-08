@@ -40,10 +40,16 @@ namespace Grapple
 
 	void EditorLayer::OnAttach()
 	{
-		UpdateWindowTitle();
+		Project::OnProjectOpen.Bind(Grapple_BIND_EVENT_CALLBACK(OnOpenProject));
+		Project::OnUnloadActiveProject.Bind([this]()
+		{
+			Ref<EditorAssetManager> assetManager = As<EditorAssetManager>(AssetManager::GetInstance());
 
-		AssetManager::Intialize(CreateRef<EditorAssetManager>(Project::GetActive()->Location / "Assets"));
-		m_AssetManagerWindow.RebuildAssetTree();
+			assetManager->UnloadAsset(EditorContext::GetActiveScene()->Handle);
+			EditorContext::Uninitialize();
+		});
+
+		AssetManager::Intialize(CreateRef<EditorAssetManager>());
 
 		m_AssetManagerWindow.SetOpenAction(AssetType::Scene, [this](AssetHandle handle)
 		{
@@ -61,6 +67,19 @@ namespace Grapple
 		settings.Far = 1000.0f;
 		settings.RotationSpeed = 1.0f;
 		settings.DragSpeed = 0.1f;
+
+		if (Application::GetInstance().GetCommandLineArguments().ArgumentsCount >= 2)
+		{
+			std::filesystem::path projectPath = Application::GetInstance().GetCommandLineArguments()[1];
+			Project::OpenProject(projectPath);
+		}
+		else
+		{
+			std::optional<std::filesystem::path> projectPath = Platform::ShowOpenFileDialog(L"Grapple Project (*.Grappleproj)\0*.Grappleproj\0");
+
+			if (projectPath.has_value())
+				Project::OpenProject(projectPath.value());
+		}
 	}
 
 	void EditorLayer::OnDetach()
@@ -82,7 +101,8 @@ namespace Grapple
 
 		ScriptingEngine::OnFrameStart(deltaTime);
 
-		EditorContext::GetActiveScene()->OnUpdateRuntime();
+		if (!m_PlaymodePaused)
+			EditorContext::GetActiveScene()->OnUpdateRuntime();
 
 		for (auto& viewport : m_Viewports)
 			viewport->OnRenderViewport();
@@ -198,6 +218,17 @@ namespace Grapple
 		}
 	}
 
+	void EditorLayer::OnOpenProject()
+	{
+		Ref<EditorAssetManager> assetManager = As<EditorAssetManager>(AssetManager::GetInstance());
+
+		assetManager->Reinitialize();
+		EditorContext::Initialize();
+
+		UpdateWindowTitle();
+		m_AssetManagerWindow.RebuildAssetTree();
+	}
+
 	void EditorLayer::SaveActiveScene()
 	{
 		if (AssetManager::IsAssetHandleValid(EditorContext::GetActiveScene()->Handle))
@@ -226,6 +257,8 @@ namespace Grapple
 		Grapple_CORE_ASSERT(EditorContext::Instance.Mode == EditorMode::Edit);
 
 		SaveActiveScene();
+
+		m_PlaymodePaused = false;
 
 		Ref<Scene> playModeScene = CreateRef<Scene>(false);
 		ScriptingEngine::SetCurrentECSWorld(playModeScene->GetECSWorld());

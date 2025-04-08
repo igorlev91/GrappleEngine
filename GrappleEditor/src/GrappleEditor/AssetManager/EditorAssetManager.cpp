@@ -1,5 +1,6 @@
 #include "EditorAssetManager.h"
 
+#include "Grapple/Core/Event.h"
 #include "Grapple/Core/Assert.h"
 #include "Grapple/Core/Log.h"
 
@@ -26,15 +27,26 @@ namespace YAML
 namespace Grapple
 {
     std::filesystem::path EditorAssetManager::s_RegistryFileName = "AssetRegistry.yaml";
+    std::filesystem::path EditorAssetManager::s_AssetsDirectoryName = "Assets";
 
-    EditorAssetManager::EditorAssetManager(const std::filesystem::path& root)
-        : m_Root(root)
+    EditorAssetManager::EditorAssetManager()
     {
-        if (!std::filesystem::exists(root))
-            std::filesystem::create_directories(root);
-
         m_AssetImporters.emplace(AssetType::Texture, TextureImporter::ImportTexture);
         m_AssetImporters.emplace(AssetType::Scene, SceneImporter::ImportScene);
+    }
+
+    void EditorAssetManager::Reinitialize()
+    {
+        m_LoadedAssets.clear();
+        m_Registry.clear();
+        m_FilepathToAssetHandle.clear();
+
+        Grapple_CORE_ASSERT(Project::GetActive());
+
+        m_Root = Project::GetActive()->Location / s_AssetsDirectoryName;
+
+        if (!std::filesystem::exists(m_Root))
+            std::filesystem::create_directories(m_Root);
 
         DeserializeRegistry();
     }
