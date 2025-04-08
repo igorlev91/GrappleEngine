@@ -2,8 +2,13 @@
 
 #include "Grapple.h"
 
+#include "GrappleECS/EntityId.h"
+#include "GrappleECS/World.h"
+
 namespace Grapple
 {
+	constexpr char* ENTITY_PAYLOAD_NAME = "ENTITY_PAYLOAD";
+
 	class EditorGUI
 	{
 	public:
@@ -19,6 +24,7 @@ namespace Grapple
 		static bool ColorPropertyField(const char* name, glm::vec4& color);
 
 		static bool AssetField(const char* name, AssetHandle& handle);
+		static bool EntityField(const char* name, const World& world, Entity& entity);
 
 		static bool BeginToggleGroup(const char* name);
 		static bool ToggleGroupItem(const char* text, bool selected);
