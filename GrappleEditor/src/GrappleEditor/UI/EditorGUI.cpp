@@ -1,9 +1,9 @@
 #include "EditorGUI.h"
 
 #include "Grapple/AssetManager/AssetManager.h"
+#include "Grapple/Scene/Scene.h"
 
 #include "GrappleEditor/AssetManager/EditorAssetManager.h"
-#include "GrappleEditor/EditorContext.h"
 
 #include <spdlog/spdlog.h>
 

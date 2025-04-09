@@ -1,9 +1,10 @@
 #include "PropertiesWindow.h"
 
-#include "GrappleEditor/EditorContext.h"
-#include "GrappleEditor/UI/EditorGUI.h"
-
+#include "Grapple/Scene/Scene.h"
 #include "Grapple/Scripting/ScriptingEngine.h"
+
+#include "GrappleEditor/UI/EditorGUI.h"
+#include "GrappleEditor/EditorLayer.h"
 
 #include <imgui.h>
 
@@ -12,7 +13,7 @@ namespace Grapple
 	void PropertiesWindow::OnImGuiRender()
 	{
 		World& world = Scene::GetActive()->GetECSWorld();
-		Entity selectedEntity = EditorContext::Instance.SelectedEntity;
+		Entity selectedEntity = EditorLayer::GetInstance().GetSelectedEntity();
 
 		ImGuiIO& io = ImGui::GetIO();
 		ImGuiStyle& style = ImGui::GetStyle();

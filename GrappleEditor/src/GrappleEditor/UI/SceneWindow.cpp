@@ -1,13 +1,14 @@
 #include "SceneWindow.h"
 
 #include "Grapple/Scene/Components.h"
+#include "Grapple/Scene/Scene.h"
 #include "Grapple/ImGui/ImGuiTheme.h"
 
 #include "GrappleECS/World.h"
 #include "GrappleECS/Query/EntityRegistryIterator.h"
 #include "GrappleECS/Registry.h"
 
-#include "GrappleEditor/EditorContext.h"
+#include "GrappleEditor/EditorLayer.h"
 #include "GrappleEditor/UI/EditorGUI.h"
 
 #include <imgui.h>
@@ -51,7 +52,7 @@ namespace Grapple
 
 				ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImGui::GetStyle().FramePadding / 2);
 
-				bool selected = entity == EditorContext::Instance.SelectedEntity;
+				bool selected = entity == EditorLayer::GetInstance().GetSelectedEntity();
 				if (selected)
 				{
 					flags |= ImGuiTreeNodeFlags_Framed;
@@ -78,7 +79,7 @@ namespace Grapple
 				}
 
 				if (ImGui::IsItemHovered() && ImGui::IsMouseReleased(ImGuiMouseButton_Left))
-					EditorContext::Instance.SelectedEntity = entity;
+					EditorLayer::GetInstance().SetSelectedEntity(entity);
 
 				if (opened)
 					ImGui::TreePop();

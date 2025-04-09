@@ -3,7 +3,6 @@
 #include "Grapple/Scene/Scene.h"
 #include "Grapple/ImGui/ImGUILayer.h"
 
-#include "GrappleEditor/EditorContext.h"
 #include "GrappleEditor/UI/EditorGUI.h"
 
 #include <glm/glm.hpp>
@@ -54,7 +53,7 @@ namespace Grapple
 				const auto& allSystems = systems.GetSystems();
 				if (s_CurrentSystem < allSystems.size())
 				{
-					auto type =ScriptingEngine::FindSystemType(s_CurrentSystem);
+					auto type = ScriptingEngine::FindSystemType(s_CurrentSystem);
 					auto inst = ScriptingEngine::FindSystemInstance(s_CurrentSystem);
 
 					if (type.has_value() && inst.has_value())

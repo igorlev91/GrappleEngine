@@ -100,6 +100,9 @@ namespace Sandbox
 
 		static void ConfigureSerialization(Grapple::TypeSerializationSettings& settings)
 		{
+			Grapple_SERIALIZE_FIELD(settings, SpawnSystem, TestValue);
+			Grapple_SERIALIZE_FIELD(settings, SpawnSystem, Tex);
+			Grapple_SERIALIZE_FIELD(settings, SpawnSystem, Vector);
 		}
 
 		virtual void Execute(Grapple::EntityView& chunk) override
@@ -133,6 +136,10 @@ namespace Sandbox
 				movingQuad.Speed = 10.0f;
 			}
 		}
+	private:
+		float TestValue;
+		Grapple::TextureAsset Tex;
+		glm::vec3 Vector;
 	};
 	Grapple_SYSTEM_IMPL(SpawnSystem);
 }

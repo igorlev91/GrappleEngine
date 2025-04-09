@@ -5,7 +5,6 @@
 
 #include "Grapple/Project/Project.h"
 
-#include "GrappleEditor/EditorContext.h"
 #include "GrappleEditor/UI/EditorGUI.h"
 
 #include <imgui.h>

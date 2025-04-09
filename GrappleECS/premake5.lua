@@ -1,5 +1,5 @@
-project "GrappleEditor"
-    kind "ConsoleApp"
+project "GrappleECS"
+    kind "StaticLib"
 	language "C++"
 	cppdialect "C++17"
 	staticruntime "off"
@@ -8,41 +8,21 @@ project "GrappleEditor"
     {
         "src/**.h",
         "src/**.cpp",
+
+		"include/**.h",
     }
 
     includedirs
-    {
-        "src",
-		"%{wks.location}/Grapple/src",
-		"%{wks.location}/GrappleCommon/src",
-		"%{wks.location}/GrappleECS/src",
-		"%{wks.location}/GrappleECS/include",
-		"%{wks.location}/GrappleScriptingCore/src/",
-		INCLUDE_DIRS.glm,
+	{
+		"src/",
+		"include/",
+		"%{wks.location}/GrappleCommon/src/",
 		INCLUDE_DIRS.spdlog,
-		INCLUDE_DIRS.imgui,
-		INCLUDE_DIRS.yaml_cpp,
-    }
+	}
 
 	links
 	{
-		"Grapple",
-		"ImGUI",
 		"GrappleCommon",
-		"GrappleScriptingCore",
-		"GrappleECS",
-		"yaml-cpp",
-	}
-
-	defines
-	{
-		"YAML_CPP_STATIC_DEFINE",
-		"Grapple_SCRIPTING_CORE_NO_MACROS",
-	}
-
-	debugargs
-	{
-		"%{wks.location}/Sandbox/Sandbox.Grappleproj"
 	}
 
 	targetdir("%{wks.location}/bin/" .. OUTPUT_DIRECTORY .. "/%{prj.name}")
