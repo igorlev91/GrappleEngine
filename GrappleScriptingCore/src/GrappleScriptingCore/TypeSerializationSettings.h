@@ -2,8 +2,8 @@
 
 #include "GrappleECS/EntityId.h"
 
-#include "GrappleScriptingCore/Bindings/Asset.h"
-#include "GrappleScriptingCore/Bindings/Texture.h"
+#include "GrappleScriptingCore/Asset.h"
+#include "GrappleScriptingCore/Texture.h"
 
 #include <glm/glm.hpp>
 
@@ -13,7 +13,7 @@
 #include <string_view>
 #include <cstddef>
 
-namespace Grapple::Internal
+namespace Grapple::Scripting
 {
 	enum class FieldType
 	{

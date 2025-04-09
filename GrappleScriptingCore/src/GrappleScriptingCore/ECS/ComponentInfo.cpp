@@ -1,6 +1,6 @@
 #include "ComponentInfo.h"
 
-namespace Grapple::Internal
+namespace Grapple::Scripting
 {
     std::vector<ComponentInfo*>& ComponentInfo::GetRegisteredComponents()
     {

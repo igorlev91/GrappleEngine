@@ -1,6 +1,6 @@
 #include "SystemInfo.h"
 
-namespace Grapple::Internal
+namespace Grapple::Scripting
 {
     std::vector<SystemInfo*>& SystemInfo::GetRegisteredSystems()
     {

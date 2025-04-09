@@ -2,7 +2,7 @@
 
 #include "Grapple/Core/UUID.h"
 
-namespace Grapple::Internal
+namespace Grapple::Scripting
 {
 	using AssetHandle = UUID;
 }

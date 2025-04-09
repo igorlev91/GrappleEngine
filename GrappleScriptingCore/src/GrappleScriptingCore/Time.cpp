@@ -1,6 +1,6 @@
 #include "Time.h"
 
-namespace Grapple::Internal
+namespace Grapple::Scripting
 {
 	TimeData TimeData::Data;
 }

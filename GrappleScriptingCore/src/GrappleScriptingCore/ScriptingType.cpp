@@ -1,6 +1,6 @@
 #include "ScriptingType.h"
 
-namespace Grapple::Internal
+namespace Grapple::Scripting
 {
 	std::vector<ScriptingType*>& ScriptingType::GetRegisteredTypes()
 	{

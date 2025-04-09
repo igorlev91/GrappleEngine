@@ -3,14 +3,14 @@
 #include "GrappleECS/System.h"
 
 #include "GrappleScriptingCore/ScriptingType.h"
-#include "GrappleScriptingCore/Bindings/ECS/SystemConfiguration.h"
-#include "GrappleScriptingCore/Bindings/ECS/EntityView.h"
+#include "GrappleScriptingCore/ECS/SystemConfiguration.h"
+#include "GrappleScriptingCore/ECS/EntityView.h"
 
 #include <string>
 #include <string_view>
 #include <typeinfo>
 
-namespace Grapple::Internal
+namespace Grapple::Scripting
 {
 	struct SystemInfo
 	{
@@ -30,7 +30,7 @@ namespace Grapple::Internal
 	{
 	public:
 		virtual void Configure(SystemConfiguration& config) = 0;
-		virtual void Execute(Internal::EntityView& chunk) = 0;
+		virtual void Execute(Scripting::EntityView& chunk) = 0;
 	};
 
 #ifndef Grapple_SCRIPTING_CORE_NO_MACROS

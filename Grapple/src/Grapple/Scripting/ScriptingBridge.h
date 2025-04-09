@@ -9,9 +9,10 @@ namespace Grapple
 	class ScriptingBridge
 	{
 	public:
-		static void ConfigureModule(Internal::ModuleConfiguration& config);
+		static void Initialize();
 
 		inline static World& GetCurrentWorld();
+		inline static Scripting::Bindings& GetBindings() { return s_Bindings; }
 
 		inline static void SetCurrentWorld(World& world)
 		{
@@ -19,5 +20,6 @@ namespace Grapple
 		}
 	private:
 		static World* s_World;
+		static Scripting::Bindings s_Bindings;
 	};
 }

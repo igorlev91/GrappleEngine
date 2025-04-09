@@ -8,7 +8,7 @@
 #include <optional>
 #include <vector>
 
-namespace Grapple::Internal
+namespace Grapple::Scripting
 {
 	struct ComponentInfo
 	{
@@ -36,12 +36,12 @@ namespace Grapple::Internal
 #ifndef Grapple_SCRIPTING_CORE_NO_MACROS
 	#define Grapple_COMPONENT(component) \
 		Grapple_DEFINE_SCRIPTING_TYPE(component) \
-		static Grapple::Internal::ComponentInfo Info;
+		static Grapple::Scripting::ComponentInfo Info;
 	#define Grapple_COMPONENT_IMPL(component, ...) \
 		Grapple_IMPL_SCRIPTING_TYPE(component, __VA_ARGS__) \
-		Grapple::Internal::ComponentInfo component::Info = Grapple::Internal::ComponentInfo(typeid(component).name());
+		Grapple::Scripting::ComponentInfo component::Info = Grapple::Scripting::ComponentInfo(typeid(component).name());
 
 	#define Grapple_COMPONENT_ALIAS_IMPL(component, aliasedComponent) \
 		Grapple_IMPL_SCRIPTING_TYPE(component) \
-		Grapple::Internal::ComponentInfo component::Info = Grapple::Internal::ComponentInfo(typeid(component).name(), aliasedComponent);
+		Grapple::Scripting::ComponentInfo component::Info = Grapple::Scripting::ComponentInfo(typeid(component).name(), aliasedComponent);
 #endif

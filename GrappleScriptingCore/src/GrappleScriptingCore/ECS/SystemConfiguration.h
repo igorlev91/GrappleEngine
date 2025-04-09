@@ -6,7 +6,7 @@
 
 #include <vector>
 
-namespace Grapple::Internal
+namespace Grapple::Scripting
 {
 	class SystemQuery
 	{

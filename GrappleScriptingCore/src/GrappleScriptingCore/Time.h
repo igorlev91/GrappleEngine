@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Grapple::Internal
+namespace Grapple::Scripting
 {
 	struct TimeData
 	{

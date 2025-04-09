@@ -5,16 +5,16 @@
 #include "GrappleECS/ComponentId.h"
 #include "GrappleECS/EntityId.h"
 
-#include "GrappleScriptingCore/Bindings/ECS/World.h"
-#include "GrappleScriptingCore/Bindings/ECS/EntityView.h"
-#include "GrappleScriptingCore/Bindings/ECS/SystemInfo.h"
-#include "GrappleScriptingCore/Bindings/ECS/SystemConfiguration.h"
-#include "GrappleScriptingCore/Bindings/ECS/ComponentInfo.h"
+#include "GrappleScriptingCore/ECS/World.h"
+#include "GrappleScriptingCore/ECS/EntityView.h"
+#include "GrappleScriptingCore/ECS/SystemInfo.h"
+#include "GrappleScriptingCore/ECS/SystemConfiguration.h"
+#include "GrappleScriptingCore/ECS/ComponentInfo.h"
 
-#include "GrappleScriptingCore/Bindings/Time.h"
-#include "GrappleScriptingCore/Bindings/Input.h"
+#include "GrappleScriptingCore/Time.h"
+#include "GrappleScriptingCore/Input.h"
 
-#include "GrappleScriptingCore/Bindings/Texture.h"
+#include "GrappleScriptingCore/Texture.h"
 
 #include "GrappleScriptingCore/ScriptingType.h"
 
@@ -22,23 +22,23 @@
 
 namespace Grapple
 {
-	using Internal::World;
-	using Internal::EntityView;
-	using Internal::EntityElement;
-	using Internal::ComponentView;
+	using Scripting::World;
+	using Scripting::EntityView;
+	using Scripting::EntityElement;
+	using Scripting::ComponentView;
 
-	using Internal::ComponentInfo;
-	using Internal::ScriptingType;
-	using Internal::SystemBase;
-	using Internal::SystemInfo;
-	using Internal::SystemConfiguration;
+	using Scripting::ComponentInfo;
+	using Scripting::ScriptingType;
+	using Scripting::SystemBase;
+	using Scripting::SystemInfo;
+	using Scripting::SystemConfiguration;
 
-	using Internal::Time;
-	using Internal::Input;
+	using Scripting::Time;
+	using Scripting::Input;
 
-	using Internal::TextureAsset;
+	using Scripting::TextureAsset;
 
-	using Internal::TypeSerializationSettings;
+	using Scripting::TypeSerializationSettings;
 
 	struct Transform
 	{

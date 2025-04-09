@@ -1,19 +1,12 @@
 #pragma once
 
+#include "GrappleECS/ArchetypeId.h"
 #include "GrappleECS/ComponentId.h"
 
-#include "GrappleScriptingCore/Bindings/ECS/ECS.h"
+#include "GrappleScriptingCore/Bindings.h"
 
-namespace Grapple::Internal
+namespace Grapple::Scripting
 {
-	struct EntityViewBindings
-	{
-		using GetArchetypeComponentOffsetFunction = size_t(*)(ArchetypeId archetype, ComponentId component);
-		GetArchetypeComponentOffsetFunction GetArchetypeComponentOffset;
-
-		static EntityViewBindings Bindings;
-	};
-
 	class EntityElement
 	{
 	public:
@@ -84,7 +77,7 @@ namespace Grapple::Internal
 		template<typename ComponentT>
 		constexpr ComponentView<ComponentT> View()
 		{
-			return ComponentView<ComponentT>(EntityViewBindings::Bindings.GetArchetypeComponentOffset(m_Archetype, ComponentT::Info.Id));
+			return ComponentView<ComponentT>(Bindings::Instance->GetArchetypeComponentOffset(m_Archetype, ComponentT::Info.Id));
 		}
 
 		constexpr EntityViewIterator begin()

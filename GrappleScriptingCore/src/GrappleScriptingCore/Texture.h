@@ -1,8 +1,8 @@
 #pragma once
 
-#include "GrappleScriptingCore/Bindings/Asset.h"
+#include "GrappleScriptingCore/Asset.h"
 
-namespace Grapple::Internal
+namespace Grapple::Scripting
 {
 	class TextureAsset
 	{

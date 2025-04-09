@@ -6,13 +6,14 @@
 #include "GrappleECS/World.h"
 
 #include "GrappleScriptingCore/ModuleConfiguration.h"
-#include "GrappleScriptingCore/Bindings/ECS/SystemInfo.h"
+#include "GrappleScriptingCore/ECS/SystemInfo.h"
 
 #include <filesystem>
 
 namespace Grapple
 {
-	using ModuleEventFunction = void(*)(Internal::ModuleConfiguration&);
+	using OnModuleLoadFunction = void(*)(Scripting::ModuleConfiguration&, Scripting::Bindings&);
+	using OnModuleUnloadFunction = void(*)(Scripting::ModuleConfiguration&);
 
 	struct ScriptingItemIndex
 	{
@@ -46,10 +47,10 @@ namespace Grapple
 	struct ScriptingModuleData
 	{
 		ScriptingModule Module;
-		Internal::ModuleConfiguration Config;
+		Scripting::ModuleConfiguration Config;
 
-		std::optional<ModuleEventFunction> OnLoad;
-		std::optional<ModuleEventFunction> OnUnload;
+		std::optional<OnModuleLoadFunction> OnLoad;
+		std::optional<OnModuleUnloadFunction> OnUnload;
 
 		std::vector<ScriptingTypeInstance> ScriptingInstances;
 		size_t FirstSystemInstance;
@@ -96,15 +97,15 @@ namespace Grapple
 		static void CreateSystems();
 		static void RegisterSystems();
 		
-		static std::optional<const Internal::ScriptingType*> FindType(std::string_view name);
-		static std::optional<const Internal::ScriptingType*> FindSystemType(uint32_t systemIndex);
+		static std::optional<const Scripting::ScriptingType*> FindType(std::string_view name);
+		static std::optional<const Scripting::ScriptingType*> FindSystemType(uint32_t systemIndex);
 
-		static std::optional<Internal::SystemBase*> FindSystemByName(std::string_view name);
+		static std::optional<Scripting::SystemBase*> FindSystemByName(std::string_view name);
 
 		static std::optional<uint8_t*> FindSystemInstance(uint32_t systemIndex);
 
-		static std::optional<const Internal::ScriptingType*> FindComponentType(ComponentId id);
-		static const Internal::ScriptingType* GetScriptingType(ScriptingItemIndex index);
+		static std::optional<const Scripting::ScriptingType*> FindComponentType(ComponentId id);
+		static const Scripting::ScriptingType* GetScriptingType(ScriptingItemIndex index);
 
 		inline static Data& GetData() { return s_Data; }
 	private:

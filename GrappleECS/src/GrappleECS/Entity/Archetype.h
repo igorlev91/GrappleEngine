@@ -1,5 +1,7 @@
 #pragma once
 
+#include "GrappleECS/ArchetypeId.h"
+
 #include "GrappleECS/Entity/Component.h"
 #include "GrappleECS/EntityStorage/EntityStorage.h"
 
@@ -9,9 +11,6 @@
 
 namespace Grapple
 {
-	using ArchetypeId = size_t;
-	constexpr ArchetypeId INVALID_ARCHETYPE_ID = SIZE_MAX;
-
 	struct ArchetypeEdge
 	{
 		ArchetypeId Add;
