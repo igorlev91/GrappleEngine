@@ -36,7 +36,7 @@ namespace Grapple::Internal
 			static Grapple::SystemInfo System;
 
 	#define Grapple_SYSTEM_IMPL(systemName) \
-		Grapple_IMPL_SCRIPTING_TYPE(systemName) \
+		Grapple_IMPL_SCRIPTING_TYPE(systemName, systemName::ConfigureSerialization) \
 		Grapple::SystemInfo systemName::System = Grapple::SystemInfo(typeid(systemName).name());
 #endif
 }

@@ -3,6 +3,7 @@
 #include "Grapple/Core/UUID.h"
 
 #include "GrappleECS/ComponentId.h"
+#include "GrappleECS/EntityId.h"
 
 #include "GrappleScriptingCore/Bindings/ECS/World.h"
 #include "GrappleScriptingCore/Bindings/ECS/EntityView.h"
@@ -22,7 +23,6 @@
 namespace Grapple
 {
 	using Internal::World;
-	using Internal::Entity;
 	using Internal::EntityView;
 	using Internal::EntityElement;
 	using Internal::ComponentView;

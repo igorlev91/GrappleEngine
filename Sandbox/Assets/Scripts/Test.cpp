@@ -43,6 +43,10 @@ namespace Sandbox
 			config.Query.Without<TestComponent>();
 		}
 
+		static void ConfigureSerialization(Grapple::TypeSerializationSettings& settings)
+		{
+		}
+
 		virtual void Execute(Grapple::EntityView& chunk) override
 		{
 			glm::vec3 direction = glm::vec3(0.0f);
@@ -92,6 +96,10 @@ namespace Sandbox
 		virtual void Configure(Grapple::SystemConfiguration& config) override
 		{
 			config.Query.With<Spawner>();
+		}
+
+		static void ConfigureSerialization(Grapple::TypeSerializationSettings& settings)
+		{
 		}
 
 		virtual void Execute(Grapple::EntityView& chunk) override

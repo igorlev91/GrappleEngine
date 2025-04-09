@@ -1,11 +1,14 @@
 #include "EditorGUI.h"
 
 #include "Grapple/AssetManager/AssetManager.h"
+
 #include "GrappleEditor/AssetManager/EditorAssetManager.h"
+#include "GrappleEditor/EditorContext.h"
 
 #include <spdlog/spdlog.h>
 
 #include <imgui.h>
+#include <imgui_internal.h>
 
 namespace Grapple
 {
@@ -43,7 +46,7 @@ namespace Grapple
 		ImGui::PopStyleVar(2);
 		ImGui::PopStyleColor(1);
 		
-		return ImGui::BeginPopup(name);
+		return ImGui::BeginPopup(name, ImGuiWindowFlags_NoMove);
 	}
 
 	void EditorGUI::EndMenu()
@@ -169,12 +172,20 @@ namespace Grapple
 		return result;
 	}
 
-	bool EditorGUI::BeginToggleGroup(const char* name)
+	bool EditorGUI::BeginToggleGroup(const char* name, uint32_t itemsCount)
+	{
+		float itemWidth = ImGui::GetContentRegionAvail().x - (itemsCount) * ImGui::GetStyle().ItemInnerSpacing.x;
+		itemWidth /= itemsCount;
+
+		ImGui::PushItemWidth(itemWidth);
+		ImGui::GetCurrentWindow()->DC.LayoutType = ImGuiLayoutType_Horizontal;
+		return true;
+	}
+
+	bool EditorGUI::BeginToggleGroupProperty(const char* name, uint32_t itemsCount)
 	{
 		RenderPropertyName(name);
-
-		ImGui::NewLine();
-		return true;
+		return BeginToggleGroup(name, itemsCount);
 	}
 
 	bool EditorGUI::ToggleGroupItem(const char* text, bool selected)
@@ -182,23 +193,62 @@ namespace Grapple
 		ImGuiStyle& style = ImGui::GetStyle();
 
 		if (selected)
-			ImGui::PushStyleColor(ImGuiCol_Button, style.Colors[ImGuiCol_FrameBg]);
-		else
-			ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
+		{
+			ImGui::PushStyleColor(ImGuiCol_Button, style.Colors[ImGuiCol_TabActive]);
+			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, style.Colors[ImGuiCol_TabHovered]);
+			ImGui::PushStyleColor(ImGuiCol_ButtonActive, style.Colors[ImGuiCol_TabActive]);
+		}
 
-		ImGui::SameLine();
-		bool result = ImGui::Button(text);
+		bool result = ImGui::Button(text, ImVec2(ImGui::CalcItemWidth(), 0));
 
 		if (selected)
-			ImGui::PopStyleColor();
-		else
-			ImGui::PopStyleVar();
+			ImGui::PopStyleColor(3);
 
 		return result;
 	}
 
 	void EditorGUI::EndToggleGroup()
 	{
+		ImGui::GetCurrentWindow()->DC.LayoutType = ImGuiLayoutType_Vertical;
+		ImGui::PopItemWidth();
+	}
+
+	bool EditorGUI::TypeEditor(const Internal::ScriptingType& type, uint8_t* data)
+	{
+		const auto& fields = type.GetSerializationSettings().GetFields();
+		bool result = false;
+
+		if (EditorGUI::BeginPropertyGrid())
+		{
+			for (size_t i = 0; i < fields.size(); i++)
+			{
+				const Internal::Field& field = fields[i];
+				uint8_t* fieldData = data + field.Offset;
+
+				switch (field.Type)
+				{
+				case Internal::FieldType::Float:
+					result |= EditorGUI::FloatPropertyField(field.Name.c_str(), *(float*)fieldData);
+					break;
+				case Internal::FieldType::Float2:
+					result |= EditorGUI::Vector2PropertyField(field.Name.c_str(), *(glm::vec2*)fieldData);
+					break;
+				case Internal::FieldType::Float3:
+					result |= EditorGUI::Vector3PropertyField(field.Name.c_str(), *(glm::vec3*)fieldData);
+					break;
+				case Internal::FieldType::Asset:
+				case Internal::FieldType::Texture:
+					result |= EditorGUI::AssetField(field.Name.c_str(), *(AssetHandle*)fieldData);
+					break;
+				case Internal::FieldType::Entity:
+					result |= EditorGUI::EntityField(field.Name.c_str(), EditorContext::GetActiveScene()->GetECSWorld(), *(Entity*)fieldData);
+					break;
+				}
+			}
+			EditorGUI::EndPropertyGrid();
+		}
+
+		return result;
 	}
 
 	void EditorGUI::RenderPropertyName(const char* name)
@@ -206,6 +256,7 @@ namespace Grapple
 		ImGui::TableNextRow();
 		ImGui::TableSetColumnIndex(0);
 
+		ImGui::SetCursorPosY(ImGui::GetCursorPosY() + ImGui::GetStyle().FramePadding.y);
 		ImGui::Text(name);
 
 		ImGui::TableSetColumnIndex(1);

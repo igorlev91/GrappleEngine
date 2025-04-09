@@ -1,5 +1,7 @@
 #pragma once
 
+#include "GrappleECS/EntityId.h"
+
 #include "GrappleScriptingCore/Bindings/Asset.h"
 #include "GrappleScriptingCore/Bindings/Texture.h"
 
@@ -29,6 +31,7 @@ namespace Grapple::Internal
 
 		Asset,
 		Texture,
+		Entity,
 	};
 
 	struct DataTypeToFiedType
@@ -46,6 +49,7 @@ namespace Grapple::Internal
 	DATA_TYPE_TO_FIELD_TYPE_CONVERTER(float);
 	DATA_TYPE_TO_FIELD_TYPE_CONVERTER(AssetHandle);
 	DATA_TYPE_TO_FIELD_TYPE_CONVERTER(TextureAsset);
+	DATA_TYPE_TO_FIELD_TYPE_CONVERTER(Entity);
 	DATA_TYPE_TO_FIELD_TYPE_CONVERTER(glm::vec2);
 	DATA_TYPE_TO_FIELD_TYPE_CONVERTER(glm::vec3);
 	DATA_TYPE_TO_FIELD_TYPE_CONVERTER(glm::vec4);
