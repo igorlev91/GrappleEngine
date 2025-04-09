@@ -1,5 +1,7 @@
 #pragma once
 
+#include "GrappleECS/System.h"
+
 #include "GrappleScriptingCore/ScriptingType.h"
 #include "GrappleScriptingCore/Bindings/ECS/SystemConfiguration.h"
 #include "GrappleScriptingCore/Bindings/ECS/EntityView.h"
@@ -13,14 +15,15 @@ namespace Grapple::Internal
 	struct SystemInfo
 	{
 		SystemInfo(const std::string_view& name)
-			: Name(name)
+			: Name(name), Id(UINT32_MAX)
 		{
 			GetRegisteredSystems().push_back(this);
 		}
 
+		SystemId Id;
 		const std::string_view Name;
 	public:
-		static std::vector<const SystemInfo*>& GetRegisteredSystems();
+		static std::vector<SystemInfo*>& GetRegisteredSystems();
 	};
 
 	class SystemBase

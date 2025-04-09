@@ -29,6 +29,18 @@ namespace Grapple
 	{
 		ScriptingItemIndex Type = ScriptingItemIndex();
 		void* Instance = nullptr;
+
+		constexpr bool IsValid()
+		{
+			return Instance != nullptr;
+		}
+
+		template<typename T>
+		constexpr T& As()
+		{
+			Grapple_CORE_ASSERT(Instance != nullptr);
+			return *(T*)Instance;
+		}
 	};
 
 	struct ScriptingModuleData
@@ -41,6 +53,13 @@ namespace Grapple
 
 		std::vector<ScriptingTypeInstance> ScriptingInstances;
 		size_t FirstSystemInstance;
+
+		inline ScriptingTypeInstance& GetSystemInstance(size_t index)
+		{
+			Grapple_CORE_ASSERT(index < Config.RegisteredSystems->size());
+			Grapple_CORE_ASSERT(FirstSystemInstance + index < ScriptingInstances.size());
+			return ScriptingInstances[FirstSystemInstance + index];
+		}
 	};
 
 	class ScriptingEngine
