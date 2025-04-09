@@ -11,7 +11,7 @@ namespace Grapple
 {
 	void PropertiesWindow::OnImGuiRender()
 	{
-		World& world = EditorContext::GetActiveScene()->GetECSWorld();
+		World& world = Scene::GetActive()->GetECSWorld();
 		Entity selectedEntity = EditorContext::Instance.SelectedEntity;
 
 		ImGuiIO& io = ImGui::GetIO();
@@ -75,7 +75,7 @@ namespace Grapple
 	{
 		if (ImGui::BeginMenu("Add component"))
 		{
-			World& world = EditorContext::GetActiveScene()->GetECSWorld();
+			World& world = Scene::GetActive()->GetECSWorld();
 			const std::vector<ComponentInfo>& components = world.GetRegistry().GetRegisteredComponents();
 
 			for (const auto& info : components)

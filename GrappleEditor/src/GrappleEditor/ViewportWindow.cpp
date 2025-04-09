@@ -32,8 +32,8 @@ namespace Grapple
 
 			OnClear();
 
-			EditorContext::GetActiveScene()->OnBeforeRender(m_RenderData);
-			EditorContext::GetActiveScene()->OnRender(m_RenderData);
+			Scene::GetActive()->OnBeforeRender(m_RenderData);
+			Scene::GetActive()->OnRender(m_RenderData);
 
 			m_FrameBuffer->Unbind();
 		}

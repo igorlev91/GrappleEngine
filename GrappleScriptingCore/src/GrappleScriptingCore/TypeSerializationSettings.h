@@ -87,4 +87,7 @@ namespace Grapple::Internal
 	#define Grapple_GET_FIELD_TYPE(typeName, fieldName) decltype(((typeName*) nullptr)->fieldName)
 	#define Grapple_SERIALIZE_FIELD(settings, typeName, fieldName) settings.AddField<Grapple_GET_FIELD_TYPE(typeName, fieldName)> \
 		(#fieldName, offsetof(typeName, fieldName));
+
+#define Grapple_DEFAULT_SERIALIZER \
+	static void ConfigureSerialization(Grapple::Internal::TypeSerializationSettings& settings) {}
 #endif

@@ -31,6 +31,8 @@ namespace Grapple
 		void SaveActiveScene();
 		void SaveActiveSceneAs();
 
+		void OpenScene(AssetHandle handle);
+
 		void EnterPlayMode();
 		void ExitPlayMode();
 
@@ -52,6 +54,7 @@ namespace Grapple
 		glm::vec4 m_ClearColor = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
 
 		EditorCamera m_Camera;
+		AssetHandle m_EditedSceneHandle;
 		bool m_PlaymodePaused;
 
 		static EditorLayer* s_Instance;

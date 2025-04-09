@@ -9,6 +9,8 @@
 
 namespace Grapple
 {
+	Ref<Scene> Scene::s_Active = nullptr;
+
 	Scene::Scene(bool registerComponents)
 		: Asset(AssetType::Scene)
 	{
