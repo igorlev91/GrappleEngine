@@ -89,5 +89,5 @@ namespace Grapple::Scripting
 		(#fieldName, offsetof(typeName, fieldName));
 
 #define Grapple_DEFAULT_SERIALIZER \
-	static void ConfigureSerialization(Grapple::Internal::TypeSerializationSettings& settings) {}
+	static void ConfigureSerialization(Grapple::Scripting::TypeSerializationSettings& settings) {}
 #endif

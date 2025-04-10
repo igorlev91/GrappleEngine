@@ -3,25 +3,24 @@
 #include "GrappleScriptingCore/ModuleConfiguration.h"
 #include "GrappleScriptingCore/ScriptingType.h"
 
-#include "GrappleScriptingCore/Bindings/ECS/ComponentInfo.h"
-#include "GrappleScriptingCore/Bindings/ECS/SystemInfo.h"
-#include "GrappleScriptingCore/Bindings/ECS/EntityView.h"
+#include "GrappleScriptingCore/ECS/ComponentInfo.h"
+#include "GrappleScriptingCore/ECS/SystemInfo.h"
+#include "GrappleScriptingCore/ECS/EntityView.h"
 
-Grapple_API void OnModuleLoaded(Grapple::Internal::ModuleConfiguration& config)
+Grapple_API void OnModuleLoaded(Grapple::Scripting::ModuleConfiguration& config, Grapple::Scripting::Bindings& bindings)
 {
 	Grapple::Log::Initialize();
 
-	config.RegisteredTypes = &Grapple::Internal::ScriptingType::GetRegisteredTypes();
-	config.RegisteredSystems = &Grapple::Internal::SystemInfo::GetRegisteredSystems();
-	config.RegisteredComponents = &Grapple::Internal::ComponentInfo::GetRegisteredComponents();
+	config.RegisteredTypes = &Grapple::Scripting::ScriptingType::GetRegisteredTypes();
+	config.RegisteredSystems = &Grapple::Scripting::SystemInfo::GetRegisteredSystems();
+	config.RegisteredComponents = &Grapple::Scripting::ComponentInfo::GetRegisteredComponents();
 
-	config.WorldBindings = &Grapple::Internal::WorldBindings::Bindings;
-	config.EntityViewBindings = &Grapple::Internal::EntityViewBindings::Bindings;
-	config.TimeData = &Grapple::Internal::TimeData::Data;
+	config.TimeData = &Grapple::Scripting::TimeData::Data;
 
-	config.InputBindings = &Grapple::Internal::InputBindings::Bindings;
+	Grapple::Scripting::Bindings::Instance = &bindings;
 }
 
-Grapple_API void OnModuleUnloaded(Grapple::Internal::ModuleConfiguration& config)
+Grapple_API void OnModuleUnloaded(Grapple::Scripting::ModuleConfiguration& config)
 {
+	Grapple::Scripting::Bindings::Instance = nullptr;
 }
