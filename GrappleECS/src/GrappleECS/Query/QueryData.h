@@ -3,15 +3,13 @@
 #include "GrappleECS/Entity/Archetype.h"
 #include "GrappleECS/Entity/Component.h"
 #include "GrappleECS/QueryFilters.h"
+#include "GrappleECS/QueryId.h"
 
 #include <vector>
 #include <unordered_set>
 
 namespace Grapple
 {
-	using QueryId = size_t;
-	constexpr QueryId INVALID_QUERY_ID = SIZE_MAX;
-
 	struct QueryData
 	{
 		QueryId Id;

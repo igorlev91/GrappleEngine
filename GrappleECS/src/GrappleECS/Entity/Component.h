@@ -12,6 +12,11 @@
 
 namespace Grapple
 {
+	struct RegisteredComponentInfo
+	{
+		ComponentId Id;
+	};
+
 	struct ComponentInfo
 	{
 		ComponentId Id;

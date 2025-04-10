@@ -10,6 +10,7 @@
 #include "GrappleScriptingCore/ECS/SystemInfo.h"
 #include "GrappleScriptingCore/ECS/SystemConfiguration.h"
 #include "GrappleScriptingCore/ECS/ComponentInfo.h"
+#include "GrappleScriptingCore/ECS/Query.h"
 
 #include "GrappleScriptingCore/Time.h"
 #include "GrappleScriptingCore/Input.h"
@@ -26,6 +27,7 @@ namespace Grapple
 	using Scripting::EntityView;
 	using Scripting::EntityElement;
 	using Scripting::ComponentView;
+	using Scripting::Query;
 
 	using Scripting::ComponentInfo;
 	using Scripting::ScriptingType;

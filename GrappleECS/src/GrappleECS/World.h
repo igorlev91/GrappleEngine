@@ -13,21 +13,31 @@
 #include <vector>
 #include <string_view>
 
-#define Grapple_COMPONENT static Grapple::ComponentId Id;
-#define Grapple_COMPONENT_IMPL(name) Grapple::ComponentId name::Id = INVALID_COMPONENT_ID;
+#define Grapple_COMPONENT static Grapple::RegisteredComponentInfo Info;
+#define Grapple_COMPONENT_IMPL(name) Grapple::RegisteredComponentInfo name::Info;
 
 namespace Grapple
 {
 	class World
 	{
 	public:
-		World() = default;
+		World()
+		{
+			Grapple_CORE_ASSERT(s_CurrentWorld == nullptr, "Multiple ECS Worlds");
+			s_CurrentWorld = this;
+		}
+
+		~World()
+		{
+			s_CurrentWorld = nullptr;
+		}
+
 		World(const World&) = delete;
 
 		template<typename ComponentT>
 		constexpr void RegisterComponent()
 		{
-			ComponentT::Id = m_Registry.RegisterComponent(typeid(ComponentT).name(), 
+			ComponentT::Info.Id = m_Registry.RegisterComponent(typeid(ComponentT).name(), 
 				sizeof(ComponentT), [](void* component) { ((ComponentT*)component)->~ComponentT(); });
 		}
 
@@ -39,7 +49,7 @@ namespace Grapple
 			size_t index = 0;
 			([&]
 			{
-				ids[index++] = T::Id;
+				ids[index++] = T::Info.Id;
 			} (), ...);
 
 			return m_Registry.CreateEntity(ComponentSet(ids, sizeof...(T)));
@@ -48,7 +58,7 @@ namespace Grapple
 		template<typename T>
 		constexpr T& GetEntityComponent(Entity entity)
 		{
-			std::optional<void*> componentData = m_Registry.GetEntityComponent(entity, T::Id);
+			std::optional<void*> componentData = m_Registry.GetEntityComponent(entity, T::Info.Id);
 			Grapple_CORE_ASSERT(componentData.has_value(), "Failed to get entity component");
 			return *(T*)componentData.value();
 		}
@@ -56,7 +66,7 @@ namespace Grapple
 		template<typename T>
 		constexpr std::optional<T*> TryGetEntityComponent(Entity entity)
 		{
-			std::optional<void*> componentData = m_Registry.GetEntityComponent(entity, T::Id);
+			std::optional<void*> componentData = m_Registry.GetEntityComponent(entity, T::Info.Id);
 			if (componentData.has_value())
 				return (T*)componentData.value();
 			return {};
@@ -74,19 +84,19 @@ namespace Grapple
 		template<typename T>
 		constexpr bool AddEntityComponent(Entity entity, const T& data)
 		{
-			return m_Registry.AddEntityComponent(entity, T::Id, &data);
+			return m_Registry.AddEntityComponent(entity, T::Info.Id, &data);
 		}
 
 		template<typename T>
 		constexpr bool RemoveEntityComponent(Entity entity)
 		{
-			return m_Registry.RemoveEntityComponent(entity, T::Id);
+			return m_Registry.RemoveEntityComponent(entity, T::Info.Id);
 		}
 		
 		template<typename T>
 		constexpr bool HasComponent(Entity entity)
 		{
-			return m_Registry.HasComponent(entity, T::Id);
+			return m_Registry.HasComponent(entity, T::Info.Id);
 		}
 
 		inline void DeleteEntity(Entity entity)
@@ -110,6 +120,12 @@ namespace Grapple
 			FilteredComponentsGroup<T...> components;
 			return m_Registry.CreateQuery(ComponentSet(components.GetComponents().data(), components.GetComponents().size()));
 		}
+
+		inline static World& GetCurrent()
+		{
+			Grapple_CORE_ASSERT(s_CurrentWorld != nullptr);
+			return *s_CurrentWorld;
+		}
 	public:
 		inline Registry& GetRegistry() { return m_Registry; }
 
@@ -119,5 +135,7 @@ namespace Grapple
 		Registry m_Registry;
 
 		SystemsManager m_SystemsManager;
+	private:
+		static World* s_CurrentWorld;
 	};
 }

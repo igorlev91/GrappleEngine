@@ -6,6 +6,7 @@
 #include "GrappleECS/ArchetypeId.h"
 #include "GrappleECS/ComponentId.h"
 #include "GrappleECS/EntityId.h"
+#include "GrappleECS/QueryId.h"
 #include "GrappleECS/System.h"
 
 #include <optional>
@@ -18,6 +19,10 @@ namespace Grapple::Scripting
 	struct Bindings
 	{
 		// ECS
+		using CreateQueryFunction = QueryId(*)(const ComponentId* components, size_t count);
+		CreateQueryFunction CreateQuery;
+		using ForEachChunkInQueryFunction = void(*)(QueryId queryId, const std::function<void(EntityView&)>& perChunk);
+		ForEachChunkInQueryFunction ForEachChunkInQuery;
 
 		using CreateEntityFunction = Entity(*)(const ComponentId* components, size_t count);
 		CreateEntityFunction CreateEntity;

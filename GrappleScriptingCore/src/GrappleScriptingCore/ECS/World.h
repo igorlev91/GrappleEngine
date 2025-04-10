@@ -6,6 +6,7 @@
 
 #include "GrappleECS/ComponentGroup.h"
 
+#include "GrappleScriptingCore/ECS/Query.h"
 #include "GrappleScriptingCore/ECS/EntityView.h"
 #include "GrappleScriptingCore/Bindings.h"
 
@@ -42,6 +43,11 @@ namespace Grapple::Scripting
 		static constexpr bool IsAlive(Entity entity)
 		{
 			return Bindings::Instance->IsEntityAlive(entity);
+		}
+
+		static constexpr void ForEachChunk(Query query, const std::function<void(EntityView&)>& perChunk)
+		{
+			Bindings::Instance->ForEachChunkInQuery(query.GetId(), perChunk);
 		}
 	};
 }
