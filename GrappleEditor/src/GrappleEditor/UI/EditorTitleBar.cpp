@@ -49,7 +49,9 @@ namespace Grapple
 
 			if (ImGui::MenuItem("Open"))
 			{
-				std::optional<std::filesystem::path> projectPath = Platform::ShowOpenFileDialog(L"Grapple Project (*.Grappleproj)\0*.Grappleproj\0");
+				std::optional<std::filesystem::path> projectPath = Platform::ShowOpenFileDialog(
+					L"Grapple Project (*.Grappleproj)\0*.Grappleproj\0",
+					Application::GetInstance().GetWindow());
 
 				if (projectPath.has_value())
 					Project::OpenProject(projectPath.value());

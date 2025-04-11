@@ -5,8 +5,6 @@
 
 #include <GLFW/glfw3.h>
 
-#include <Windows.h>
-
 namespace Grapple
 {
 	class WindowsWindow : public Window
@@ -49,6 +47,6 @@ namespace Grapple
 		Scope<GraphicsContext> m_GraphicsContext;
 		WindowData m_Data;
 
-		WNDPROC m_OriginalProc;
+		void* m_OriginalProc;
 	};
 }

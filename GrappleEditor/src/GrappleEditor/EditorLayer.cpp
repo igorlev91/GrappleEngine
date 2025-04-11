@@ -80,7 +80,9 @@ namespace Grapple
 		}
 		else
 		{
-			std::optional<std::filesystem::path> projectPath = Platform::ShowOpenFileDialog(L"Grapple Project (*.Grappleproj)\0*.Grappleproj\0");
+			std::optional<std::filesystem::path> projectPath = Platform::ShowOpenFileDialog(
+				L"Grapple Project (*.Grappleproj)\0*.Grappleproj\0",
+				Application::GetInstance().GetWindow());
 
 			if (projectPath.has_value())
 				Project::OpenProject(projectPath.value());
@@ -253,7 +255,10 @@ namespace Grapple
 
 	void EditorLayer::SaveActiveSceneAs()
 	{
-		std::optional<std::filesystem::path> scenePath = Platform::ShowSaveFileDialog(L"Grapple Scene (*.Grapple)\0*.Grapple\0");
+		std::optional<std::filesystem::path> scenePath = Platform::ShowSaveFileDialog(
+			L"Grapple Scene (*.Grapple)\0*.Grapple\0",
+			Application::GetInstance().GetWindow());
+
 		if (scenePath.has_value())
 		{
 			std::filesystem::path& path = scenePath.value();
