@@ -45,9 +45,6 @@ namespace Grapple
 			}
 		});
 
-		m_ImGuiLayer = CreateRef<ImGUILayer>();
-		PushOverlay(m_ImGuiLayer);
-
 		RenderCommand::Initialize();
 		Renderer2D::Initialize();
 
@@ -73,10 +70,8 @@ namespace Grapple
 			for (const Ref<Layer>& layer : m_LayersStack.GetLayers())
 				layer->OnUpdate(deltaTime);
 
-			m_ImGuiLayer->Begin();
 			for (const Ref<Layer>& layer : m_LayersStack.GetLayers())
 				layer->OnImGUIRender();
-			m_ImGuiLayer->End();
 
 			m_Window->OnUpdate();
 			m_PreviousFrameTime = currentTime;

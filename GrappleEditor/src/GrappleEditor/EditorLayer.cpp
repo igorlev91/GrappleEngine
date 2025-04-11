@@ -15,6 +15,7 @@
 
 #include "GrappleEditor/AssetManager/EditorAssetManager.h"
 
+#include "GrappleEditor/ImGui/ImGuiLayer.h"
 #include "GrappleEditor/UI/SceneViewportWindow.h"
 #include "GrappleEditor/UI/EditorTitleBar.h"
 #include "GrappleEditor/UI/SystemsInspectorWindow.h"
@@ -44,6 +45,8 @@ namespace Grapple
 
 	void EditorLayer::OnAttach()
 	{
+		ImGuiLayer::OnAttach();
+
 		Project::OnProjectOpen.Bind(Grapple_BIND_EVENT_CALLBACK(OnOpenProject));
 		Project::OnUnloadActiveProject.Bind([this]()
 		{
@@ -86,6 +89,8 @@ namespace Grapple
 
 	void EditorLayer::OnDetach()
 	{
+		ImGuiLayer::OnDetach();
+
 		if (m_Mode == EditorMode::Play)
 			ExitPlayMode();
 
@@ -137,6 +142,8 @@ namespace Grapple
 
 	void EditorLayer::OnImGUIRender()
 	{
+		ImGuiLayer::Begin();
+
 		static bool fullscreen = true;
 		static ImGuiDockNodeFlags dockspaceFlags = ImGuiDockNodeFlags_None;
 
@@ -210,6 +217,7 @@ namespace Grapple
 		m_AssetManagerWindow.OnImGuiRender();
 
 		ImGui::End();
+		ImGuiLayer::End();
 	}
 
 	void EditorLayer::UpdateWindowTitle()

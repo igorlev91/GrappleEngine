@@ -1,4 +1,4 @@
-include "dependencies.lua"
+include "Dependencies.lua"
 
 workspace "Grapple"
 	architecture "x86_64"
@@ -26,12 +26,12 @@ group "Dependencies"
 group ""
 
 group "Core"
-	include "GrappleCommon"
-	include "Grapple"
-	include "GrappleECS"
-	include "GrappleScriptingCore"
+	include "GrappleCommon/GrappleCommon.Build.lua"
+	include "Grapple/Grapple.Build.lua"
+	include "GrappleECS/GrappleECS.Build.lua"
+	include "GrappleScriptingCore/GrappleScriptingCore.Build.lua"
 group ""
 
 group "Editor"
-	include "GrappleEditor"
+	include "GrappleEditor/GrappleEditor.Build.lua"
 group ""

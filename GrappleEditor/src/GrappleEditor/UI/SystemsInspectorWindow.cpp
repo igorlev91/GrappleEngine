@@ -1,8 +1,8 @@
 #include "SystemsInspectorWindow.h"
 
 #include "Grapple/Scene/Scene.h"
-#include "Grapple/ImGui/ImGUILayer.h"
 
+#include "GrappleEditor/ImGui/ImGuiLayer.h"
 #include "GrappleEditor/UI/EditorGUI.h"
 
 #include <glm/glm.hpp>

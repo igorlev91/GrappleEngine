@@ -1,5 +1,5 @@
-project "GrappleEditor"
-    kind "ConsoleApp"
+project "Grapple"
+    kind "StaticLib"
 	language "C++"
 	cppdialect "C++17"
 	staticruntime "off"
@@ -8,42 +8,45 @@ project "GrappleEditor"
     {
         "src/**.h",
         "src/**.cpp",
+
+		"vendor/stb_image/stb_image/**.h",
+		"vendor/stb_image/stb_image/**.cpp",
     }
 
     includedirs
-    {
-        "src",
-		"%{wks.location}/Grapple/src",
-		"%{wks.location}/GrappleCommon/src",
-		"%{wks.location}/GrappleECS/src",
-		"%{wks.location}/GrappleECS/include",
+	{
+		"src/",
+		"%{wks.location}/GrappleCommon/src/",
+		"%{wks.location}/GrappleECS/src/",
+		"%{wks.location}/GrappleECS/include/",
 		"%{wks.location}/GrappleScriptingCore/src/",
+
+		INCLUDE_DIRS.GLAD,
+		INCLUDE_DIRS.GLFW,
 		INCLUDE_DIRS.glm,
+		INCLUDE_DIRS.stb_image,
 		INCLUDE_DIRS.spdlog,
-		INCLUDE_DIRS.imgui,
 		INCLUDE_DIRS.imguizmo,
 		INCLUDE_DIRS.yaml_cpp,
-    }
+		INCLUDE_DIRS.imgui,
+	}
 
 	links
 	{
-		"Grapple",
+		"GLAD",
+		"GLFW",
 		"ImGUI",
+		"GrappleECS",
 		"GrappleCommon",
 		"GrappleScriptingCore",
-		"GrappleECS",
-		"yaml-cpp",
+		"yaml-cpp"
 	}
 
 	defines
 	{
+		"GLFW_INCLUDE_NONE",
 		"YAML_CPP_STATIC_DEFINE",
 		"Grapple_SCRIPTING_CORE_NO_MACROS",
-	}
-
-	debugargs
-	{
-		"%{wks.location}/Sandbox/Sandbox.Grappleproj"
 	}
 
 	targetdir("%{wks.location}/bin/" .. OUTPUT_DIRECTORY .. "/%{prj.name}")
@@ -51,6 +54,8 @@ project "GrappleEditor"
 
 	filter "system:windows"
 		systemversion "latest"
+
+		links { "dwmapi.lib" }
 	
 	filter "configurations:Debug"
 		defines "Grapple_DEBUG"
@@ -66,4 +71,3 @@ project "GrappleEditor"
 		defines "Grapple_DIST"
 		runtime "Release"
 		optimize "on"
-
