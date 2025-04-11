@@ -1,7 +1,7 @@
 #include "ScriptingModule.h"
 
 #include "Grapple/Core/Assert.h"
-#include "Grapple/Platform/Platform.h"
+#include "GrapplePlatform/Platform.h"
 
 namespace Grapple
 {

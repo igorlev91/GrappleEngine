@@ -1,8 +1,11 @@
 #pragma once
 
-#include "Grapple/Core/Window.h"
 #include "Grapple/Core/LayerStack.h"
 #include "Grapple/Core/CommandLineArguments.h"
+
+#include "Grapple/Renderer/GraphicsContext.h"
+
+#include "GrapplePlatform/Window.h"
 
 namespace Grapple
 {
@@ -26,6 +29,7 @@ namespace Grapple
 		Ref<Window> m_Window;
 		CommandLineArguments m_CommandLineArguments;
 	private:
+		Scope<GraphicsContext> m_GraphicsContext;
 		LayerStack m_LayersStack;
 
 		bool m_Running;

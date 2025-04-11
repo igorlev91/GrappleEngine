@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Grapple/Core/Core.h"
-#include "Grapple/Platform/Platform.h"
+#include "GrapplePlatform/Platform.h"
 
 #include <filesystem>
 #include <optional>

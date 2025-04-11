@@ -2,7 +2,8 @@
 
 #include "Grapple/Core/KeyCode.h"
 #include "Grapple/Core/MouseCode.h"
-#include "Grapple/Core/Event.h"
+
+#include "GrapplePlatform/Event.h"
 
 #include <glm/glm.hpp>
 

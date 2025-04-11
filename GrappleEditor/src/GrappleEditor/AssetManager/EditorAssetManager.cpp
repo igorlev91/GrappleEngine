@@ -1,6 +1,5 @@
 #include "EditorAssetManager.h"
 
-#include "Grapple/Core/Event.h"
 #include "Grapple/Core/Assert.h"
 #include "Grapple/Core/Log.h"
 

@@ -1,7 +1,7 @@
 #include "EditorCamera.h"
 
 #include "Grapple/Core/Log.h"
-#include "Grapple/Core/Events.h"
+#include "GrapplePlatform/Events.h"
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>

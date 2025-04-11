@@ -1,4 +1,4 @@
-project "Grapple"
+project "GrapplePlatform"
     kind "StaticLib"
 	language "C++"
 	cppdialect "C++17"
@@ -8,47 +8,28 @@ project "Grapple"
     {
         "src/**.h",
         "src/**.cpp",
-
-		"vendor/stb_image/stb_image/**.h",
-		"vendor/stb_image/stb_image/**.cpp",
     }
 
     includedirs
 	{
 		"src/",
 		"%{wks.location}/GrappleCommon/src/",
-		"%{wks.location}/GrapplePlatform/src/",
-		"%{wks.location}/GrappleECS/src/",
-		"%{wks.location}/GrappleECS/include/",
-		"%{wks.location}/GrappleScriptingCore/src/",
 
-		INCLUDE_DIRS.GLAD,
 		INCLUDE_DIRS.GLFW,
 		INCLUDE_DIRS.glm,
-		INCLUDE_DIRS.stb_image,
 		INCLUDE_DIRS.spdlog,
-		INCLUDE_DIRS.imguizmo,
-		INCLUDE_DIRS.yaml_cpp,
-		INCLUDE_DIRS.imgui,
 	}
 
 	links
 	{
-		"GLAD",
 		"GLFW",
 		"ImGUI",
-		"GrappleECS",
 		"GrappleCommon",
-		"GrapplePlatform",
-		"GrappleScriptingCore",
-		"yaml-cpp"
 	}
 
 	defines
 	{
 		"GLFW_INCLUDE_NONE",
-		"YAML_CPP_STATIC_DEFINE",
-		"Grapple_SCRIPTING_CORE_NO_MACROS",
 	}
 
 	targetdir("%{wks.location}/bin/" .. OUTPUT_DIRECTORY .. "/%{prj.name}")

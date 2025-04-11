@@ -1,9 +1,11 @@
 #pragma once
 
-#include "Grapple.h"
-#include "Grapple/Core/Event.h"
 #include "Grapple/Core/KeyCode.h"
 #include "Grapple/Core/MouseCode.h"
+
+#include "GrapplePlatform/Event.h"
+
+#include <glm/glm.hpp>
 
 namespace Grapple
 {

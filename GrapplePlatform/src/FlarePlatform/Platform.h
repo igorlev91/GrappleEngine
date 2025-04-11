@@ -1,6 +1,8 @@
 #pragma once
 
-#include "Grapple/Core/Window.h"
+#include "Grapple/Core/Core.h"
+
+#include "GrapplePlatform/Window.h"
 
 #include <filesystem>
 #include <optional>
@@ -10,6 +12,8 @@ namespace Grapple
 	class Platform
 	{
 	public:
+		static float GetTime();
+
 		static void* LoadSharedLibrary(const std::filesystem::path& path);
 		static void FreeSharedLibrary(void* library);
 		static void* LoadFunction(void* library, const std::string& name);

@@ -1,8 +1,9 @@
-#include "Grapple/Platform/Platform.h"
+#include "GrapplePlatform/Platform.h"
 
-#include "Grapple/Core/Core.h"
-#include "Grapple/Core/Window.h"
-#include "Grapple/Core/Application.h"
+#include "Grapple/Core/Assert.h"
+#include "Grapple/Core/Assert.h"
+
+#include "GrapplePlatform/Window.h"
 
 #include <optional>
 #include <filesystem>
@@ -18,6 +19,11 @@
 
 namespace Grapple
 {
+	float Platform::GetTime()
+	{
+		return glfwGetTime();
+	}
+
 	void* Platform::LoadSharedLibrary(const std::filesystem::path& path)
 	{
 		HMODULE library = LoadLibraryW(path.c_str());
@@ -70,6 +76,8 @@ namespace Grapple
 
 		OPENFILENAMEW openFile{};
 		ZeroMemory(&openFile, sizeof(OPENFILENAMEW));
+
+		GLFWwindow* nativeWindow = (GLFWwindow*)window->GetNativeWindow();
 
 		openFile.lStructSize = sizeof(OPENFILENAMEW);
 		openFile.lpstrFile = buffer;

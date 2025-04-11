@@ -1,9 +1,10 @@
 #include "EditorTitleBar.h"
 
 #include "Grapple/Core/Application.h"
-#include "Grapple/Core/Window.h"
-#include "Grapple/Platform/Platform.h"
 #include "Grapple/Project/Project.h"
+
+#include "GrapplePlatform/Platform.h"
+#include "GrapplePlatform/Window.h"
 
 #include "GrappleEditor/EditorLayer.h"
 
@@ -15,20 +16,25 @@
 
 namespace Grapple
 {
+	EditorTitleBar::EditorTitleBar()
+	{
+		m_WindowControls = CreateRef<WindowsWindowControls>();
+
+		Application::GetInstance().GetWindow()->SetWindowControls(m_WindowControls);
+	}
+
 	void EditorTitleBar::OnRenderImGui()
 	{
 		Ref<Window> window = Application::GetInstance().GetWindow();
 
 		if (window->GetProperties().CustomTitleBar)
 		{
-			WindowControls& controls = window->GetWindowControls();
-
-			if (controls.BeginTitleBar())
+			if (m_WindowControls->BeginTitleBar())
 			{
 				RenderTitleBar();
 
-				controls.RenderControls();
-				controls.EndTitleBar();
+				m_WindowControls->RenderControls();
+				m_WindowControls->EndTitleBar();
 			}
 		}
 	}

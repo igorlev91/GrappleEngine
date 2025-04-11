@@ -8,10 +8,12 @@
 #include "Grapple/AssetManager/AssetManager.h"
 
 #include "Grapple/Project/Project.h"
-#include "Grapple/Platform/Platform.h"
 
 #include "Grapple/Scripting/ScriptingEngine.h"
 #include "Grapple/Input/InputManager.h"
+
+#include "GrapplePlatform/Platform.h"
+#include "GrapplePlatform/Events.h"
 
 #include "GrappleEditor/AssetManager/EditorAssetManager.h"
 
@@ -173,8 +175,7 @@ namespace Grapple
 		ImGuiID dockspaceId = ImGui::GetID("DockSpace");
 		ImGui::DockSpace(dockspaceId, ImVec2(0.0f, 0.0f), dockspaceFlags);
 
-		EditorTitleBar titleBar;
-		titleBar.OnRenderImGui();
+		m_TitleBar.OnRenderImGui();
 
 		{
 			ImGui::Begin("Renderer");

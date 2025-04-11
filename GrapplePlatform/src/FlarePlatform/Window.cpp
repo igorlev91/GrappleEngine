@@ -1,6 +1,7 @@
 #include "Window.h"
 
-#include "Grapple/Platform/Windows/WindowsWindow.h"
+#include "GrapplePlatform/Window.h"
+#include "GrapplePlatform/Windows/WindowsWindow.h"
 
 namespace Grapple
 {

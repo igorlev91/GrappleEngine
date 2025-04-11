@@ -26,6 +26,7 @@ group "Dependencies"
 group ""
 
 group "Core"
+	include "GrapplePlatform/GrapplePlatform.Build.lua"
 	include "GrappleCommon/GrappleCommon.Build.lua"
 	include "Grapple/Grapple.Build.lua"
 	include "GrappleECS/GrappleECS.Build.lua"

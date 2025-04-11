@@ -8,6 +8,8 @@
 #include "GrappleEditor/UI/PropertiesWindow.h"
 #include "GrappleEditor/UI/AssetManagerWindow.h"
 
+#include "GrappleEditor/UI//EditorTitleBar.h"
+
 #include "GrappleEditor/ViewportWindow.h"
 #include "GrappleEditor/EditorCamera.h"
 
@@ -65,6 +67,8 @@ namespace Grapple
 		void OnOpenProject();
 	private:
 		float m_PreviousFrameTime = 0.0f;
+
+		EditorTitleBar m_TitleBar;
 
 		SceneWindow m_SceneWindow;
 		PropertiesWindow m_PropertiesWindow;

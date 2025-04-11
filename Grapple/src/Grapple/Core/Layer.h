@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Grapple/Core/Event.h"
+#include "GrapplePlatform/Event.h"
 
 #include <string>
 

@@ -1,6 +1,6 @@
 #include "InputManager.h"
 
-#include "Grapple/Core/Events.h"
+#include "GrapplePlatform/Events.h"
 
 namespace Grapple
 {

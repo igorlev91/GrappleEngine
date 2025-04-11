@@ -5,6 +5,11 @@
 
 #include "Grapple/Scripting/ScriptingEngine.h"
 
+#include "GrapplePlatform/Event.h"
+#include "GrapplePlatform/Events.h"
+
+#include "GrapplePlatform/Platform.h"
+
 namespace Grapple
 {
 	Application* Application::s_Instance = nullptr;
@@ -16,11 +21,13 @@ namespace Grapple
 
 		WindowProperties properties;
 		properties.Title = "Grapple Engine";
-		properties.Width = 1280;
-		properties.Height = 720;
+		properties.Size = glm::uvec2(1280, 720);
 		properties.CustomTitleBar = true;
 
 		m_Window = Window::Create(properties);
+		m_GraphicsContext = GraphicsContext::Create(m_Window->GetNativeWindow());
+		m_GraphicsContext->Initialize();
+		
 		m_Window->SetEventCallback([this](Event& event)
 		{
 			EventDispatcher dispatcher(event);
@@ -64,7 +71,7 @@ namespace Grapple
 
 		while (m_Running)
 		{
-			float currentTime = Time::GetTime();
+			float currentTime = Platform::GetTime();
 			float deltaTime = currentTime - m_PreviousFrameTime;
 
 			for (const Ref<Layer>& layer : m_LayersStack.GetLayers())
@@ -74,6 +81,8 @@ namespace Grapple
 				layer->OnImGUIRender();
 
 			m_Window->OnUpdate();
+			m_GraphicsContext->SwapBuffers();
+
 			m_PreviousFrameTime = currentTime;
 		}
 
