@@ -66,6 +66,18 @@ namespace Grapple
 		return result;
 	}
 
+	bool EditorGUI::IntPropertyField(const char* name, int32_t& value)
+	{
+		RenderPropertyName(name);
+
+		ImGui::PushID(&value);
+		bool result = ImGui::DragInt("", &value, 0.1f);
+		ImGui::PopID();
+
+		ImGui::PopItemWidth();
+		return result;
+	}
+
 	bool EditorGUI::FloatPropertyField(const char* name, float& value)
 	{
 		RenderPropertyName(name);
@@ -225,38 +237,34 @@ namespace Grapple
 		ImGui::PopItemWidth();
 	}
 
-	bool EditorGUI::TypeEditor(const Scripting::ScriptingType& type, uint8_t* data)
+	bool EditorGUI::TypeEditor(const TypeInitializer& type, uint8_t* data)
 	{
-		const auto& fields = type.GetSerializationSettings().GetFields();
+		const auto& fields = type.SerializedFields;
 		bool result = false;
 
 		if (EditorGUI::BeginPropertyGrid())
 		{
 			for (size_t i = 0; i < fields.size(); i++)
 			{
-				const Scripting::Field& field = fields[i];
+				const FieldData& field = fields[i];
 				uint8_t* fieldData = data + field.Offset;
 
 				switch (field.Type)
 				{
-				case Scripting::FieldType::Bool:
-					result |= EditorGUI::BoolPropertyField(field.Name.c_str(), *(bool*)fieldData);
+				case SerializableFieldType::Bool:
+					result |= EditorGUI::BoolPropertyField(field.Name, *(bool*)fieldData);
 					break;
-				case Scripting::FieldType::Float:
-					result |= EditorGUI::FloatPropertyField(field.Name.c_str(), *(float*)fieldData);
+				case SerializableFieldType::Int32:
+					result |= EditorGUI::IntPropertyField(field.Name, *(int32_t*)fieldData);
 					break;
-				case Scripting::FieldType::Float2:
-					result |= EditorGUI::Vector2PropertyField(field.Name.c_str(), *(glm::vec2*)fieldData);
+				case SerializableFieldType::Float32:
+					result |= EditorGUI::FloatPropertyField(field.Name, *(float*)fieldData);
 					break;
-				case Scripting::FieldType::Float3:
-					result |= EditorGUI::Vector3PropertyField(field.Name.c_str(), *(glm::vec3*)fieldData);
+				case SerializableFieldType::Float2:
+					result |= EditorGUI::Vector2PropertyField(field.Name, *(glm::vec2*)fieldData);
 					break;
-				case Scripting::FieldType::Asset:
-				case Scripting::FieldType::Texture:
-					result |= EditorGUI::AssetField(field.Name.c_str(), *(AssetHandle*)fieldData);
-					break;
-				case Scripting::FieldType::Entity:
-					result |= EditorGUI::EntityField(field.Name.c_str(), Scene::GetActive()->GetECSWorld(), *(Entity*)fieldData);
+				case SerializableFieldType::Float3:
+					result |= EditorGUI::Vector3PropertyField(field.Name, *(glm::vec3*)fieldData);
 					break;
 				}
 			}

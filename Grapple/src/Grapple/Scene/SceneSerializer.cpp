@@ -2,9 +2,9 @@
 
 #include "Grapple/Scene/Components.h"
 #include "Grapple/AssetManager/AssetManager.h"
-#include "Grapple/Serialization/Serialization.h"
 
-#include "Grapple/Scripting/ScriptingEngine.h"
+#include "Grapple/Serialization/Serialization.h"
+#include "Grapple/Serialization/TypeInitializer.h"
 
 #include "GrappleECS/Query/EntityRegistryIterator.h"
 
@@ -15,38 +15,31 @@
 
 namespace Grapple
 {
-	static void SerializeType(YAML::Emitter& emitter, const Scripting::ScriptingType& type, const uint8_t* data)
+	static void SerializeType(YAML::Emitter& emitter, const TypeInitializer& type, const uint8_t* data)
 	{
 		emitter << YAML::BeginMap;
-		emitter << YAML::Key << "Name" << YAML::Value << std::string(type.Name);
+		emitter << YAML::Key << "Name" << YAML::Value << std::string(type.TypeName);
 
-		const Scripting::TypeSerializationSettings& serializationSettings = type.GetSerializationSettings();
-		for (const Scripting::Field& field : serializationSettings.GetFields())
+		for (const FieldData& field : type.SerializedFields)
 		{
 			const uint8_t* fieldData = (const uint8_t*)data + field.Offset;
 			switch (field.Type)
 			{
-			case Scripting::FieldType::Bool:
+			case SerializableFieldType::Bool:
 				emitter << YAML::Key << field.Name << YAML::Value << *(bool*)(fieldData);
 				break;
-			case Scripting::FieldType::Float:
+			case SerializableFieldType::Int32:
+				emitter << YAML::Key << field.Name << YAML::Value << *(int32_t*)(fieldData);
+				break;
+			case SerializableFieldType::Float32:
 				emitter << YAML::Key << field.Name << YAML::Value << *(float*)(fieldData);
 				break;
-			case Scripting::FieldType::Float2:
+			case SerializableFieldType::Float2:
 				emitter << YAML::Key << field.Name << YAML::Value << *(glm::vec2*)(fieldData);
 				break;
-			case Scripting::FieldType::Float3:
+			case SerializableFieldType::Float3:
 				emitter << YAML::Key << field.Name << YAML::Value << *(glm::vec3*)(fieldData);
 				break;
-			case Scripting::FieldType::Asset:
-			case Scripting::FieldType::Texture:
-				emitter << YAML::Key << field.Name << YAML::Value << *(AssetHandle*)(fieldData);
-				break;
-			case Scripting::FieldType::Entity:
-			{
-				Grapple_CORE_WARN("Entity serialization is not implemented");
-				break;
-			}
 			default:
 				Grapple_CORE_ASSERT(false, "Unhandled field type");
 			}
@@ -55,48 +48,42 @@ namespace Grapple
 		emitter << YAML::EndMap;
 	}
 
-	static void DeserializeType(YAML::Node& node, const Scripting::ScriptingType& type, uint8_t* data)
+	static void DeserializeType(YAML::Node& node, const TypeInitializer& type, uint8_t* data)
 	{
-		for (const Scripting::Field& field : type.GetSerializationSettings().GetFields())
+		for (const FieldData& field : type.SerializedFields)
 		{
 			if (YAML::Node fieldNode = node[field.Name])
 			{
 				switch (field.Type)
 				{
-				case Scripting::FieldType::Bool:
+				case SerializableFieldType::Bool:
 				{
 					bool value = fieldNode.as<bool>();
 					std::memcpy(data + field.Offset, &value, sizeof(value));
 					break;
 				}
-				case Scripting::FieldType::Float:
+				case SerializableFieldType::Int32:
+				{
+					int32_t value = fieldNode.as<int32_t>();
+					std::memcpy(data + field.Offset, &value, sizeof(value));
+					break;
+				}
+				case SerializableFieldType::Float32:
 				{
 					float value = fieldNode.as<float>();
 					std::memcpy(data + field.Offset, &value, sizeof(value));
 					break;
 				}
-				case Scripting::FieldType::Float2:
+				case SerializableFieldType::Float2:
 				{
 					glm::vec2 vector = fieldNode.as<glm::vec2>();
 					std::memcpy(data + field.Offset, &vector, sizeof(vector));
 					break;
 				}
-				case Scripting::FieldType::Float3:
+				case SerializableFieldType::Float3:
 				{
 					glm::vec3 vector = fieldNode.as<glm::vec3>();
 					std::memcpy(data + field.Offset, &vector, sizeof(vector));
-					break;
-				}
-				case Scripting::FieldType::Asset:
-				case Scripting::FieldType::Texture:
-				{
-					AssetHandle handle = fieldNode.as<AssetHandle>();
-					std::memcpy(data + field.Offset, &handle, sizeof(handle));
-					break;
-				}
-				case Scripting::FieldType::Entity:
-				{
-					Grapple_CORE_WARN("Entity serialization is not implemented");
 					break;
 				}
 				default:
@@ -156,16 +143,11 @@ namespace Grapple
 		}
 		else
 		{
-		 	std::optional<const Scripting::ScriptingType*> componentType = ScriptingEngine::FindComponentType(component);
 			std::optional<void*> entityData = world.GetRegistry().GetEntityComponent(entity, component);
+			const ComponentInfo& info = world.GetRegistry().GetComponentInfo(component);
 
-			Grapple_CORE_ASSERT(entityData.has_value());
-
-			if (componentType.has_value())
-				SerializeType(emitter, *componentType.value(), (const uint8_t*)entityData.value());
-			else
-				Grapple_CORE_ERROR("Componnet with id={{0};{1}} cannot be serialized because it's type infomation cannot be found",
-					component.GetIndex(), component.GetGeneration());
+			if (entityData.has_value() && info.Initializer)
+				SerializeType(emitter, info.Initializer->Type, (const uint8_t*) entityData.value());
 		}
 	}
 
@@ -222,23 +204,6 @@ namespace Grapple
 			emitter << YAML::EndMap;
 		}
 
-		emitter << YAML::EndSeq;
-
-		emitter << YAML::Key << "Systems";
-		emitter << YAML::BeginSeq;
-
-		const auto& modules = ScriptingEngine::GetData().Modules;
-		for (const ScriptingModuleData& module : modules)
-		{
-			for (size_t systemIndex = module.FirstSystemInstance; systemIndex < module.Config.RegisteredSystems->size(); systemIndex++)
-			{
-				const ScriptingTypeInstance& instance = module.ScriptingInstances[systemIndex];
-				std::optional<const Scripting::ScriptingType*> type = ScriptingEngine::GetScriptingType(instance.Type);
-
-				if (type.has_value())
-					SerializeType(emitter, *type.value(), (const uint8_t*)instance.Instance);
-			}
-		}
 		emitter << YAML::EndSeq;
 
 		emitter << YAML::EndMap;
@@ -335,40 +300,13 @@ namespace Grapple
 						continue;
 					}
 
-					std::optional<const Scripting::ScriptingType*> type = ScriptingEngine::FindComponentType(componentId.value());
-					if (type.has_value())
+					const ComponentInfo& info = scene->GetECSWorld().GetRegistry().GetComponentInfo(componentId.value());
+					if (info.Initializer)
 					{
 						uint8_t* componentData = AddDeserializedComponent(scene->GetECSWorld(), entity, componentId.value());
-						DeserializeType(componentNode, *type.value(), componentData);
+						DeserializeType(componentNode, info.Initializer->Type, componentData);
 					}
 				}
-			}
-		}
-
-		YAML::Node systems = node["Systems"];
-		if (!systems)
-			return;
-
-		for (auto system : systems)
-		{
-			if (YAML::Node nameNode = system["Name"])
-			{
-				std::string name = nameNode.as<std::string>();
-				std::optional<const Scripting::ScriptingType*> type = ScriptingEngine::FindType(name);
-				if (!type.has_value())
-				{
-					Grapple_CORE_ERROR("System named '{0}' cannot be deserialized", name);
-					continue;
-				}
-
-				std::optional<Scripting::SystemBase*> systemData = ScriptingEngine::FindSystemByName(name);
-				if (!systemData.has_value())
-				{
-					Grapple_CORE_ERROR("System '{0}' cannot be found", name);
-					continue;
-				}
-
-				DeserializeType(system, *type.value(), (uint8_t*) systemData.value());
 			}
 		}
 	}

@@ -1,8 +1,14 @@
+local build_tool = require("BuildTool")
+
 project "Grapple"
-    kind "StaticLib"
 	language "C++"
 	cppdialect "C++17"
 	staticruntime "off"
+
+	build_tool.define_module("Grapple")
+	build_tool.add_module_ref("GrapplePlatform")
+	build_tool.add_module_ref("GrappleCommon")
+	build_tool.add_module_ref("GrappleECS")
 
     files
     {
@@ -20,7 +26,6 @@ project "Grapple"
 		"%{wks.location}/GrapplePlatform/src/",
 		"%{wks.location}/GrappleECS/src/",
 		"%{wks.location}/GrappleECS/include/",
-		"%{wks.location}/GrappleScriptingCore/src/",
 
 		INCLUDE_DIRS.GLAD,
 		INCLUDE_DIRS.GLFW,
@@ -40,7 +45,6 @@ project "Grapple"
 		"GrappleECS",
 		"GrappleCommon",
 		"GrapplePlatform",
-		"GrappleScriptingCore",
 		"yaml-cpp"
 	}
 
@@ -48,11 +52,8 @@ project "Grapple"
 	{
 		"GLFW_INCLUDE_NONE",
 		"YAML_CPP_STATIC_DEFINE",
-		"Grapple_SCRIPTING_CORE_NO_MACROS",
+		"_GLFW_BUILD_DLL",
 	}
-
-	targetdir("%{wks.location}/bin/" .. OUTPUT_DIRECTORY .. "/%{prj.name}")
-	objdir("%{wks.location}/bin-int/" .. OUTPUT_DIRECTORY .. "/%{prj.name}")
 
 	filter "system:windows"
 		systemversion "latest"
