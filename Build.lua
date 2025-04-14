@@ -1,4 +1,5 @@
 include "Dependencies.lua"
+include "BuildTool.lua"
 
 workspace "Grapple"
 	architecture "x86_64"
@@ -8,15 +9,19 @@ workspace "Grapple"
 	{
 		"Debug",
 		"Release",
-		"Dist"
+		"Dist",
 	}
+
+	filter "configurations:not Dist"
+		disablewarnings
+		{
+			"4251"
+		}
 
 	flags
 	{
 		"MultiProcessorCompile"
 	}
-
-OUTPUT_DIRECTORY = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 group "Dependencies"
     include "Grapple/vendor/GLFW"

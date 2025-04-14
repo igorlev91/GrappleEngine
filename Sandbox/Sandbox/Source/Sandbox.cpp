@@ -1,42 +1,37 @@
-#include <Grapple/Scene/Components.h>
-
 #include <GrappleECS/World.h>
 #include <GrappleECS/System/System.h>
 #include <GrappleECS/System/SystemInitializer.h>
+
+#include <Grapple/Scene/Components.h>
 
 #include <iostream>
 
 namespace Sandbox
 {
 	using namespace Grapple;
-	class TestSandboxSystem : public System
+	class SandboxTestSystem : public Grapple::System
 	{
+	public:
 		Grapple_SYSTEM;
+
 		virtual void OnConfig(SystemConfig& config) override
 		{
-			World& world = World::GetCurrent();
-			const std::vector<SystemInitializer*>& inits = SystemInitializer::GetInitializers();
-			
-			config.Group = World::GetCurrent().GetSystemsManager().FindGroup("Scripting Update");
-
-			m_TestQuery = World::GetCurrent().CreateQuery<With<TransformComponent>>();
+			m_TestQuery = World::GetCurrent().CreateQuery<With<TransformComponent>, Without<CameraComponent>>();
 		}
 
-		virtual void OnUpdate(Grapple::SystemExecutionContext& context) override
-	 	{
-			std::cout << "Update\n";
+		virtual void OnUpdate(SystemExecutionContext& context) override
+		{
 			for (EntityView chunk : m_TestQuery)
 			{
 				auto transforms = chunk.View<TransformComponent>();
 				for (EntityViewElement entity : chunk)
 				{
-					transforms[entity].Rotation.z += 10.0f;
+					transforms[entity].Rotation.z += 2.0f;
 				}
 			}
 		}
-
 	private:
 		Query m_TestQuery;
 	};
-	Grapple_IMPL_SYSTEM(TestSandboxSystem);
+	Grapple_IMPL_SYSTEM(SandboxTestSystem);
 }

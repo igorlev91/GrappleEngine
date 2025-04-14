@@ -62,19 +62,12 @@ namespace Grapple
 #ifdef Grapple_PLATFORM_WINDOWS
 		platformName = "windows";
 #endif
-
+		
 		for (const std::string& moduleName : Project::GetActive()->ScriptingModules)
 		{
-			ScriptingEngine::LoadModule(Project::GetActive()->Location
-				/ fmt::format("bin/{0}-{1}-x86_64/{2}/{2}.dll", configurationName, platformName, moduleName));
-		}
+			std::filesystem::path libraryPath = Project::GetActive()->Location
+				/ fmt::format("bin/{0}-{1}-x86_64/{2}.dll", configurationName, platformName, moduleName);
 
-		//SystemInitializer init("sdfsf", 0);
-		auto& arr = SystemInitializer::GetInitializers();
-		//arr.reserve(16);
-		for (const std::filesystem::path& modulePath : Project::GetActive()->Modules)
-		{
-			std::filesystem::path libraryPath = Project::GetActive()->Location / modulePath / "bin/Debug-windows-x86_64" / fmt::format("{0}.dll", modulePath.filename().generic_string());
 			void* library = Platform::LoadSharedLibrary(libraryPath);
 			Grapple_CORE_ASSERT(library);
 
