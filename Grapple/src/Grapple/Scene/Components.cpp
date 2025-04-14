@@ -2,9 +2,9 @@
 
 namespace Grapple
 {
-	Grapple_COMPONENT_IMPL(TransformComponent);
-	Grapple_COMPONENT_IMPL(CameraComponent);
-	Grapple_COMPONENT_IMPL(SpriteComponent);
+	Grapple_IMPL_COMPONENT(TransformComponent);
+	Grapple_IMPL_COMPONENT(CameraComponent);
+	Grapple_IMPL_COMPONENT(SpriteComponent);
 
 	glm::mat4 TransformComponent::GetTransformationMatrix() const
 	{

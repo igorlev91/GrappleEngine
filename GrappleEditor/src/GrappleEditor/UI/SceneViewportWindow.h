@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GrappleECS/EntityId.h"
+#include "GrappleECS/Entity/Entity.h"
 
 #include "GrappleEditor/ViewportWindow.h"
 #include "GrappleEditor/EditorCamera.h"

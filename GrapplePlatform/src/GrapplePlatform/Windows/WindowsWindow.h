@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Grapple/Core/Core.h"
 #include "GrapplePlatform/Window.h"
 
 #include <GLFW/glfw3.h>
@@ -8,7 +9,7 @@
 
 namespace Grapple
 {
-	class WindowsWindow : public Window
+	class GrapplePLATFORM_API WindowsWindow : public Window
 	{
 	public:
 		WindowsWindow(WindowProperties& properties);

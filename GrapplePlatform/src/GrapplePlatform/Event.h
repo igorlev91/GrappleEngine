@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Grapple/Core/Core.h"
+
 #include <string_view>
 #include <functional>
 
@@ -22,7 +24,7 @@ namespace Grapple
 		KeyTyped,
 	};
 
-	class Event
+	class GrapplePLATFORM_API Event
 	{
 	public:
 		virtual EventType GetType() const = 0;

@@ -1,8 +1,10 @@
 #pragma once
 
+#include "Grapple/Core/Core.h"
+
 namespace Grapple
 {
-	class WindowControls
+	class GrapplePLATFORM_API WindowControls
 	{
 	public:
 		virtual bool IsTitleBarHovered() const = 0;

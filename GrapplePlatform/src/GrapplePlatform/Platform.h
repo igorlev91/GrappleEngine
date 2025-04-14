@@ -9,7 +9,7 @@
 
 namespace Grapple
 {
-	class Platform
+	class GrapplePLATFORM_API Platform
 	{
 	public:
 		static float GetTime();

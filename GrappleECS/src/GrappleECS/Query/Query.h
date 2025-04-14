@@ -4,6 +4,7 @@
 #include "GrappleECS/Entity/Archetype.h"
 
 #include "GrappleECS/Query/QueryCache.h"
+#include "GrappleECS/Query/QueryData.h"
 #include "GrappleECS/Query/EntityView.h"
 
 #include "GrappleECS/Registry.h"

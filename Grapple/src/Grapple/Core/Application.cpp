@@ -1,5 +1,7 @@
 #include "Application.h"
 
+#include "Grapple/Core/Time.h"
+
 #include "Grapple/Renderer2D/Renderer2D.h"
 #include "Grapple/Renderer/RenderCommand.h"
 
@@ -73,6 +75,8 @@ namespace Grapple
 		{
 			float currentTime = Platform::GetTime();
 			float deltaTime = currentTime - m_PreviousFrameTime;
+
+			Time::UpdateDeltaTime();
 
 			for (const Ref<Layer>& layer : m_LayersStack.GetLayers())
 				layer->OnUpdate(deltaTime);

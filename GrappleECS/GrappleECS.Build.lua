@@ -12,8 +12,6 @@ project "GrappleECS"
     {
         "src/**.h",
         "src/**.cpp",
-
-		"include/**.h",
     }
 
     includedirs
@@ -22,6 +20,7 @@ project "GrappleECS"
 		"include/",
 		"%{wks.location}/GrappleCommon/src/",
 		INCLUDE_DIRS.spdlog,
+		INCLUDE_DIRS.glm,
 	}
 
 	links

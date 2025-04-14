@@ -4,56 +4,62 @@
 #include <GrappleECS/System/SystemInitializer.h>
 #include <GrappleECS/Entity/ComponentInitializer.h>
 
+#include <Grapple/Core/Time.h>
 #include <Grapple/Serialization/TypeInitializer.h>
 #include <Grapple/Scene/Components.h>
 
 #include <iostream>
 
-
 namespace Sandbox
 {
 	using namespace Grapple;
-	class SandboxTestSystem : public Grapple::System
+	struct RotatingQuadData
+	{
+		Grapple_COMPONENT;
+		float RotationSpeed;
+	};
+	Grapple_IMPL_COMPONENT(RotatingQuadData,
+		Grapple_FIELD(RotatingQuadData, RotationSpeed)
+	);
+
+	class RotatingQuadSystem : public Grapple::System
 	{
 	public:
 		Grapple_SYSTEM;
-		Grapple_TYPE;
 
 		virtual void OnConfig(SystemConfig& config) override
 		{
-			m_TestQuery = World::GetCurrent().CreateQuery<With<TransformComponent>, Without<CameraComponent>>();
+			m_Query = World::GetCurrent().CreateQuery<With<TransformComponent>, Without<CameraComponent>>();
+			m_SingletonQuery = World::GetCurrent().CreateQuery<With<RotatingQuadData>>();
 		}
 
 		virtual void OnUpdate(SystemExecutionContext& context) override
 		{
-			for (EntityView chunk : m_TestQuery)
+			const RotatingQuadData& data = World::GetCurrent().GetSingletonComponent<RotatingQuadData>();
+			Entity e = World::GetCurrent().GetSingletonEntity(m_SingletonQuery);
+
+			for (EntityView chunk : m_Query)
 			{
 				auto transforms = chunk.View<TransformComponent>();
 				for (EntityViewElement entity : chunk)
 				{
-					transforms[entity].Rotation.z += 2.0f;
+					transforms[entity].Rotation.z += data.RotationSpeed * Time::GetDeltaTime();
 				}
 			}
 		}
-
-		int a;
-		float b;
 	private:
-		Query m_TestQuery;
+		Query m_Query;
+		Query m_SingletonQuery;
 	};
-	Grapple_IMPL_SYSTEM(SandboxTestSystem);
-	Grapple_IMPL_TYPE(SandboxTestSystem,
-		Grapple_FIELD(SandboxTestSystem, a),
-		Grapple_FIELD(SandboxTestSystem, b)
-	);
-
+	Grapple_IMPL_SYSTEM(RotatingQuadSystem);
+		
 	struct SomeComponent
 	{
-		Grapple_COMPONENT2;
+		Grapple_COMPONENT;
 
 		int a, b;
 	};
-	Grapple_IMPL_COMPONENT2(SomeComponent,
+	Grapple_IMPL_COMPONENT(SomeComponent,
 		Grapple_FIELD(SomeComponent, a),
 		Grapple_FIELD(SomeComponent, b),
 	);

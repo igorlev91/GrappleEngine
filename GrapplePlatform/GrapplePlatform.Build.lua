@@ -1,8 +1,12 @@
+local build_tool = require("BuildTool")
+
 project "GrapplePlatform"
-    kind "StaticLib"
 	language "C++"
 	cppdialect "C++17"
 	staticruntime "off"
+
+	build_tool.define_module("GrapplePlatform")
+	build_tool.add_module_ref("GrappleCommon")
 
     files
     {
@@ -30,10 +34,8 @@ project "GrapplePlatform"
 	defines
 	{
 		"GLFW_INCLUDE_NONE",
+		"_GLFW_BUILD_DLL",
 	}
-
-	targetdir("%{wks.location}/bin/" .. OUTPUT_DIRECTORY .. "/%{prj.name}")
-	objdir("%{wks.location}/bin-int/" .. OUTPUT_DIRECTORY .. "/%{prj.name}")
 
 	filter "system:windows"
 		systemversion "latest"

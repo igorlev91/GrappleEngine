@@ -5,6 +5,8 @@
 
 #include "GrappleECS/Query/Query.h"
 
+#include "GrappleECS/Entity/ComponentInitializer.h"
+
 #include "GrappleECS/EntityStorage/EntityChunksPool.h"
 
 #include <algorithm>
@@ -410,6 +412,13 @@ namespace Grapple
 		return entityData + archetype.Data.ComponentOffsets[componentIndex.value()];
 	}
 
+	void Registry::RegisterComponents()
+	{
+		auto& initializers = ComponentInitializer::GetInitializers();
+		for (ComponentInitializer* initializer : initializers)
+			initializer->m_Id = RegisterComponent(*initializer);
+	}
+
 	ComponentId Registry::RegisterComponent(std::string_view name, size_t size, const std::function<void(void*)>& deleter)
 	{
 		Entity entityId = m_EntityIndex.CreateId();
@@ -463,19 +472,32 @@ namespace Grapple
 		auto it = m_ComponentToArchetype.find(id);
 		const auto& archetypes = it->second;
 		
-		if (archetypes.size() == 0)
+		ArchetypeId archetype = INVALID_ARCHETYPE_ID;
+		size_t componentIndex = SIZE_MAX;
+		for (const auto& pair : archetypes)
+		{
+			if (m_Archetypes[pair.first].Storage.GetEntitiesCount() != 0)
+			{
+				if (archetype == INVALID_ARCHETYPE_ID)
+				{
+					archetype = pair.first;
+					componentIndex = pair.second;
+				}
+				else
+				{
+					Grapple_CORE_ERROR("Failed to get singleton component: World contains multiple entities with component '{0}'", GetComponentInfo(id).Name);
+					return {};
+				}
+			}
+		}
+
+		if (archetype == INVALID_ARCHETYPE_ID)
 		{
 			Grapple_CORE_ERROR("Failed to get singleton component: World doesn't contain any entities with component '{0}'", GetComponentInfo(id).Name);
 			return {};
 		}
-		else if (archetypes.size() != 1)
-		{
-			Grapple_CORE_ERROR("Failed to get singleton component: World contains multiple entities with component '{0}'", GetComponentInfo(id).Name);
-			return {};
-		}
 
-		auto archetype = *archetypes.begin();
-		const ArchetypeRecord& record = GetArchetypeRecord(archetype.first);
+		const ArchetypeRecord& record = GetArchetypeRecord(archetype);
 
 		if (record.Storage.GetEntitiesCount() != 1)
 		{
@@ -484,27 +506,36 @@ namespace Grapple
 		}
 
 		uint8_t* entityData = record.Storage.GetEntityData(0);
-
-		return entityData + record.Data.ComponentOffsets[archetype.second];
+		return entityData + record.Data.ComponentOffsets[componentIndex];
 	}
 
 	std::optional<Entity> Registry::GetSingletonEntity(const Query& query) const
 	{
-		const auto& matchedArchetypes = query.GetMatchedArchetypes();
-		if (matchedArchetypes.size() == 0)
+		const auto& archetypes = query.GetMatchedArchetypes();
+
+		ArchetypeId archetype = INVALID_ARCHETYPE_ID;
+		size_t componentIndex = SIZE_MAX;
+		for (const auto& pair : archetypes)
+		{
+			if (m_Archetypes[pair].Storage.GetEntitiesCount() != 0)
+			{
+				if (archetype == INVALID_ARCHETYPE_ID)
+					archetype = pair;
+				else
+				{
+					Grapple_CORE_ERROR("Failed to get singleton entity: Multiple entities matched the query");
+					return Entity();
+				}
+			}
+		}
+
+		if (archetype == INVALID_ARCHETYPE_ID)
 		{
 			Grapple_CORE_ERROR("Failed to get singleton entity: Zero entities matched the query");
 			return Entity();
 		}
-		else if (matchedArchetypes.size() != 1)
-		{
-			Grapple_CORE_ERROR("Failed to get singleton entity: Multiple entities matched the query");
-			return Entity();
-		}
 
-		ArchetypeId archetype = *matchedArchetypes.begin();
 		const ArchetypeRecord& record = GetArchetypeRecord(archetype);
-
 		if (record.Storage.GetEntitiesCount() != 1)
 		{
 			Grapple_CORE_ERROR("Failed to get singleton entity: Multiple entities matched the query");
@@ -576,6 +607,25 @@ namespace Grapple
 	{
 		Grapple_CORE_ASSERT(index < m_EntityRecords.size());
 		return m_EntityRecords[index];
+	}
+
+	ComponentId Registry::RegisterComponent(ComponentInitializer& initializer)
+	{
+		Entity entityId = m_EntityIndex.CreateId();
+
+		uint32_t registryIndex = (uint32_t)m_RegisteredComponents.size();
+		ComponentInfo& info = m_RegisteredComponents.emplace_back();
+
+		info.Id = ComponentId(entityId.GetIndex(), entityId.GetGeneration());
+		info.RegistryIndex = registryIndex;
+		info.Name = initializer.Type.TypeName;
+		info.Size = initializer.Type.Size;
+		info.Deleter = initializer.Type.Destructor;
+		info.Initializer = &initializer;
+
+		m_ComponentNameToIndex.emplace(info.Name, registryIndex);
+		m_ComponentIdToIndex.emplace(info.Id, registryIndex);
+		return info.Id;
 	}
 
 	ArchetypeId Registry::CreateArchetype()

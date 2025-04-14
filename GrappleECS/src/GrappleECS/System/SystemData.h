@@ -1,14 +1,15 @@
 #pragma once
 
 #include "GrappleECS/Query/Query.h"
-#include "GrappleECS/System.h"
-
 #include "GrappleECS/System/ExecutionGraph/ExecutionGraph.h"
 
 #include <functional>
 
 namespace Grapple
 {
+	using SystemGroupId = uint32_t;
+	using SystemId = uint32_t;
+
 	class SystemExecutionContext
 	{
 	};

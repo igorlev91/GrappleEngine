@@ -1,8 +1,11 @@
+local build_tool = require("BuildTool")
+
 project "GrappleCommon"
-    kind "StaticLib"
 	language "C++"
 	cppdialect "C++17"
 	staticruntime "off"
+
+	build_tool.define_module("GrappleCommon")
 
     files
     {
@@ -14,10 +17,8 @@ project "GrappleCommon"
 	{
 		"src/",
 		INCLUDE_DIRS.spdlog,
+		INCLUDE_DIRS.glm,
 	}
-
-	targetdir("%{wks.location}/bin/" .. OUTPUT_DIRECTORY .. "/%{prj.name}")
-	objdir("%{wks.location}/bin-int/" .. OUTPUT_DIRECTORY .. "/%{prj.name}")
 
 	filter "system:windows"
 		systemversion "latest"

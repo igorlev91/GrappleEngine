@@ -2,9 +2,6 @@
 
 #include "Grapple/Scene/Components.h"
 
-#include "GrappleScriptingCore/ScriptingType.h"
-#include "GrappleScriptingCore/TypeSerializationSettings.h"
-
 #include <unordered_map>
 #include <functional>
 

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "GrappleECS/Query/Query.h"
-#include "GrappleECS/System.h"
 
 #include "GrappleECS/System/System.h"
 #include "GrappleECS/System/SystemData.h"

@@ -5,7 +5,7 @@
 #include "Grapple/Scripting/ScriptingEngine.h"
 #include "Grapple/Serialization/TypeInitializer.h"
 
-#include "GrappleECS/EntityId.h"
+#include "GrappleECS/Entity/Entity.h"
 #include "GrappleECS/World.h"
 
 namespace Grapple

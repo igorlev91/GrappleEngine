@@ -3,6 +3,7 @@
 #include "Grapple.h"
 
 #include "GrappleECS/World.h"
+#include "GrappleECS/Entity/ComponentInitializer.h"
 
 #include "Grapple/AssetManager/Asset.h"
 

@@ -27,8 +27,6 @@ project "GrappleEditor"
 		"%{wks.location}/GrappleCommon/src",
 		"%{wks.location}/GrapplePlatform/src",
 		"%{wks.location}/GrappleECS/src",
-		"%{wks.location}/GrappleECS/include",
-		"%{wks.location}/GrappleScriptingCore/src/",
 
 		INCLUDE_DIRS.glm,
 		INCLUDE_DIRS.GLFW,
@@ -45,7 +43,6 @@ project "GrappleEditor"
 		"ImGUI",
 		"GrappleCommon",
 		"GrapplePlatform",
-		"GrappleScriptingCore",
 		"GrappleECS",
 		"yaml-cpp",
 	}
@@ -53,7 +50,6 @@ project "GrappleEditor"
 	defines
 	{
 		"YAML_CPP_STATIC_DEFINE",
-		"Grapple_SCRIPTING_CORE_NO_MACROS",
 	}
 
 	debugargs

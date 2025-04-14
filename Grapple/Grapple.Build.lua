@@ -25,7 +25,6 @@ project "Grapple"
 		"%{wks.location}/GrappleCommon/src/",
 		"%{wks.location}/GrapplePlatform/src/",
 		"%{wks.location}/GrappleECS/src/",
-		"%{wks.location}/GrappleECS/include/",
 
 		INCLUDE_DIRS.GLAD,
 		INCLUDE_DIRS.GLFW,

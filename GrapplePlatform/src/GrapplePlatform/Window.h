@@ -24,7 +24,7 @@ namespace Grapple
 		bool VSyncEnabled = true;
 	};
 
-	class Window
+	class GrapplePLATFORM_API Window
 	{
 	public:
 		virtual const WindowProperties& GetProperties() const = 0;

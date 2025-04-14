@@ -35,7 +35,6 @@ group "Core"
 	include "GrappleCommon/GrappleCommon.Build.lua"
 	include "Grapple/Grapple.Build.lua"
 	include "GrappleECS/GrappleECS.Build.lua"
-	include "GrappleScriptingCore/GrappleScriptingCore.Build.lua"
 group ""
 
 group "Editor"
