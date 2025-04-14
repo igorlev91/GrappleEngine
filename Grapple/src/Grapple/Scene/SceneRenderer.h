@@ -5,6 +5,7 @@
 #include "Grapple/Scene/Components.h"
 
 #include "GrappleECS/World.h"
+#include "GrappleECS/System/SystemInitializer.h"
 
 namespace Grapple
 {
@@ -13,6 +14,7 @@ namespace Grapple
 	public:
 		SpritesRendererSystem();
 
+		virtual void OnConfig(SystemConfig& config) override {}
 		virtual void OnUpdate(SystemExecutionContext& context) override;
 	private:
 		Query m_SpritesQuery;

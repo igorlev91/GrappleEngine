@@ -343,6 +343,11 @@ namespace Grapple
 		return FindEntity(entity) != m_EntityToRecord.end();
 	}
 
+	const std::vector<EntityRecord>& Registry::GetEntityRecords() const
+	{
+		return m_EntityRecords;
+	}
+
 	std::optional<Entity> Registry::FindEntityByIndex(uint32_t entityIndex)
 	{
 		auto it = m_EntityToRecord.find(Entity(entityIndex, 0));
@@ -440,10 +445,15 @@ namespace Grapple
 		return it->second < m_RegisteredComponents.size();
 	}
 
-	inline const ComponentInfo& Registry::GetComponentInfo(ComponentId id) const
+	const ComponentInfo& Registry::GetComponentInfo(ComponentId id) const
 	{
 		Grapple_CORE_ASSERT(IsComponentIdValid(id));
 		return m_RegisteredComponents[m_ComponentIdToIndex.at(id)];
+	}
+
+	const std::vector<ComponentInfo>& Registry::GetRegisteredComponents() const
+	{
+		return m_RegisteredComponents;
 	}
 
 	std::optional<void*> Registry::GetSingleComponent(ComponentId id) const
@@ -519,6 +529,11 @@ namespace Grapple
 		return m_QueryCache.AddQuery(components);
 	}
 
+	const QueryCache& Registry::GetQueryCache() const
+	{
+		return m_QueryCache;
+	}
+
 	EntityView Registry::QueryArchetype(const ComponentSet& componentSet)
 	{
 		Grapple_CORE_ASSERT(componentSet.GetCount() > 0);
@@ -551,13 +566,13 @@ namespace Grapple
 		return GetArchetypeComponentIndex(m_EntityRecords[it->second].Archetype, component).has_value();
 	}
 
-	inline EntityRecord& Registry::operator[](size_t index)
+	EntityRecord& Registry::operator[](size_t index)
 	{
 		Grapple_CORE_ASSERT(index < m_EntityRecords.size());
 		return m_EntityRecords[index];
 	}
 
-	inline const EntityRecord& Registry::operator[](size_t index) const
+	const EntityRecord& Registry::operator[](size_t index) const
 	{
 		Grapple_CORE_ASSERT(index < m_EntityRecords.size());
 		return m_EntityRecords[index];
@@ -570,6 +585,16 @@ namespace Grapple
 		record.Data.Id = id;
 		
 		return id;
+	}
+
+	ArchetypeRecord& Registry::GetArchetypeRecord(size_t archetypeId)
+	{
+		return m_Archetypes[archetypeId];
+	}
+
+	const ArchetypeRecord& Registry::GetArchetypeRecord(size_t archetypeId) const
+	{
+		return m_Archetypes[archetypeId];
 	}
 
 	std::optional<size_t> Registry::GetArchetypeComponentIndex(ArchetypeId archetype, ComponentId component) const

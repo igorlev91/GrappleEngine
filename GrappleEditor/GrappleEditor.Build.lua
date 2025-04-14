@@ -1,14 +1,21 @@
+local build_tool = require("BuildTool")
+
 project "GrappleEditor"
     kind "ConsoleApp"
 	language "C++"
 	cppdialect "C++17"
 	staticruntime "off"
 
+	build_tool.add_module_ref("Grapple")
+	build_tool.add_module_ref("GrapplePlatform")
+	build_tool.add_module_ref("GrappleCommon")
+	build_tool.add_module_ref("GrappleECS")
+
     files
     {
         "src/**.h",
         "src/**.cpp",
-		
+
 		"%{wks.location}/Grapple/vendor/ImGuizmo/ImGuizmo.h",
 		"%{wks.location}/Grapple/vendor/ImGuizmo/ImGuizmo.cpp",
     }
@@ -34,6 +41,7 @@ project "GrappleEditor"
 	links
 	{
 		"Grapple",
+		"GLFW",
 		"ImGUI",
 		"GrappleCommon",
 		"GrapplePlatform",
@@ -53,12 +61,12 @@ project "GrappleEditor"
 		"%{wks.location}/Sandbox/Sandbox.Grappleproj"
 	}
 
-	targetdir("%{wks.location}/bin/" .. OUTPUT_DIRECTORY .. "/%{prj.name}")
+	targetdir("%{wks.location}/bin/" .. OUTPUT_DIRECTORY)
 	objdir("%{wks.location}/bin-int/" .. OUTPUT_DIRECTORY .. "/%{prj.name}")
 
 	filter "system:windows"
 		systemversion "latest"
-	
+
 	filter "configurations:Debug"
 		defines "Grapple_DEBUG"
 		runtime "Debug"

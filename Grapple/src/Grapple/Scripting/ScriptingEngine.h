@@ -77,6 +77,8 @@ namespace Grapple
 
 			std::unordered_map<uint32_t, ScriptingItemIndex> SystemIndexToInstance;
 			std::unordered_map<std::string_view, ScriptingItemIndex> SystemNameToInstance;
+
+			std::vector<void*> LoadedSharedLibraries;
 		};
 	public:
 		static void Initialize();

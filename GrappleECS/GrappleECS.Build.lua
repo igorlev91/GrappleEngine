@@ -1,8 +1,12 @@
+local build_tool = require("BuildTool")
+
 project "GrappleECS"
-    kind "StaticLib"
 	language "C++"
 	cppdialect "C++17"
 	staticruntime "off"
+
+	build_tool.define_module("GrappleECS")
+	build_tool.add_module_ref("GrappleCommon")
 
     files
     {
@@ -25,12 +29,9 @@ project "GrappleECS"
 		"GrappleCommon",
 	}
 
-	targetdir("%{wks.location}/bin/" .. OUTPUT_DIRECTORY .. "/%{prj.name}")
-	objdir("%{wks.location}/bin-int/" .. OUTPUT_DIRECTORY .. "/%{prj.name}")
-
 	filter "system:windows"
 		systemversion "latest"
-	
+
 	filter "configurations:Debug"
 		defines "Grapple_DEBUG"
 		runtime "Debug"

@@ -13,8 +13,8 @@
 namespace Grapple
 {
 	class GrappleECS_API Registry;
+	class GrappleECS_API Query;
 
-	class Query;
 	class GrappleECS_API QueryCache
 	{
 	public:
