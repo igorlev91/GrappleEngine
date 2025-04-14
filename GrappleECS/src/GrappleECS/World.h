@@ -18,20 +18,11 @@
 
 namespace Grapple
 {
-	class World
+	class GrappleECS_API World
 	{
 	public:
-		World()
-		{
-			Grapple_CORE_ASSERT(s_CurrentWorld == nullptr, "Multiple ECS Worlds");
-			s_CurrentWorld = this;
-		}
-
-		~World()
-		{
-			s_CurrentWorld = nullptr;
-		}
-
+		World();
+		~World();
 		World(const World&) = delete;
 
 		template<typename ComponentT>
@@ -143,21 +134,14 @@ namespace Grapple
 			return m_Registry.CreateQuery(ComponentSet(components.GetComponents().data(), components.GetComponents().size()));
 		}
 
-		inline static World& GetCurrent()
-		{
-			Grapple_CORE_ASSERT(s_CurrentWorld != nullptr);
-			return *s_CurrentWorld;
-		}
+		static World& GetCurrent();
 	public:
-		inline Registry& GetRegistry() { return m_Registry; }
+		Registry& GetRegistry();
 
-		SystemsManager& GetSystemsManager() { return m_SystemsManager; }
-		const SystemsManager& GetSystemsManager() const { return m_SystemsManager; }
+		SystemsManager& GetSystemsManager();
+		const SystemsManager& GetSystemsManager() const;
 	private:
 		Registry m_Registry;
-
 		SystemsManager m_SystemsManager;
-	private:
-		static World* s_CurrentWorld;
 	};
 }

@@ -21,7 +21,7 @@ namespace Grapple
 	class EntityView;
 	class EntityRegistryIterator;
 
-	class Registry
+	class GrappleECS_API Registry
 	{
 	public:
 		Registry();

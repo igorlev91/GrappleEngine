@@ -6,7 +6,7 @@
 
 namespace Grapple
 {
-	class Layer
+	class Grapple_API Layer
 	{
 	public:
 		Layer(std::string_view debugName)

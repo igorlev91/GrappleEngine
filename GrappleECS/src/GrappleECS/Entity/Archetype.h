@@ -17,7 +17,7 @@ namespace Grapple
 		ArchetypeId Remove;
 	};
 
-	struct Archetype
+	struct GrappleECS_API Archetype
 	{
 		size_t Id;
 
@@ -36,12 +36,17 @@ namespace Grapple
 		}
 	};
 	
-	struct ArchetypeRecord
+	struct GrappleECS_API ArchetypeRecord
 	{
 		Archetype Data;
 		EntityStorage Storage;
 
 		ArchetypeRecord() {}
+
+		ArchetypeRecord(const ArchetypeRecord& other)
+		{
+			Grapple_CORE_INFO("ArchetypeRecord::Copy");
+		}
 
 		ArchetypeRecord(ArchetypeRecord&& other) noexcept
 			: Data(std::move(other.Data)), Storage(std::move(other.Storage)) {}

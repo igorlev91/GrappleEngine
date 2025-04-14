@@ -6,7 +6,7 @@
 
 namespace Grapple
 {
-	class SceneSerializer
+	class Grapple_API SceneSerializer
 	{
 	public:
 		static void Serialize(const Ref<Scene>& scene);

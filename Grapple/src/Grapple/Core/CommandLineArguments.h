@@ -4,7 +4,7 @@
 
 namespace Grapple
 {
-	struct CommandLineArguments
+	struct Grapple_API CommandLineArguments
 	{
 		const char** Arguments = nullptr;
 		uint32_t ArgumentsCount = 0;

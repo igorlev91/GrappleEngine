@@ -8,7 +8,7 @@
 
 namespace Grapple
 {
-	struct TransformComponent
+	struct Grapple_API TransformComponent
 	{
 		Grapple_COMPONENT;
 
@@ -19,7 +19,7 @@ namespace Grapple
 		glm::mat4 GetTransformationMatrix() const;
 	};
 
-	struct CameraComponent
+	struct Grapple_API CameraComponent
 	{
 		Grapple_COMPONENT;
 
@@ -37,7 +37,7 @@ namespace Grapple
 		float Far;
 	};
 
-	struct SpriteComponent
+	struct Grapple_API SpriteComponent
 	{
 		Grapple_COMPONENT;
 

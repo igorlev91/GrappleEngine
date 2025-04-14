@@ -12,10 +12,10 @@
 
 namespace Grapple
 {
-	class Registry;
+	class GrappleECS_API Registry;
 
 	class Query;
-	class QueryCache
+	class GrappleECS_API QueryCache
 	{
 	public:
 		QueryCache(Registry& registry)

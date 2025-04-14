@@ -6,11 +6,16 @@
 
 namespace Grapple
 {
-	Ref<Project> Project::s_Active;
+	Ref<Project> s_Active;
 	Signal<> Project::OnProjectOpen;
 	Signal<> Project::OnUnloadActiveProject;
 
 	std::filesystem::path Project::s_ProjectFileExtension = ".Grappleproj";
+
+	Ref<Project> Project::GetActive()
+	{
+		return s_Active;
+	}
 
 	void Project::New(std::string_view name, const std::filesystem::path& path)
 	{
@@ -44,8 +49,18 @@ namespace Grapple
 		Project::OnProjectOpen.Invoke();
 	}
 
+	const std::filesystem::path& Project::GetProjectFileExtension()
+	{
+		return s_ProjectFileExtension;
+	}
+
 	void Project::Save()
 	{
 		ProjectSerializer::Serialize(s_Active, s_Active->GetProjectFilePath());
+	}
+
+	std::filesystem::path Project::GetProjectFilePath()
+	{
+		return (Location / Name).replace_extension(s_ProjectFileExtension);
 	}
 }

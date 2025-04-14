@@ -18,8 +18,8 @@ namespace Grapple
 		Texture,
 	};
 
-	std::string_view AssetTypeToString(AssetType type);
-	AssetType AssetTypeFromString(std::string_view string);
+	Grapple_API std::string_view AssetTypeToString(AssetType type);
+	Grapple_API AssetType AssetTypeFromString(std::string_view string);
 
 	struct AssetMetadata
 	{
@@ -28,7 +28,7 @@ namespace Grapple
 		std::filesystem::path Path;
 	};
 
-	class Asset
+	class Grapple_API Asset
 	{
 	public:
 		Asset(AssetType type)

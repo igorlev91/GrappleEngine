@@ -34,7 +34,7 @@ namespace Grapple
 		std::vector<FrameBufferAttachmentSpecifications> Attachments;
 	};
 
-	class FrameBuffer
+	class Grapple_API FrameBuffer
 	{
 	public:
 		virtual ~FrameBuffer() = default;

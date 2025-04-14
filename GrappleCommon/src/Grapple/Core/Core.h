@@ -21,6 +21,14 @@
 	#define Grapple_DEBUGBREAK
 #endif
 
+#define Grapple_NONE
+
+#define Grapple_API_EXPORT __declspec(dllexport)
+#define Grapple_API_IMPORT __declspec(dllimport)
+
+#define Grapple_EXPORT extern "C" __declspec(dllexport)
+#define Grapple_IMPORT extern "C" __declspec(dllimport)
+
 #define Grapple_EXPEND_MACRO(a) a
 #define FALRE_STRINGIFY_MACRO(a) #a
 

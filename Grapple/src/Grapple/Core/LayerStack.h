@@ -7,7 +7,7 @@
 
 namespace Grapple
 {
-	class LayerStack
+	class Grapple_API LayerStack
 	{
 	public:
 		LayerStack();

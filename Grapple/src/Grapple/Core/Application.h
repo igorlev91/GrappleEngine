@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Grapple/Core/Core.h"
 #include "Grapple/Core/LayerStack.h"
 #include "Grapple/Core/CommandLineArguments.h"
 
@@ -9,7 +10,7 @@
 
 namespace Grapple
 {
-	class Application
+	class Grapple_API Application
 	{
 	public:
 		Application(CommandLineArguments arguments);
@@ -34,7 +35,5 @@ namespace Grapple
 
 		bool m_Running;
 		float m_PreviousFrameTime;
-	private:
-		static Application* s_Instance;
 	};
 }

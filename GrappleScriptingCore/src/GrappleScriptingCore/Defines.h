@@ -4,6 +4,6 @@
 	#define Grapple_API extern "C" __declspec(dllexport)
 	#define Grapple_API_CLASS __declspec(dllexport)
 #else
-	#define Grapple_API
-	#define Grapple_API_CLASS
+	#define Grapple_SCRIPTING_API
+	#define Grapple_SCRIPTING_API_CLASS
 #endif

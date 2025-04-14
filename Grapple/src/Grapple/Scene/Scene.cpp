@@ -9,7 +9,7 @@
 
 namespace Grapple
 {
-	Ref<Scene> Scene::s_Active = nullptr;
+	Ref<Scene> s_Active = nullptr;
 
 	Scene::Scene(bool registerComponents)
 		: Asset(AssetType::Scene)
@@ -62,7 +62,7 @@ namespace Grapple
 
 		m_CameraDataUpdateQuery = m_World.CreateQuery<With<TransformComponent>, With<CameraComponent>>();
 
-		systemsManager.RegisterSystem("Sprites Renderer", m_2DRenderingGroup, CreateScope<SpritesRendererSystem>());
+		systemsManager.RegisterSystem("Sprites Renderer", m_2DRenderingGroup, new SpritesRendererSystem());
 	}
 
 	void Scene::InitializeRuntime()
@@ -126,5 +126,20 @@ namespace Grapple
 
 	void Scene::OnViewportResize(uint32_t width, uint32_t height)
 	{
+	}
+
+	World& Scene::GetECSWorld()
+	{
+		return m_World;
+	}
+
+	Ref<Scene> Scene::GetActive()
+	{
+		return s_Active;
+	}
+
+	void Scene::SetActive(const Ref<Scene>& scene)
+	{
+		s_Active = scene;
 	}
 }

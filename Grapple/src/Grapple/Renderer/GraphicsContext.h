@@ -4,7 +4,7 @@
 
 namespace Grapple
 {
-	class GraphicsContext
+	class Grapple_API GraphicsContext
 	{
 	public:
 		virtual ~GraphicsContext() = default;
