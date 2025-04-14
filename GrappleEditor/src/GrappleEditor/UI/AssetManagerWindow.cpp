@@ -1,7 +1,6 @@
 #include "AssetManagerWindow.h"
 
 #include "Grapple/Core/Assert.h"
-#include "Grapple/Core/Event.h"
 
 #include "Grapple/Project/Project.h"
 
