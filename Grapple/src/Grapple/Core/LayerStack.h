@@ -1,6 +1,4 @@
 #pragma once
-
-#include "Grapple.h"
 #include "Grapple/Core/Layer.h"
 
 #include <vector>
