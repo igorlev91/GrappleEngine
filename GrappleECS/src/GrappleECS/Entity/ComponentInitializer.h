@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Grapple/Core/Core.h"
-#include "Grapple/Serialization/TypeInitializer.h"
+#include "GrappleCore/Core.h"
+#include "GrappleCore/Serialization/TypeInitializer.h"
 
 #include "GrappleECS/Entity/Component.h"
 

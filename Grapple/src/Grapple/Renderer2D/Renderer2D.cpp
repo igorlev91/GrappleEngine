@@ -1,6 +1,6 @@
 #include "Renderer2D.h"
 
-#include "Grapple/Core/Core.h"
+#include "GrappleCore/Core.h"
 
 #include "Grapple/Renderer/RenderCommand.h"
 

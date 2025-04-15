@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Grapple/Core/Assert.h"
+#include "GrappleCore/Assert.h"
 
 #include "GrappleECS/EntityStorage/EntityStorageChunk.h"
 

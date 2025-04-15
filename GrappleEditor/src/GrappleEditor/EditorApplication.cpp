@@ -1,6 +1,6 @@
 #include "EditorApplication.h"
 
-#include "Grapple/Core/Log.h"
+#include "GrappleCore/Log.h"
 #include "Grapple/Project/Project.h"
 
 #include "GrapplePlatform/Platform.h"

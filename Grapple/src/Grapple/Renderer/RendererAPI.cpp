@@ -1,6 +1,6 @@
 #include "RendererAPI.h"
 
-#include "Grapple/Core/Assert.h"
+#include "GrappleCore/Assert.h"
 #include "Grapple/Platform/OpenGL/OpenGLRendererAPI.h"
 
 namespace Grapple

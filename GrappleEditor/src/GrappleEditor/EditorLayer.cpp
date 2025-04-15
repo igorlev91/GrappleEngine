@@ -4,7 +4,6 @@
 #include "Grapple/Core/Application.h"
 #include "Grapple/Renderer2D/Renderer2D.h"
 #include "Grapple/Renderer/Renderer.h"
-#include "Grapple/Scene/SceneSerializer.h"
 
 #include "Grapple/AssetManager/AssetManager.h"
 
@@ -16,6 +15,7 @@
 #include "GrapplePlatform/Platform.h"
 #include "GrapplePlatform/Events.h"
 
+#include "GrappleEditor/Serialization/SceneSerializer.h"
 #include "GrappleEditor/AssetManager/EditorAssetManager.h"
 
 #include "GrappleEditor/ImGui/ImGuiLayer.h"

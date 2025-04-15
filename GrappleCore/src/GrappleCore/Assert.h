@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Grapple/Core/Log.h"
-#include "Grapple/Core/Core.h"
+#include "GrappleCore/Log.h"
+#include "GrappleCore/Core.h"
 
 #include <filesystem>
 

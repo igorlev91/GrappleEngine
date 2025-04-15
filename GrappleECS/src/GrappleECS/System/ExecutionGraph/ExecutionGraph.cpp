@@ -1,6 +1,6 @@
 #include "ExecutionGraph.h"
 
-#include "Grapple/Core/Assert.h"
+#include "GrappleCore/Assert.h"
 
 #include <unordered_set>
 #include <queue>

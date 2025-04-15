@@ -1,13 +1,14 @@
 #include "EditorAssetManager.h"
 
-#include "Grapple/Core/Assert.h"
-#include "Grapple/Core/Log.h"
-
-#include "Grapple/AssetManager/Importers/TextureImporter.h"
-#include "Grapple/AssetManager/Importers/SceneImporter.h"
+#include "GrappleCore/Assert.h"
+#include "GrappleCore/Log.h"
 
 #include "Grapple/Serialization/Serialization.h"
 #include "Grapple/Project/Project.h"
+
+#include "Grapple/Renderer/Texture.h"
+
+#include "GrappleEditor/Serialization/SceneSerializer.h"
 
 #include <yaml-cpp/yaml.h>
 
@@ -30,8 +31,17 @@ namespace Grapple
 
     EditorAssetManager::EditorAssetManager()
     {
-        m_AssetImporters.emplace(AssetType::Texture, TextureImporter::ImportTexture);
-        m_AssetImporters.emplace(AssetType::Scene, SceneImporter::ImportScene);
+        m_AssetImporters.emplace(AssetType::Texture, [](const AssetMetadata& metadata) -> Ref<Asset>
+        {
+            return Texture::Create(metadata.Path, TextureFiltering::Closest);
+        });
+
+        m_AssetImporters.emplace(AssetType::Scene, [](const AssetMetadata& metadata) -> Ref<Asset>
+        {
+            Ref<Scene> scene = CreateRef<Scene>();
+            SceneSerializer::Deserialize(scene, metadata.Path);
+            return scene;
+        });
     }
 
     void EditorAssetManager::Reinitialize()

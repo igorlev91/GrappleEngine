@@ -3,7 +3,7 @@
 #include "Grapple.h"
 
 #include "Grapple/Scripting/ScriptingEngine.h"
-#include "Grapple/Serialization/TypeInitializer.h"
+#include "GrappleCore/Serialization/TypeInitializer.h"
 
 #include "GrappleECS/Entity/Entity.h"
 #include "GrappleECS/World.h"

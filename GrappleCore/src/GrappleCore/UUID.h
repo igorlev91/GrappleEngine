@@ -1,12 +1,12 @@
 #pragma once
 
-#include "Grapple/Core/Core.h"
+#include "GrappleCore/Core.h"
 
 #include <xhash>
 
 namespace Grapple
 {
-	class GrappleCOMMON_API UUID
+	class GrappleCORE_API UUID
 	{
 	public:
 		UUID();

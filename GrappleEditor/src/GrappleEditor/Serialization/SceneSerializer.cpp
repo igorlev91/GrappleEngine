@@ -4,7 +4,7 @@
 #include "Grapple/AssetManager/AssetManager.h"
 
 #include "Grapple/Serialization/Serialization.h"
-#include "Grapple/Serialization/TypeInitializer.h"
+#include "GrappleCore/Serialization/TypeInitializer.h"
 
 #include "GrappleECS/Query/EntityRegistryIterator.h"
 

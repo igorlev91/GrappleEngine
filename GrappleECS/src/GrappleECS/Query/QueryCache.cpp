@@ -1,6 +1,6 @@
 #include "QueryCache.h"
 
-#include "Grapple/Core/Core.h"
+#include "GrappleCore/Core.h"
 
 #include "GrappleECS/Registry.h"
 #include "GrappleECS/Query/Query.h"

@@ -1,6 +1,6 @@
 #include "ScriptingEngine.h"
 
-#include "Grapple/Core/Log.h"
+#include "GrappleCore/Log.h"
 
 #include "Grapple/Scene/Components.h"
 #include "Grapple/Project/Project.h"

@@ -1,11 +1,11 @@
 local build_tool = require("BuildTool")
 
-project "GrappleCommon"
+project "GrappleCore"
 	language "C++"
 	cppdialect "C++17"
 	staticruntime "off"
 
-	build_tool.define_module("GrappleCommon")
+	build_tool.define_module("GrappleCore")
 
     files
     {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Grapple/Core/UUID.h"
+#include "GrappleCore/UUID.h"
 #include "GrappleECS/World.h"
 
 #include <filesystem>

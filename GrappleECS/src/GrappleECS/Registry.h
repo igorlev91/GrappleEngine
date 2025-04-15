@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Grapple/Core/Assert.h"
-#include "Grapple/Core/Core.h"
+#include "GrappleCore/Assert.h"
+#include "GrappleCore/Core.h"
 
 #include "GrappleECS/Entity/Entity.h"
 #include "GrappleECS/Entity/Component.h"
@@ -14,8 +14,6 @@
 #include <unordered_map>
 #include <vector>
 #include <optional>
-#include <Grapple/Core/KeyCode.h>
-#include <Grapple/Core/KeyCode.h>
 
 namespace Grapple
 {

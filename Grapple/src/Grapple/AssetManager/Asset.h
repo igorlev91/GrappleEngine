@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Grapple/Core/UUID.h"
-#include "Grapple/Core/Assert.h"
+#include "GrappleCore/UUID.h"
+#include "GrappleCore/Assert.h"
 
-#include "Grapple/Serialization/TypeInitializer.h"
+#include "GrappleCore/Serialization/TypeInitializer.h"
 
 #include <filesystem>
 #include <string_view>

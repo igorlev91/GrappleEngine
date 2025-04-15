@@ -1,6 +1,6 @@
 #include "EditorCamera.h"
 
-#include "Grapple/Core/Log.h"
+#include "GrappleCore/Log.h"
 #include "GrapplePlatform/Events.h"
 
 #include "Grapple/Renderer2D/Renderer2D.h"

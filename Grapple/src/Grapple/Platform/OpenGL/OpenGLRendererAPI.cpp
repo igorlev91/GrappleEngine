@@ -1,6 +1,6 @@
 #include "OpenGLRendererAPI.h"
 
-#include "Grapple/Core/Log.h"
+#include "GrappleCore/Log.h"
 
 #include <glad/glad.h>
 

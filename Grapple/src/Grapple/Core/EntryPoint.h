@@ -1,6 +1,6 @@
 #include "Grapple/Core/Application.h"
 #include "Grapple/Core/CommandLineArguments.h"
-#include "Grapple/Core/Log.h"
+#include "GrappleCore/Log.h"
 
 #include <stdint.h>
 

@@ -32,7 +32,7 @@ group ""
 
 group "Core"
 	include "GrapplePlatform/GrapplePlatform.Build.lua"
-	include "GrappleCommon/GrappleCommon.Build.lua"
+	include "GrappleCore/GrappleCore.Build.lua"
 	include "Grapple/Grapple.Build.lua"
 	include "GrappleECS/GrappleECS.Build.lua"
 group ""

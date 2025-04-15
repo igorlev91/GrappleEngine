@@ -7,7 +7,7 @@
 #include <GrappleECS/Commands/CommandBuffer.h>
 
 #include <Grapple/Core/Time.h>
-#include <Grapple/Serialization/TypeInitializer.h>
+#include <GrappleCore/Serialization/TypeInitializer.h>
 #include <Grapple/Scene/Components.h>
 
 #include <Grapple/Input/InputManager.h>

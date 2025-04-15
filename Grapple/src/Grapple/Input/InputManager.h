@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Grapple/Core/Core.h"
-#include "Grapple/Core/KeyCode.h"
-#include "Grapple/Core/MouseCode.h"
+#include "GrappleCore/Core.h"
+#include "GrappleCore/KeyCode.h"
+#include "GrappleCore/MouseCode.h"
 
 #include "GrapplePlatform/Event.h"
 

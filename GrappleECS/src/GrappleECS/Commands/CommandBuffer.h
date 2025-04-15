@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Grapple/Core/Core.h"
+#include "GrappleCore/Core.h"
 
 #include "GrappleECS/Commands/CommandsStorage.h"
 #include "GrappleECS/Commands/Command.h"

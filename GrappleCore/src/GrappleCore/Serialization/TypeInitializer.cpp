@@ -1,6 +1,6 @@
 #include "TypeInitializer.h"
 
-#include "Grapple/Core/Assert.h"
+#include "GrappleCore/Assert.h"
 
 namespace Grapple
 {

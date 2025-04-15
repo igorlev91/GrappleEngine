@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Grapple/Core/Assert.h"
-#include "Grapple/Core/Core.h"
+#include "GrappleCore/Assert.h"
+#include "GrappleCore/Core.h"
 
 #include <string>
 #include <vector>

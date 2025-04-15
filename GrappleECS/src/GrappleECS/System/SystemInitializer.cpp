@@ -1,6 +1,6 @@
 #include "SystemInitializer.h"
 
-#include "Grapple/Core/Log.h"
+#include "GrappleCore/Log.h"
 
 namespace Grapple
 {

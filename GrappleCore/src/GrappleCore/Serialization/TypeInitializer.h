@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Grapple/Core/Core.h"
-#include "Grapple/Core/Assert.h"
+#include "GrappleCore/Core.h"
+#include "GrappleCore/Assert.h"
 
 #include <glm/glm.hpp>
 
@@ -48,10 +48,10 @@ namespace Grapple
         Custom,
     };
 
-    GrappleCOMMON_API size_t GetFieldTypeSize(SerializableFieldType fieldType);
+    GrappleCORE_API size_t GetFieldTypeSize(SerializableFieldType fieldType);
 
-    class GrappleCOMMON_API TypeInitializer;
-    struct GrappleCOMMON_API FieldTypeInfo
+    class GrappleCORE_API TypeInitializer;
+    struct GrappleCORE_API FieldTypeInfo
     {
         constexpr FieldTypeInfo()
             : FieldType(SerializableFieldType::None), CustomType(nullptr) {}
@@ -153,7 +153,7 @@ namespace Grapple
 #define Grapple_GET_FIELD_TYPE(typeName, fieldName) decltype(((typeName*)nullptr)->fieldName)
 #define Grapple_FIELD(typeName, fieldName) Grapple::FieldDataFromType<Grapple_GET_FIELD_TYPE(typeName, fieldName)>().Get(#fieldName, offsetof(typeName, fieldName))
 
-    class GrappleCOMMON_API TypeInitializer
+    class GrappleCORE_API TypeInitializer
     {
     public:
         using DefaultConstructorFunction = void(*)(void*);

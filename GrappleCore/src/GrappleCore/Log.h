@@ -1,12 +1,12 @@
 #pragma once
 
-#include "Grapple/Core/Core.h"
+#include "GrappleCore/Core.h"
 
 #include <spdlog/spdlog.h>
 
 namespace Grapple
 {
-	class GrappleCOMMON_API Log
+	class GrappleCORE_API Log
 	{
 	public:
 		static void Initialize();

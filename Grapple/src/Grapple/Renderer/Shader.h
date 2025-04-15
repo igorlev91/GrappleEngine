@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Grapple/Core/Core.h"
+#include "GrappleCore/Core.h"
 
 #include <filesystem>
 

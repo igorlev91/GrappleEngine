@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Grapple/Core/Core.h"
+#include "GrappleCore/Core.h"
 
 #include "Grapple/AssetManager/Asset.h"
 
@@ -34,7 +34,7 @@ namespace Grapple
 		TextureFiltering Filtering;
 	};
 
-	class Texture : public Asset
+	class Grapple_API Texture : public Asset
 	{
 	public:
 		Texture()
