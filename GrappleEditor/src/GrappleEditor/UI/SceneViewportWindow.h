@@ -14,7 +14,7 @@ namespace Grapple
 			: ViewportWindow("Scene Viewport", true), m_Camera(camera) {}
 
 		virtual void OnRenderViewport() override;
-		virtual void OnViewportResize() override;
+		virtual void OnViewportChanged() override;
 		virtual void OnRenderImGui() override;
 	protected:
 		virtual void CreateFrameBuffer() override;

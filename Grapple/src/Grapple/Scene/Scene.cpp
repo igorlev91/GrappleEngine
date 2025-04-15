@@ -4,6 +4,7 @@
 #include "Grapple/AssetManager/AssetManager.h"
 
 #include "Grapple/Scene/Components.h"
+#include "Grapple/Input/InputManager.h"
 
 #include "Grapple/Scripting/ScriptingEngine.h"
 
@@ -92,7 +93,7 @@ namespace Grapple
 					CameraComponent& camera = cameras[entity];
 
 					float halfSize = camera.Size / 2;
-					float aspectRation = (float)renderData.ViewportSize.x / (float)renderData.ViewportSize.y;
+					float aspectRation = (float)renderData.Viewport.Size.x / (float)renderData.Viewport.Size.y;
 
 					renderData.Camera.ViewMatrix = glm::inverse(transforms[entity].GetTransformationMatrix());
 
