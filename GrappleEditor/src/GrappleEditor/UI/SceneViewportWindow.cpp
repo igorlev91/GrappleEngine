@@ -1,6 +1,7 @@
 #include "SceneViewportWindow.h"
 
 #include "Grapple/Renderer/RenderCommand.h"
+#include "Grapple/Renderer/DebugRenderer.h"
 #include "Grapple/Scene/Components.h"
 #include "Grapple/Scene/Scene.h"
 #include "Grapple/Math/Math.h"
@@ -66,6 +67,10 @@ namespace Grapple
 
 			Scene::GetActive()->OnBeforeRender(m_RenderData);
 			Scene::GetActive()->OnRender(m_RenderData);
+
+			DebugRenderer::Begin(m_RenderData);
+			DebugRenderer::DrawLine(glm::vec3(-1.0f, 0.0f, 2.0f), glm::vec3(3.0f, 0.0f, 2.0f));
+			DebugRenderer::End();
 
 			m_ScreenBuffer->Unbind();
 

@@ -8,7 +8,7 @@ project "GrappleEditor"
 
 	build_tool.add_module_ref("Grapple")
 	build_tool.add_module_ref("GrapplePlatform")
-	build_tool.add_module_ref("GrappleCommon")
+	build_tool.add_module_ref("GrappleCore")
 	build_tool.add_module_ref("GrappleECS")
 
     files
@@ -24,7 +24,7 @@ project "GrappleEditor"
     {
         "src",
 		"%{wks.location}/Grapple/src",
-		"%{wks.location}/GrappleCommon/src",
+		"%{wks.location}/GrappleCore/src",
 		"%{wks.location}/GrapplePlatform/src",
 		"%{wks.location}/GrappleECS/src",
 
@@ -41,7 +41,7 @@ project "GrappleEditor"
 		"Grapple",
 		"GLFW",
 		"ImGUI",
-		"GrappleCommon",
+		"GrappleCore",
 		"GrapplePlatform",
 		"GrappleECS",
 		"yaml-cpp",

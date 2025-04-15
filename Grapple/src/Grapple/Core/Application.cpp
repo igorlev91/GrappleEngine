@@ -3,6 +3,7 @@
 #include "Grapple/Core/Time.h"
 
 #include "Grapple/Renderer2D/Renderer2D.h"
+#include "Grapple/Renderer/DebugRenderer.h"
 #include "Grapple/Renderer/RenderCommand.h"
 
 #include "Grapple/Scripting/ScriptingEngine.h"
@@ -59,14 +60,18 @@ namespace Grapple
 
 		RenderCommand::Initialize();
 		Renderer2D::Initialize();
+		DebugRenderer::Initialize();
 
 		ScriptingEngine::Initialize();
+
+		RenderCommand::SetLineWidth(1.2f);
 	}
 
 	Application::~Application()
 	{
 		ScriptingEngine::Shutdown();
 		Renderer2D::Shutdown();
+		DebugRenderer::Shutdown();
 	}
 
 	void Application::Run()
