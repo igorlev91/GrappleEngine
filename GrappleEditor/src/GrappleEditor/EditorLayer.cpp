@@ -3,6 +3,7 @@
 #include "Grapple.h"
 #include "Grapple/Core/Application.h"
 #include "Grapple/Renderer2D/Renderer2D.h"
+#include "Grapple/Renderer/Renderer.h"
 #include "Grapple/Scene/SceneSerializer.h"
 
 #include "Grapple/AssetManager/AssetManager.h"
@@ -70,8 +71,9 @@ namespace Grapple
 			OpenScene(handle);
 		});
 
+		m_GameWindow = CreateRef<ViewportWindow>("Game");
 		m_Viewports.emplace_back(CreateRef<SceneViewportWindow>(m_Camera));
-		m_Viewports.emplace_back(CreateRef<ViewportWindow>("Game"));
+		m_Viewports.emplace_back(m_GameWindow);
 
 		EditorCameraSettings& settings = m_Camera.GetSettings();
 		settings.FOV = 60.0f;
@@ -114,6 +116,9 @@ namespace Grapple
 		m_PreviousFrameTime = deltaTime;
 
 		Renderer2D::ResetStats();
+
+		Renderer::SetMainViewportSize(m_GameWindow->GetRenderData().Viewport.Size);
+		InputManager::SetMousePositionOffset(-m_GameWindow->GetRenderData().Viewport.Position);
 
 		if (m_Mode == EditorMode::Play && !m_PlaymodePaused)
 			Scene::GetActive()->OnUpdateRuntime();

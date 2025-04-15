@@ -38,6 +38,11 @@ namespace Grapple
 		}
 	}
 
+	const RenderData& ViewportWindow::GetRenderData() const
+	{
+		return m_RenderData;
+	}
+
 	void ViewportWindow::PrepareViewport()
 	{
 		if (m_RenderData.Viewport.Size != glm::ivec2(0))
