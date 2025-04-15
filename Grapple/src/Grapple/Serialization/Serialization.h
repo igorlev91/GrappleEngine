@@ -87,7 +87,7 @@ namespace YAML
 	{
 		static Node encode(const Grapple::AssetHandle& handle)
 		{
-			return Node((uint64_t)handle);
+			return Node((uint64_t)(Grapple::UUID)handle);
 		}
 
 		static bool decode(const Node& node, Grapple::AssetHandle& out)
@@ -95,7 +95,7 @@ namespace YAML
 			if (!node.IsScalar())
 				return false;
 
-			out = node.as<uint64_t>();
+			out = (Grapple::UUID)node.as<uint64_t>();
 			return true;
 		}
 	};

@@ -3,12 +3,33 @@
 #include "Grapple/Core/UUID.h"
 #include "Grapple/Core/Assert.h"
 
+#include "Grapple/Serialization/TypeInitializer.h"
+
 #include <filesystem>
 #include <string_view>
 
 namespace Grapple
 {
-	using AssetHandle = UUID;
+	struct Grapple_API AssetHandle
+	{
+	public:
+		Grapple_TYPE;
+
+		AssetHandle() = default;
+		constexpr AssetHandle(UUID uuid)
+			: m_UUID(uuid) {}
+
+		constexpr operator UUID() const { return m_UUID; }
+		constexpr operator uint64_t() const { return (uint64_t)m_UUID; }
+
+		constexpr bool operator==(AssetHandle other) const { return m_UUID == other.m_UUID; }
+		constexpr bool operator!=(AssetHandle other) const { return m_UUID != other.m_UUID; }
+		constexpr AssetHandle& operator=(AssetHandle other) { m_UUID = other.m_UUID; return *this; }
+		constexpr AssetHandle& operator=(UUID uuid) { m_UUID = uuid; return *this; }
+	private:
+		UUID m_UUID;
+	};
+	
 	constexpr AssetHandle NULL_ASSET_HANDLE = 0;
 
 	enum class AssetType
@@ -41,3 +62,12 @@ namespace Grapple
 		AssetHandle Handle = NULL_ASSET_HANDLE;
 	};
 }
+
+template<>
+struct std::hash<Grapple::AssetHandle>
+{
+	size_t operator()(Grapple::AssetHandle handle) const
+	{
+		return std::hash<Grapple::UUID>()((Grapple::UUID)handle);
+	}
+};
