@@ -1,8 +1,8 @@
 #include "Asset.h"
 
-namespace Flare
+namespace Grapple
 {
-	FLARE_IMPL_TYPE(AssetHandle);
+	Grapple_IMPL_TYPE(AssetHandle);
 
 	std::string_view AssetTypeToString(AssetType type)
 	{
@@ -16,7 +16,7 @@ namespace Flare
 			return "Texture";
 		}
 
-		FLARE_CORE_ASSERT(false, "Unhandled asset type");
+		Grapple_CORE_ASSERT(false, "Unhandled asset type");
 		return "";
 	}
 
@@ -27,7 +27,7 @@ namespace Flare
 		else if (string == "Scene")
 			return AssetType::Scene;
 
-		FLARE_CORE_ASSERT(false, "Unknown asset type string");
+		Grapple_CORE_ASSERT(false, "Unknown asset type string");
 		return AssetType::None;
 	}
 }

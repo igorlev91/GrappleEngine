@@ -8,6 +8,7 @@
 
 #include "Grapple/Renderer/Texture.h"
 
+#include "GrappleEditor/AssetManager/TextureImporter.h"
 #include "GrappleEditor/Serialization/SceneSerializer.h"
 
 #include <yaml-cpp/yaml.h>
@@ -31,11 +32,7 @@ namespace Grapple
 
     EditorAssetManager::EditorAssetManager()
     {
-        m_AssetImporters.emplace(AssetType::Texture, [](const AssetMetadata& metadata) -> Ref<Asset>
-        {
-            return Texture::Create(metadata.Path, TextureFiltering::Closest);
-        });
-
+        m_AssetImporters.emplace(AssetType::Texture, TextureImporter::ImportTexture);
         m_AssetImporters.emplace(AssetType::Scene, [](const AssetMetadata& metadata) -> Ref<Asset>
         {
             Ref<Scene> scene = CreateRef<Scene>();
@@ -123,6 +120,17 @@ namespace Grapple
         return handle;
     }
 
+    void EditorAssetManager::ReloadAsset(AssetHandle handle)
+    {
+        Grapple_CORE_ASSERT(IsAssetHandleValid(handle));
+
+        auto registryIterator = m_Registry.find(handle);
+        if (registryIterator == m_Registry.end())
+            return;
+
+        LoadAsset(registryIterator->second);
+    }
+
     void EditorAssetManager::UnloadAsset(AssetHandle handle)
     {
         auto it = m_LoadedAssets.find(handle);
@@ -154,7 +162,7 @@ namespace Grapple
 
         Ref<Asset> asset = importerIterator->second(metadata);
         asset->Handle = metadata.Handle;
-        m_LoadedAssets.emplace(metadata.Handle, asset);
+        m_LoadedAssets[metadata.Handle] = asset;
         return asset;
     }
 

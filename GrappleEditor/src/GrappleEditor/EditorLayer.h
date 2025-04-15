@@ -13,6 +13,8 @@
 #include "GrappleEditor/ViewportWindow.h"
 #include "GrappleEditor/EditorCamera.h"
 
+#include "GrappleEditor/EditorSelection.h"
+
 #include <vector>
 
 namespace Grapple
@@ -58,9 +60,6 @@ namespace Grapple
 		inline bool IsPlaymodePaused() const { return m_PlaymodePaused; }
 		inline void SetPlaymodePaused(bool value) { m_PlaymodePaused = value; }
 
-		inline Entity GetSelectedEntity() const { return m_SelectedEntity; }
-		inline void SetSelectedEntity(Entity entity) { m_SelectedEntity = entity; }
-
 		inline GuizmoMode GetGuizmoMode() const { return m_Guizmo; }
 		inline EditorMode GetMode() const { return m_Mode; }
 
@@ -84,10 +83,11 @@ namespace Grapple
 		EditorCamera m_Camera;
 		AssetHandle m_EditedSceneHandle;
 		bool m_PlaymodePaused;
-		Entity m_SelectedEntity;
 		EditorMode m_Mode;
 		GuizmoMode m_Guizmo;
-
+	public:
+		EditorSelection Selection;
+	private:
 		static EditorLayer* s_Instance;
 	};
 }

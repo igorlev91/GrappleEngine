@@ -4,6 +4,7 @@
 
 #include "Grapple/Project/Project.h"
 
+#include "GrappleEditor/EditorLayer.h"
 #include "GrappleEditor/UI/EditorGUI.h"
 
 #include <imgui.h>
@@ -141,6 +142,12 @@ namespace Grapple
 
 		if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
 			OnOpenFile(node);
+
+		if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+		{
+			EditorLayer::GetInstance().Selection.SetAsset(node.Handle);
+			OnAssetSelectionChanged.Invoke(node.Handle);
+		}
 
 		if (node.IsImported && ImGui::BeginDragDropSource())
 		{
