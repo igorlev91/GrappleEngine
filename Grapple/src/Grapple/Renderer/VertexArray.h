@@ -6,7 +6,7 @@
 
 namespace Grapple
 {
-	class VertexArray
+	class Grapple_API VertexArray
 	{
 	public:
 		using VertexBuffers = std::vector<Ref<VertexBuffer>>;

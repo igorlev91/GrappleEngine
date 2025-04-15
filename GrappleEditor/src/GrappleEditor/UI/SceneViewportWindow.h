@@ -1,5 +1,8 @@
 #pragma once
 
+#include "Grapple/Renderer/Shader.h"
+#include "Grapple/Renderer/VertexArray.h"
+
 #include "GrappleECS/Entity/Entity.h"
 
 #include "GrappleEditor/ViewportWindow.h"
@@ -10,8 +13,7 @@ namespace Grapple
 	class SceneViewportWindow : public ViewportWindow
 	{
 	public:
-		SceneViewportWindow(EditorCamera& camera)
-			: ViewportWindow("Scene Viewport", true), m_Camera(camera) {}
+		SceneViewportWindow(EditorCamera& camera);
 
 		virtual void OnRenderViewport() override;
 		virtual void OnViewportChanged() override;
@@ -23,5 +25,8 @@ namespace Grapple
 		Entity GetEntityUnderCursor() const;
 	private:
 		EditorCamera& m_Camera;
+		Ref<Shader> m_SelectionOutlineShader;
+		Ref<VertexArray> m_FullscreenQuad;
+		Ref<FrameBuffer> m_ScreenBuffer;
 	};
 }
