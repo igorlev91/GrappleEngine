@@ -249,7 +249,7 @@ namespace Grapple
 				const FieldData& field = fields[i];
 				uint8_t* fieldData = data + field.Offset;
 
-				switch (field.Type)
+				switch (field.FieldType)
 				{
 				case SerializableFieldType::Bool:
 					result |= EditorGUI::BoolPropertyField(field.Name, *(bool*)fieldData);
@@ -266,6 +266,25 @@ namespace Grapple
 				case SerializableFieldType::Float3:
 					result |= EditorGUI::Vector3PropertyField(field.Name, *(glm::vec3*)fieldData);
 					break;
+				case SerializableFieldType::Custom:
+				{
+					if (field.Type == &Entity::_Type)
+					{
+						EntityField(field.Name, World::GetCurrent(), *(Entity*)fieldData);
+						break;
+					}
+
+					EndPropertyGrid();
+
+					bool opened = ImGui::TreeNodeEx(field.Type->TypeName.data(), ImGuiTreeNodeFlags_FramePadding | ImGuiTreeNodeFlags_SpanAvailWidth);
+					if (opened)
+					{
+						result |= EditorGUI::TypeEditor(*field.Type, fieldData);
+						ImGui::TreePop();
+					}
+					BeginPropertyGrid();
+					break;
+				}
 				}
 			}
 			EditorGUI::EndPropertyGrid();

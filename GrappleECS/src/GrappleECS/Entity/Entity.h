@@ -2,14 +2,18 @@
 
 #include "GrappleECS/Entity/Archetype.h"
 
+#include "Grapple/Serialization/TypeInitializer.h"
+
 #include <stdint.h>
 #include <xhash>
 
 namespace Grapple
 {
-	struct Entity
+	struct GrappleECS_API Entity
 	{
 	public:
+		Grapple_TYPE;
+
 		constexpr Entity()
 			: m_Packed(SIZE_MAX) {}
 		constexpr Entity(uint32_t id)

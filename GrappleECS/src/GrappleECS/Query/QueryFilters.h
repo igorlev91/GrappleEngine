@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GrappleECS/Entity/Component.h"
+#include "GrappleECS/Entity/ComponentInitializer.h"
 
 #include <stdint.h>
 
