@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Grapple/Core/Core.h"
+#include "Grapple/Core/Assert.h"
 
 #include <glm/glm.hpp>
 
@@ -42,61 +43,115 @@ namespace Grapple
         UInt3,
         UInt4,
 
+        Array,
+
         Custom,
     };
 
+    GrappleCOMMON_API size_t GetFieldTypeSize(SerializableFieldType fieldType);
+
     class GrappleCOMMON_API TypeInitializer;
+    struct GrappleCOMMON_API FieldTypeInfo
+    {
+        constexpr FieldTypeInfo()
+            : FieldType(SerializableFieldType::None), CustomType(nullptr) {}
+        constexpr FieldTypeInfo(SerializableFieldType fieldType, TypeInitializer* customType)
+            : FieldType(fieldType), CustomType(customType) {}
+
+        size_t GetSize() const;
+
+        SerializableFieldType FieldType;
+        TypeInitializer* CustomType;
+    };
+
     struct FieldData
     {
-        constexpr FieldData(const char* name, SerializableFieldType fieldType, size_t offset, TypeInitializer* type)
-            : Name(name), FieldType(fieldType), Offset(offset), Type(type) {}
+        constexpr FieldData(const char* name, size_t offset, FieldTypeInfo typeInfo, size_t elementsCount = 0)
+            : Name(name), Offset(offset), TypeInfo(typeInfo), ElementsCount(elementsCount) {}
+        constexpr FieldData(const char* name, size_t offset, FieldTypeInfo typeInfo, const FieldTypeInfo& arrayElementType, size_t elementsCount = 0)
+            : Name(name), Offset(offset), TypeInfo(typeInfo), ElementsCount(elementsCount), ArrayElementType(arrayElementType) {}
 
         const char* Name;
-        SerializableFieldType FieldType;
         size_t Offset;
-        TypeInitializer* Type;
+        FieldTypeInfo TypeInfo;
+        FieldTypeInfo ArrayElementType;
+        size_t ElementsCount;
     };
 
     template<typename T>
-    constexpr FieldData GetFieldData(const char* fieldName, size_t offset)
+    struct FieldTypeInfoFromType
     {
-        return FieldData{ fieldName, SerializableFieldType::Custom, offset, &T::_Type };
-    }
+        constexpr FieldTypeInfo Get()
+        {
+            return FieldTypeInfo{ SerializableFieldType::Custom, &T::_Type };
+        }
+    };
 
-#define GET_FIELD_DATA(typeName, fieldType) template<> constexpr Grapple::FieldData GetFieldData<typeName>(const char* name, size_t offset) \
-    { \
-        return FieldData{name, fieldType, offset, nullptr}; \
-    }
+    template<typename T>
+    struct FieldDataFromType
+    {
+        constexpr FieldData Get(const char* name, size_t offset)
+        {
+            return FieldData{ name, offset, FieldTypeInfoFromType<T>().Get() };
+        }
+    };
 
-    GET_FIELD_DATA(bool, SerializableFieldType::Bool);
-    GET_FIELD_DATA(float, SerializableFieldType::Float32);
-    GET_FIELD_DATA(double, SerializableFieldType::Float64);
+#define GET_FIELD_DATA(typeName, fieldType) template<> \
+    struct FieldTypeInfoFromType<typeName>             \
+    {                                                  \
+        constexpr FieldTypeInfo Get()                  \
+        {                                              \
+            return FieldTypeInfo{fieldType, nullptr};  \
+        }                                              \
+    };
 
-    GET_FIELD_DATA(int8_t,   SerializableFieldType::Int8);
-    GET_FIELD_DATA(uint8_t,  SerializableFieldType::UInt8);
-    GET_FIELD_DATA(int16_t,  SerializableFieldType::Int16);
-    GET_FIELD_DATA(uint16_t, SerializableFieldType::UInt16);
-    GET_FIELD_DATA(int32_t,  SerializableFieldType::Int32);
-    GET_FIELD_DATA(uint32_t, SerializableFieldType::UInt32);
-    GET_FIELD_DATA(int64_t,  SerializableFieldType::Int64);
-    GET_FIELD_DATA(uint64_t, SerializableFieldType::UInt64);
+    GET_FIELD_DATA(bool,   Grapple::SerializableFieldType::Bool);
+    GET_FIELD_DATA(float,  Grapple::SerializableFieldType::Float32);
+    GET_FIELD_DATA(double, Grapple::SerializableFieldType::Float64);
 
-    GET_FIELD_DATA(glm::vec2, SerializableFieldType::Float2);
-    GET_FIELD_DATA(glm::vec3, SerializableFieldType::Float3);
-    GET_FIELD_DATA(glm::vec4, SerializableFieldType::Float4);
+    GET_FIELD_DATA(int8_t,   Grapple::SerializableFieldType::Int8);
+    GET_FIELD_DATA(uint8_t,  Grapple::SerializableFieldType::UInt8);
+    GET_FIELD_DATA(int16_t,  Grapple::SerializableFieldType::Int16);
+    GET_FIELD_DATA(uint16_t, Grapple::SerializableFieldType::UInt16);
+    GET_FIELD_DATA(int32_t,  Grapple::SerializableFieldType::Int32);
+    GET_FIELD_DATA(uint32_t, Grapple::SerializableFieldType::UInt32);
+    GET_FIELD_DATA(int64_t,  Grapple::SerializableFieldType::Int64);
+    GET_FIELD_DATA(uint64_t, Grapple::SerializableFieldType::UInt64);
 
-    GET_FIELD_DATA(glm::ivec2, SerializableFieldType::Int2);
-    GET_FIELD_DATA(glm::ivec3, SerializableFieldType::Int3);
-    GET_FIELD_DATA(glm::ivec4, SerializableFieldType::Int4);
+    GET_FIELD_DATA(glm::vec2, Grapple::SerializableFieldType::Float2);
+    GET_FIELD_DATA(glm::vec3, Grapple::SerializableFieldType::Float3);
+    GET_FIELD_DATA(glm::vec4, Grapple::SerializableFieldType::Float4);
 
-    GET_FIELD_DATA(glm::uvec2, SerializableFieldType::UInt2);
-    GET_FIELD_DATA(glm::uvec3, SerializableFieldType::UInt3);
-    GET_FIELD_DATA(glm::uvec4, SerializableFieldType::UInt4);
+    GET_FIELD_DATA(glm::ivec2, Grapple::SerializableFieldType::Int2);
+    GET_FIELD_DATA(glm::ivec3, Grapple::SerializableFieldType::Int3);
+    GET_FIELD_DATA(glm::ivec4, Grapple::SerializableFieldType::Int4);
+
+    GET_FIELD_DATA(glm::uvec2, Grapple::SerializableFieldType::UInt2);
+    GET_FIELD_DATA(glm::uvec3, Grapple::SerializableFieldType::UInt3);
+    GET_FIELD_DATA(glm::uvec4, Grapple::SerializableFieldType::UInt4);
 
 #undef GET_FIELD_DATA
 
+    template<typename T, size_t N>
+    struct FieldTypeInfoFromType<T[N]>
+    {
+        constexpr FieldTypeInfo Get()
+        {
+            return FieldTypeInfoFromType<T>().Get();
+        }
+    };
+
+    template<typename T, size_t N>
+    struct FieldDataFromType<T[N]>
+    {
+        constexpr FieldData Get(const char* name, size_t offset)
+        {
+            return FieldData{ name, offset, FieldTypeInfo{SerializableFieldType::Array, nullptr}, FieldTypeInfoFromType<T>().Get(), N };
+        }
+    };
+
 #define Grapple_GET_FIELD_TYPE(typeName, fieldName) decltype(((typeName*)nullptr)->fieldName)
-#define Grapple_FIELD(typeName, fieldName) Grapple::GetFieldData<Grapple_GET_FIELD_TYPE(typeName, fieldName)>(#fieldName, offsetof(typeName, fieldName))
+#define Grapple_FIELD(typeName, fieldName) Grapple::FieldDataFromType<Grapple_GET_FIELD_TYPE(typeName, fieldName)>().Get(#fieldName, offsetof(typeName, fieldName))
 
     class GrappleCOMMON_API TypeInitializer
     {

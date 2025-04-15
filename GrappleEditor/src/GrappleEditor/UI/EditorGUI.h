@@ -30,6 +30,8 @@ namespace Grapple
 
 		static bool AssetField(const char* name, AssetHandle& handle);
 		static bool EntityField(const char* name, const World& world, Entity& entity);
+		static bool AssetField(AssetHandle& handle);
+		static bool EntityField(const World& world, Entity& entity);
 
 		static bool BeginToggleGroup(const char* name, uint32_t itemsCount);
 		static bool BeginToggleGroupProperty(const char* name, uint32_t itemsCount);
@@ -39,5 +41,6 @@ namespace Grapple
 		static bool TypeEditor(const TypeInitializer& type, uint8_t* data);
 
 		static void PropertyName(const char* name);
+		static void PropertyIndex(size_t index);
 	};
 }
