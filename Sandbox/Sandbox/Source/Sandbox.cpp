@@ -58,6 +58,9 @@ namespace Sandbox
 		Grapple_COMPONENT;
 
 		int a, b;
+
+		SomeComponent()
+			: a(100), b(-234) {}
 	};
 	Grapple_IMPL_COMPONENT(SomeComponent,
 		Grapple_FIELD(SomeComponent, a),

@@ -22,6 +22,12 @@ namespace Grapple
 	class EntityView;
 	class EntityRegistryIterator;
 
+	enum class ComponentInitializationStrategy : uint8_t
+	{
+		Zero,
+		DefaultConstructor,
+	};
+
 	class GrappleECS_API Registry
 	{
 	public:
@@ -30,9 +36,16 @@ namespace Grapple
 	public:
 		// Entity operations
 
-		Entity CreateEntity(const ComponentSet& componentSet);
+		Entity CreateEntity(const ComponentSet& componentSet, 
+			ComponentInitializationStrategy initStrategy = ComponentInitializationStrategy::DefaultConstructor);
+
 		void DeleteEntity(Entity entity);
-		bool AddEntityComponent(Entity entity, ComponentId componentId, const void* componentData);
+
+		bool AddEntityComponent(Entity entity, 
+			ComponentId componentId, 
+			const void* componentData, 
+			ComponentInitializationStrategy initStrategy = ComponentInitializationStrategy::DefaultConstructor);
+
 		bool RemoveEntityComponent(Entity entity, ComponentId componentId);
 		bool IsEntityAlive(Entity entity) const;
 
