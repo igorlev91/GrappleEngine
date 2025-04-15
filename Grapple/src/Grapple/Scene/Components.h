@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Grapple.h"
+#include "Grapple/Renderer2D/Renderer2D.h"
 
 #include "GrappleECS/World.h"
 #include "GrappleECS/Entity/ComponentInitializer.h"
@@ -55,5 +56,6 @@ namespace Grapple
 		glm::vec4 Color;
 		glm::vec2 TextureTiling;
 		AssetHandle Texture;
+		SpriteRenderFlags Flags;
 	};
 }
