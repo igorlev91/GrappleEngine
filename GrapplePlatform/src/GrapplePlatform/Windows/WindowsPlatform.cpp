@@ -21,7 +21,7 @@ namespace Grapple
 {
 	float Platform::GetTime()
 	{
-		return glfwGetTime();
+		return (float)glfwGetTime();
 	}
 
 	void* Platform::LoadSharedLibrary(const std::filesystem::path& path)

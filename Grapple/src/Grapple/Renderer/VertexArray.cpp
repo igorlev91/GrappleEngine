@@ -12,5 +12,7 @@ namespace Grapple
 		case RendererAPI::API::OpenGL:
 			return CreateRef<OpenGLVertexArray>();
 		}
+
+		return nullptr;
 	}
 }

@@ -1,5 +1,6 @@
 #include "RendererAPI.h"
 
+#include "Grapple/Core/Assert.h"
 #include "Grapple/Platform/OpenGL/OpenGLRendererAPI.h"
 
 namespace Grapple
@@ -12,7 +13,11 @@ namespace Grapple
 		{
 		case API::OpenGL:
 			return CreateScope<OpenGLRendererAPI>();
+		default:
+			Grapple_CORE_ASSERT(false, "Unsupported rendering API");
 		}
+
+		return nullptr;
 	}
 
 	RendererAPI::API RendererAPI::GetAPI()

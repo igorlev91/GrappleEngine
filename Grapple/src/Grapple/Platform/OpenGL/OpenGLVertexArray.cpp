@@ -47,7 +47,7 @@ namespace Grapple
 					element.ComponentsCount, 
 					GL_INT,
 					layout.GetStride(), 
-					(const void*)element.Offset);
+					(const void*)(size_t)element.Offset);
 				break;
 			case ShaderDataType::Float:
 			case ShaderDataType::Float2:
@@ -58,7 +58,7 @@ namespace Grapple
 					GL_FLOAT,
 					element.IsNormalized,
 					layout.GetStride(),
-					(const void*)element.Offset);
+					(const void*)(size_t)element.Offset);
 				break;
 			}
 

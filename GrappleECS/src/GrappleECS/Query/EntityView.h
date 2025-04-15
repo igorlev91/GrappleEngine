@@ -20,7 +20,7 @@ namespace Grapple
 		EntityViewIterator begin();
 		EntityViewIterator end();
 
-		std::optional<Entity> GetEntity(uint32_t index);
+		std::optional<Entity> GetEntity(size_t index);
 
 		ArchetypeId GetArchetype() const;
 

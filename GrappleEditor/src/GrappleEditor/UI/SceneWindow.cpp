@@ -26,7 +26,7 @@ namespace Grapple
 
 		ImGui::BeginChild("Scene Entities");
 		ImGuiListClipper clipper;
-		clipper.Begin(records.size());
+		clipper.Begin((int32_t)records.size());
 
 		if (ImGui::BeginPopupContextWindow("Scene Context Menu"))
 		{
