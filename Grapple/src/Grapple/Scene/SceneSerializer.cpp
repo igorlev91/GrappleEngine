@@ -330,7 +330,7 @@ namespace Grapple
 					std::optional<ComponentId> componentId = scene->GetECSWorld().GetRegistry().FindComponnet(name);
 					if (!componentId.has_value())
 					{
-						Grapple_CORE_ERROR("Component named '{0}' cannot not be deserialized", name);
+						Grapple_CORE_ERROR("Component named '{0}' cannot be deserialized", name);
 						continue;
 					}
 
