@@ -43,6 +43,19 @@ namespace Grapple
 			case SerializableFieldType::Float3:
 				emitter << YAML::Key << field.Name << YAML::Value << *(glm::vec3*)(fieldData);
 				break;
+			case SerializableFieldType::Custom:
+			{
+				Grapple_CORE_ASSERT(field.Type);
+				if (field.Type == &Entity::_Type)
+				{
+					Grapple_CORE_WARN("Entity serialization is not supported yet");
+					break;
+				}
+
+				emitter << YAML::Key << field.Name << YAML::Value;
+				SerializeType(emitter, *field.Type, data + field.Offset);
+				break;
+			}
 			default:
 				Grapple_CORE_ASSERT(false, "Unhandled field type");
 			}
@@ -93,6 +106,18 @@ namespace Grapple
 				{
 					glm::vec3 vector = fieldNode.as<glm::vec3>();
 					std::memcpy(data + field.Offset, &vector, sizeof(vector));
+					break;
+				}
+				case SerializableFieldType::Custom:
+				{
+					Grapple_CORE_ASSERT(field.Type);
+					if (field.Type == &Entity::_Type)
+					{
+						Grapple_CORE_WARN("Entity deserialization is not supported yet");
+						break;
+					}
+
+					DeserializeType(fieldNode, *field.Type, data + field.Offset);
 					break;
 				}
 				default:
