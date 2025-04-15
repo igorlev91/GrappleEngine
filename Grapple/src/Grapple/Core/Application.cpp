@@ -6,6 +6,7 @@
 #include "Grapple/Renderer/RenderCommand.h"
 
 #include "Grapple/Scripting/ScriptingEngine.h"
+#include "Grapple/Input/InputManager.h"
 
 #include "GrapplePlatform/Event.h"
 #include "GrapplePlatform/Events.h"
@@ -54,6 +55,8 @@ namespace Grapple
 			}
 		});
 
+		InputManager::Initialize();
+
 		RenderCommand::Initialize();
 		Renderer2D::Initialize();
 
@@ -78,15 +81,16 @@ namespace Grapple
 
 			Time::UpdateDeltaTime();
 
+			InputManager::Update();
+			m_Window->OnUpdate();
+
 			for (const Ref<Layer>& layer : m_LayersStack.GetLayers())
 				layer->OnUpdate(deltaTime);
 
 			for (const Ref<Layer>& layer : m_LayersStack.GetLayers())
 				layer->OnImGUIRender();
 
-			m_Window->OnUpdate();
 			m_GraphicsContext->SwapBuffers();
-
 			m_PreviousFrameTime = currentTime;
 		}
 

@@ -3,6 +3,8 @@
 #include "GrappleECS/Query/Query.h"
 #include "GrappleECS/System/ExecutionGraph/ExecutionGraph.h"
 
+#include "GrappleECS/Commands/CommandBuffer.h"
+
 #include <functional>
 
 namespace Grapple
@@ -10,8 +12,9 @@ namespace Grapple
 	using SystemGroupId = uint32_t;
 	using SystemId = uint32_t;
 
-	class SystemExecutionContext
+	struct SystemExecutionContext
 	{
+		CommandBuffer* Commands = nullptr;
 	};
 
 	using SystemEventFunction = std::function<void(SystemExecutionContext& context)>;

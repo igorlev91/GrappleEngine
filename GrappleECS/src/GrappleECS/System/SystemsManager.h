@@ -5,6 +5,8 @@
 #include "GrappleECS/System/System.h"
 #include "GrappleECS/System/SystemData.h"
 
+#include "GrappleECS/Commands/CommandBuffer.h"
+
 #include <functional>
 #include <vector>
 #include <string>
@@ -14,10 +16,11 @@
 namespace Grapple
 {
 	class System;
+	class GrappleECS_API World;
 	class GrappleECS_API SystemsManager
 	{
 	public:
-		SystemsManager() = default;
+		SystemsManager(World& world);
 		~SystemsManager();
 
 		SystemGroupId CreateGroup(std::string_view name);
@@ -41,6 +44,8 @@ namespace Grapple
 
 		const std::vector<SystemData>& GetSystems() const;
 	private:
+		CommandBuffer m_CommandBuffer;
+
 		std::vector<SystemData> m_Systems;
 		std::unordered_map<std::string, SystemGroupId> m_GroupNameToId;
 		std::vector<SystemGroup> m_Groups;
