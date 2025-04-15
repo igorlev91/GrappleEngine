@@ -18,10 +18,15 @@ namespace Grapple
 {
 	void SceneWindow::OnImGuiRender()
 	{
-		World& world = Scene::GetActive()->GetECSWorld();
-
 		ImGui::Begin("Scene");
 
+		if (Scene::GetActive() == nullptr)
+		{
+			ImGui::End();
+			return;
+		}
+
+		World& world = Scene::GetActive()->GetECSWorld();
 		const auto& records = world.GetRegistry().GetEntityRecords();
 
 		ImGui::BeginChild("Scene Entities");

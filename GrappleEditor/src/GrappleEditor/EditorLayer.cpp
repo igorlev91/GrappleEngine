@@ -23,6 +23,8 @@
 #include "GrappleEditor/UI/SystemsInspectorWindow.h"
 #include "GrappleEditor/UI/ProjectSettingsWindow.h"
 
+#include "GrappleEditor/Scripting/BuildSystem/BuildSystem.h"
+
 #include <imgui.h>
 #include <imgui_internal.h>
 
@@ -52,6 +54,9 @@ namespace Grapple
 		Project::OnProjectOpen.Bind(Grapple_BIND_EVENT_CALLBACK(OnOpenProject));
 		Project::OnUnloadActiveProject.Bind([this]()
 		{
+			if (Scene::GetActive() == nullptr)
+				return;
+
 			Ref<EditorAssetManager> assetManager = As<EditorAssetManager>(AssetManager::GetInstance());
 
 			assetManager->UnloadAsset(Scene::GetActive()->Handle);
@@ -340,6 +345,32 @@ namespace Grapple
 
 		Scene::SetActive(editorScene);
 		m_Mode = EditorMode::Edit;
+	}
+
+	void EditorLayer::ReloadScriptingModules()
+	{
+		Grapple_CORE_ASSERT(m_Mode == EditorMode::Edit);
+
+		Ref<Scene> active = Scene::GetActive();
+
+		Ref<EditorAssetManager> assetManager = As<EditorAssetManager>(AssetManager::GetInstance());
+		std::filesystem::path activeScenePath = assetManager->GetAssetMetadata(active->Handle)->Path;
+		SaveActiveScene();
+
+		Scene::SetActive(nullptr);
+		assetManager->UnloadAsset(active->Handle);
+		active = nullptr;
+
+		ScriptingEngine::UnloadAllModules();
+
+		BuildSystem::BuildModules();
+
+		ScriptingEngine::LoadModules();
+		active = CreateRef<Scene>();
+		SceneSerializer::Deserialize(active, activeScenePath);
+
+		active->InitializeRuntime();
+		Scene::SetActive(active);
 	}
 
 	EditorLayer& EditorLayer::GetInstance()

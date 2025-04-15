@@ -38,7 +38,13 @@ M.setup_workspace = function(name)
 end
 
 M.setup_project = function(name)
-	local root = "%{wks.location}/" .. _OPTIONS["Grapple_root"]
+	local root = nil
+
+	if path.isabsolute(_OPTIONS["Grapple_root"]) then
+		root = _OPTIONS["Grapple_root"]
+	else
+		root = "%{wks.location}/" .. _OPTIONS["Grapple_root"]
+	end
 
 	project(name)
 	language("C++")
@@ -98,7 +104,12 @@ end
 M.add_internal_module_ref = function(name)
     set_module_defines(name);
 
-    local root = "%{wks.location}/" .. _OPTIONS["Grapple_root"]
+	local root = nil
+	if path.isabsolute(_OPTIONS["Grapple_root"]) then
+		root = _OPTIONS["Grapple_root"]
+	else
+		root = "%{wks.location}/" .. _OPTIONS["Grapple_root"]
+	end
 
     includedirs
     {

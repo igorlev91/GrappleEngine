@@ -82,8 +82,16 @@ namespace Grapple
 
 		startUpInfo.cb = sizeof(startUpInfo);
 
-		std::wstring arguments = path.wstring() + L" " + settings.Arguments;
-		bool result = CreateProcessW(path.c_str(), (LPWSTR)arguments.c_str(), nullptr, nullptr, false, 0, nullptr, nullptr, &startUpInfo, &processInfo);
+		Grapple_CORE_ASSERT(std::filesystem::exists(settings.WorkingDirectory), "Invalid working directory");
+
+		bool result = CreateProcessW(path.c_str(), 
+			(LPWSTR)settings.Arguments.c_str(), 
+			nullptr, nullptr, 
+			false, 0, nullptr,
+			settings.WorkingDirectory.c_str(),
+			&startUpInfo,
+			&processInfo);
+
 		if (!result)
 		{
 			Grapple_CORE_ERROR("Failed to create process: {0}", path.generic_string());

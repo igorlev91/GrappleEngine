@@ -31,7 +31,6 @@ namespace Grapple
 		AssetHandle StartScene;
 
 		std::vector<std::string> ScriptingModules;
-		std::vector<std::filesystem::path> Modules;
 	public:
 		static Signal<> OnProjectOpen;
 		static Signal<> OnUnloadActiveProject;

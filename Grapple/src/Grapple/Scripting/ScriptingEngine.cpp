@@ -49,7 +49,7 @@ namespace Grapple
 #ifdef Grapple_PLATFORM_WINDOWS
 		platformName = "windows";
 #endif
-		
+
 		for (const std::string& moduleName : Project::GetActive()->ScriptingModules)
 		{
 			std::filesystem::path libraryPath = Project::GetActive()->Location
@@ -59,7 +59,11 @@ namespace Grapple
 					moduleName);
 
 			void* library = Platform::LoadSharedLibrary(libraryPath);
-			Grapple_CORE_ASSERT(library);
+			if (!library)
+			{
+				Grapple_CORE_ERROR("Failed to load module '{0}'", moduleName);
+				continue;
+			}
 
 			s_Data.LoadedSharedLibraries.push_back(library);
 		}
