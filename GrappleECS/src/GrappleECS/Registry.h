@@ -14,6 +14,8 @@
 #include <unordered_map>
 #include <vector>
 #include <optional>
+#include <Grapple/Core/KeyCode.h>
+#include <Grapple/Core/KeyCode.h>
 
 namespace Grapple
 {
@@ -39,6 +41,9 @@ namespace Grapple
 		Entity CreateEntity(const ComponentSet& componentSet, 
 			ComponentInitializationStrategy initStrategy = ComponentInitializationStrategy::DefaultConstructor);
 
+		Entity CreateEntityFromArchetype(ArchetypeId archetype,
+			ComponentInitializationStrategy initStrategy = ComponentInitializationStrategy::DefaultConstructor);
+
 		void DeleteEntity(Entity entity);
 
 		bool AddEntityComponent(Entity entity, 
@@ -48,6 +53,8 @@ namespace Grapple
 
 		bool RemoveEntityComponent(Entity entity, ComponentId componentId);
 		bool IsEntityAlive(Entity entity) const;
+
+		ArchetypeId GetEntityArchetype(Entity entity);
 
 		const std::vector<EntityRecord>& GetEntityRecords() const;
 
