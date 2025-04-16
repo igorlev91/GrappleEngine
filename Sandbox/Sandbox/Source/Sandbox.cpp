@@ -40,6 +40,16 @@ namespace Sandbox
 		Grapple_FIELD(SomeComponent, b),
 	);
 
+	struct TestComponent
+	{
+		Grapple_COMPONENT;
+		int a;
+
+		TestComponent()
+			: a(1000) {}
+	};
+	Grapple_IMPL_COMPONENT(TestComponent, Grapple_FIELD(TestComponent, a));
+
 	class RotatingQuadSystem : public Grapple::System
 	{
 	public:
@@ -93,6 +103,9 @@ namespace Sandbox
 						break;
 					case 4:
 						context.Commands->DeleteEntity(e);
+						break;
+					case 5:
+						World::GetCurrent().CreateEntity<TransformComponent, TestComponent>(TransformComponent(), TestComponent());
 						break;
 					}
 
