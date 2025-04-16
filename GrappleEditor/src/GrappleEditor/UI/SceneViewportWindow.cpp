@@ -4,6 +4,8 @@
 #include "Grapple/Renderer/DebugRenderer.h"
 #include "Grapple/Scene/Components.h"
 #include "Grapple/Scene/Scene.h"
+#include "Grapple/Scene/Prefab.h"
+
 #include "Grapple/Math/Math.h"
 
 #include "Grapple/Input/InputManager.h"
@@ -153,6 +155,12 @@ namespace Grapple
 						if (sprite.has_value())
 							sprite.value()->Texture = handle;
 
+						break;
+					}
+					case AssetType::Prefab:
+					{
+						Ref<Prefab> prefab = AssetManager::GetAsset<Prefab>(handle);
+						prefab->CreateInstance(Scene::GetActive()->GetECSWorld());
 						break;
 					}
 					}

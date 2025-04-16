@@ -14,6 +14,8 @@ namespace Grapple
 			return "Scene";
 		case AssetType::Texture:
 			return "Texture";
+		case AssetType::Prefab:
+			return "Prefab";
 		}
 
 		Grapple_CORE_ASSERT(false, "Unhandled asset type");
@@ -26,6 +28,8 @@ namespace Grapple
 			return AssetType::Texture;
 		else if (string == "Scene")
 			return AssetType::Scene;
+		else if (string == "Prefab")
+			return AssetType::Prefab;
 
 		Grapple_CORE_ASSERT(false, "Unknown asset type string");
 		return AssetType::None;

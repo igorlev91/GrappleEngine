@@ -137,8 +137,8 @@ namespace Grapple
 		size_t m_Count;
 	};
 
-	bool operator==(const ComponentSet& setA, const ComponentSet& setB);
-	bool operator!=(const ComponentSet& setA, const ComponentSet& setB);
+	GrappleECS_API bool operator==(const ComponentSet& setA, const ComponentSet& setB);
+	GrappleECS_API bool operator!=(const ComponentSet& setA, const ComponentSet& setB);
 }
 
 template<>

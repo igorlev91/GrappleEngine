@@ -9,6 +9,7 @@
 #include "Grapple/Renderer/Texture.h"
 
 #include "GrappleEditor/AssetManager/TextureImporter.h"
+#include "GrappleEditor/AssetManager/PrefabImporter.h"
 #include "GrappleEditor/Serialization/SceneSerializer.h"
 
 #include <yaml-cpp/yaml.h>
@@ -33,6 +34,7 @@ namespace Grapple
     EditorAssetManager::EditorAssetManager()
     {
         m_AssetImporters.emplace(AssetType::Texture, TextureImporter::ImportTexture);
+        m_AssetImporters.emplace(AssetType::Prefab, PrefabImporter::ImportPrefab);
         m_AssetImporters.emplace(AssetType::Scene, [](const AssetMetadata& metadata) -> Ref<Asset>
         {
             Ref<Scene> scene = CreateRef<Scene>();
@@ -105,6 +107,8 @@ namespace Grapple
             type = AssetType::Texture;
         else if (extension == ".Grapple")
             type = AssetType::Scene;
+        else if (extension == ".flrprefab")
+            type = AssetType::Prefab;
 
         AssetHandle handle;
         AssetMetadata metadata;
