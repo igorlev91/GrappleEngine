@@ -9,8 +9,8 @@
 #include "GrappleEditor/EditorLayer.h"
 
 #include "GrappleEditor/UI/EditorGUI.h"
-#include "GrappleEditor/UI/SystemsInspectorWindow.h"
 #include "GrappleEditor/UI/ProjectSettingsWindow.h"
+#include "GrappleEditor/UI/ECS/ECSInspector.h"
 
 #include <imgui_internal.h>
 
@@ -97,8 +97,8 @@ namespace Grapple
 
 		if (EditorGUI::BeginMenu("Window"))
 		{
-			if (ImGui::MenuItem("Systems Inspector"))
-				SystemsInspectorWindow::Show();
+			if (ImGui::MenuItem("ECS Inspector"))
+				ECSInspector::Show();
 
 			EditorGUI::EndMenu();
 		}

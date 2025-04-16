@@ -21,8 +21,8 @@
 #include "GrappleEditor/ImGui/ImGuiLayer.h"
 #include "GrappleEditor/UI/SceneViewportWindow.h"
 #include "GrappleEditor/UI/EditorTitleBar.h"
-#include "GrappleEditor/UI/SystemsInspectorWindow.h"
 #include "GrappleEditor/UI/ProjectSettingsWindow.h"
+#include "GrappleEditor/UI/ECS/ECSInspector.h"
 
 #include "GrappleEditor/Scripting/BuildSystem/BuildSystem.h"
 
@@ -222,12 +222,13 @@ namespace Grapple
 		for (auto& viewport : m_Viewports)
 			viewport->OnRenderImGui();
 
-		SystemsInspectorWindow::OnImGuiRender();
 		ProjectSettingsWindow::OnRenderImGui();
 
 		m_SceneWindow.OnImGuiRender();
 		m_PropertiesWindow.OnImGuiRender();
 		m_AssetManagerWindow.OnImGuiRender();
+
+		ECSInspector::GetInstance().OnImGuiRender();
 
 		ImGui::End();
 		ImGuiLayer::End();

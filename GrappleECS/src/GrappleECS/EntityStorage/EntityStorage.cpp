@@ -89,11 +89,6 @@ namespace Grapple
 		m_EntityIndices[entityIndex] = newRegistryIndex;
 	}
 
-	size_t EntityStorage::GetChunksCount() const
-	{
-		return m_Chunks.size();
-	}
-
 	size_t EntityStorage::GetEntitiesCountInChunk(size_t index) const
 	{
 		Grapple_CORE_ASSERT(index < m_Chunks.size());
