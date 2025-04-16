@@ -19,8 +19,6 @@ namespace Grapple
 		Scene(bool registerComponents = true);
 		~Scene();
 
-		void CopyFrom(const Ref<Scene>& scene);
-
 		void Initialize();
 		void InitializeRuntime();
 	public:

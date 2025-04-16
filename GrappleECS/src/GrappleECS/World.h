@@ -2,6 +2,7 @@
 
 #include "GrappleECS/Entities.h"
 #include "GrappleECS/Entity/Component.h"
+#include "GrappleECS/Entity/Components.h"
 #include "GrappleECS/Entity/ComponentGroup.h"
 
 #include "GrappleECS/Entity/Archetypes.h"
@@ -131,6 +132,7 @@ namespace Grapple
 		inline const SystemsManager& GetSystemsManager() const { return m_SystemsManager; }
 
 		Grapple::Entities Entities;
+		Grapple::Components Components;
 	private:
 		Archetypes m_Archetypes;
 		QueryCache m_Queries;
