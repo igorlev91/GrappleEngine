@@ -1,6 +1,8 @@
 #include "ViewportWindow.h"
 
 #include "Grapple/Renderer/RenderCommand.h"
+#include "Grapple/Renderer/Renderer.h"
+
 #include "Grapple/Scene/Scene.h"
 
 #include "Grapple/Core/Application.h"
