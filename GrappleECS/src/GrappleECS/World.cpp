@@ -5,7 +5,7 @@ namespace Grapple
 	World* s_CurrentWorld = nullptr;
 
 	World::World()
-		: m_SystemsManager(*this)
+		: m_SystemsManager(*this), m_Registry(m_Queries, m_Archetypes), m_Queries(m_Registry, m_Archetypes)
 	{
 		Grapple_CORE_ASSERT(s_CurrentWorld == nullptr, "Multiple ECS Worlds");
 		s_CurrentWorld = this;
@@ -40,20 +40,5 @@ namespace Grapple
 	{
 		Grapple_CORE_ASSERT(s_CurrentWorld != nullptr);
 		return *s_CurrentWorld;
-	}
-
-	Registry& World::GetRegistry()
-	{
-		return m_Registry;
-	}
-
-	SystemsManager& World::GetSystemsManager()
-	{
-		return m_SystemsManager;
-	}
-
-	const SystemsManager& World::GetSystemsManager() const
-	{
-		return m_SystemsManager;
 	}
 }

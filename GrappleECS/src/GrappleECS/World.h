@@ -2,8 +2,9 @@
 
 #include "GrappleECS/Registry.h"
 #include "GrappleECS/Entity/Component.h"
-
 #include "GrappleECS/Entity/ComponentGroup.h"
+
+#include "GrappleECS/Entity/Archetypes.h"
 
 #include "GrappleECS/Query/QueryFilters.h"
 #include "GrappleECS/Query/Query.h"
@@ -106,17 +107,26 @@ namespace Grapple
 		constexpr Query CreateQuery()
 		{
 			FilteredComponentsGroup<T...> components;
-			return m_Registry.CreateQuery(ComponentSet(components.GetComponents().data(), components.GetComponents().size()));
+			return m_Queries.AddQuery(ComponentSet(components.GetComponents().data(), components.GetComponents().size()));
 		}
 
 		static World& GetCurrent();
 	public:
-		Registry& GetRegistry();
+		inline Archetypes& GetArchetypes() { return m_Archetypes; }
+		inline const Archetypes& GetArchetypes() const { return m_Archetypes; }
 
-		SystemsManager& GetSystemsManager();
-		const SystemsManager& GetSystemsManager() const;
+		inline Registry& GetRegistry() { return m_Registry; }
+		inline const Registry& GetRegistry() const { return m_Registry; }
+
+		inline QueryCache& GetQueries() { return m_Queries; }
+		inline const QueryCache& GetQueries() const { return m_Queries; }
+
+		inline SystemsManager& GetSystemsManager() { return m_SystemsManager; }
+		inline const SystemsManager& GetSystemsManager() const { return m_SystemsManager; }
 	private:
+		Archetypes m_Archetypes;
 		Registry m_Registry;
+		QueryCache m_Queries;
 		SystemsManager m_SystemsManager;
 	};
 }

@@ -18,7 +18,7 @@ namespace Grapple
 		ArchetypeId Remove;
 	};
 
-	struct GrappleECS_API Archetype
+	struct GrappleECS_API ArchetypeRecord
 	{
 		size_t Id;
 
@@ -27,29 +27,30 @@ namespace Grapple
 
 		std::unordered_map<ComponentId, ArchetypeEdge> Edges;
 
-		Archetype()
+		ArchetypeRecord()
 			: Id(INVALID_ARCHETYPE_ID) {}
 
-		Archetype(Archetype&& other) noexcept
-			: Id(other.Id), Components(std::move(other.Components)), ComponentOffsets(std::move(other.ComponentOffsets)), Edges(std::move(other.Edges))
+		ArchetypeRecord(const ArchetypeRecord&) = delete;
+
+		ArchetypeRecord(ArchetypeRecord&& other) noexcept
+			: Id(other.Id),
+			Components(std::move(other.Components)),
+			ComponentOffsets(std::move(other.ComponentOffsets)),
+			Edges(std::move(other.Edges))
 		{
 			other.Id = INVALID_ARCHETYPE_ID;
 		}
-	};
-	
-	struct GrappleECS_API ArchetypeRecord
-	{
-		Archetype Data;
-		EntityStorage Storage;
 
-		ArchetypeRecord() {}
-
-		ArchetypeRecord(const ArchetypeRecord& other)
+		ArchetypeRecord& operator=(const ArchetypeRecord&) = delete;
+		ArchetypeRecord& operator=(ArchetypeRecord&& other) noexcept
 		{
-			Grapple_CORE_INFO("ArchetypeRecord::Copy");
-		}
+			Id = other.Id;
+			Components = std::move(other.Components);
+			ComponentOffsets = std::move(other.ComponentOffsets);
+			Edges = std::move(other.Edges);
 
-		ArchetypeRecord(ArchetypeRecord&& other) noexcept
-			: Data(std::move(other.Data)), Storage(std::move(other.Storage)) {}
+			other.Id = INVALID_ARCHETYPE_ID;
+			return *this;
+		}
 	};
 }
