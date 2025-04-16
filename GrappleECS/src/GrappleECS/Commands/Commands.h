@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GrappleECS/Registry.h"
+#include "GrappleECS/Entities.h"
 #include "GrappleECS/Entity/ComponentGroup.h"
 #include "GrappleECS/Commands/Command.h"
 

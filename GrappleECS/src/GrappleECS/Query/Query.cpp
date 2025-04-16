@@ -9,16 +9,16 @@ namespace Grapple
 
 	QueryIterator Query::begin() const
 	{
-		Grapple_CORE_ASSERT(m_Registry);
+		Grapple_CORE_ASSERT(m_Entities);
 		Grapple_CORE_ASSERT(m_QueryCache);
-		return QueryIterator(*m_Registry, (*m_QueryCache)[m_Id].MatchedArchetypes.begin());
+		return QueryIterator(*m_Entities, (*m_QueryCache)[m_Id].MatchedArchetypes.begin());
 	}
 
 	QueryIterator Query::end() const
 	{
-		Grapple_CORE_ASSERT(m_Registry);
+		Grapple_CORE_ASSERT(m_Entities);
 		Grapple_CORE_ASSERT(m_QueryCache);
-		return QueryIterator(*m_Registry, (*m_QueryCache)[m_Id].MatchedArchetypes.end());
+		return QueryIterator(*m_Entities, (*m_QueryCache)[m_Id].MatchedArchetypes.end());
 	}
 
 	const std::unordered_set<ArchetypeId>& Query::GetMatchedArchetypes() const

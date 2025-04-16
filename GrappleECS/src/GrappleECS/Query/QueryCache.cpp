@@ -2,7 +2,7 @@
 
 #include "GrappleCore/Core.h"
 
-#include "GrappleECS/Registry.h"
+#include "GrappleECS/Entities.h"
 #include "GrappleECS/Query/Query.h"
 
 #include <unordered_set>
@@ -49,7 +49,7 @@ namespace Grapple
 		for (size_t i = 0; i < components.GetCount(); i++)
 			m_CachedMatches[components[i].Masked()].push_back(id);
 
-		return Query(id, m_Registry, *this);
+		return Query(id, m_Entities, *this);
 	}
 
 	void QueryCache::OnArchetypeCreated(ArchetypeId archetype)

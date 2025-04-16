@@ -13,14 +13,17 @@
 
 namespace Grapple
 {
-	class GrappleECS_API Registry;
+	class GrappleECS_API Entities;
 	class GrappleECS_API Query;
 
 	class GrappleECS_API QueryCache
 	{
 	public:
-		QueryCache(Registry& registry, const Archetypes& archetypes)
-			: m_Registry(registry), m_Archetypes(archetypes) {}
+		QueryCache(Entities& entities, const Archetypes& archetypes)
+			: m_Entities(entities), m_Archetypes(archetypes) {}
+
+		QueryCache(const QueryCache&) = delete;
+		QueryCache& operator=(const QueryCache&) = delete;
 
 		const QueryData& operator[](QueryId id) const;
 	public:
@@ -29,7 +32,7 @@ namespace Grapple
 	private:
 		bool CompareComponentSets(const std::vector<ComponentId>& archetypeComponents, const std::vector<ComponentId>& queryComponents);
 	private:
-		Registry& m_Registry;
+		Entities& m_Entities;
 		const Archetypes& m_Archetypes;
 
 		std::vector<QueryData> m_Queries;

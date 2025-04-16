@@ -79,7 +79,7 @@ namespace Grapple
 			std::optional<ComponentId> removedComponent;
 			for (ComponentId component : world.GetEntityComponents(entity))
 			{
-				const ComponentInfo& componentInfo = world.GetRegistry().GetComponentInfo(component);
+				const ComponentInfo& componentInfo = world.Entities.GetComponentInfo(component);
 
 				ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_FramePadding;
 				if (ImGui::TreeNodeEx((void*)std::hash<ComponentId>()(component), flags, "%s", componentInfo.Name.c_str()))
@@ -92,7 +92,7 @@ namespace Grapple
 						RenderSpriteComponent(world.GetEntityComponent<SpriteComponent>(entity));
 					else
 					{
-						std::optional<void*> componentData = world.GetRegistry().GetEntityComponent(entity, component);
+						std::optional<void*> componentData = world.Entities.GetEntityComponent(entity, component);
 						if (componentData.has_value() && componentInfo.Initializer)
 							EditorGUI::TypeEditor(componentInfo.Initializer->Type, (uint8_t*)componentData.value());
 					}
@@ -110,7 +110,7 @@ namespace Grapple
 			}
 
 			if (removedComponent.has_value())
-				world.GetRegistry().RemoveEntityComponent(entity, removedComponent.value());
+				world.Entities.RemoveEntityComponent(entity, removedComponent.value());
 
 			ImGui::EndChild();
 		}
@@ -139,12 +139,12 @@ namespace Grapple
 		if (ImGui::BeginMenu("Add component"))
 		{
 			World& world = Scene::GetActive()->GetECSWorld();
-			const std::vector<ComponentInfo>& components = world.GetRegistry().GetRegisteredComponents();
+			const std::vector<ComponentInfo>& components = world.Entities.GetRegisteredComponents();
 
 			for (const auto& info : components)
 			{
 				if (ImGui::MenuItem(info.Name.c_str()))
-					world.GetRegistry().AddEntityComponent(entity, info.Id, nullptr);
+					world.Entities.AddEntityComponent(entity, info.Id, nullptr);
 			}
 
 			ImGui::End();

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GrappleECS/Registry.h"
+#include "GrappleECS/Entities.h"
 #include "GrappleECS/Entity/Component.h"
 #include "GrappleECS/Entity/ComponentGroup.h"
 
@@ -26,21 +26,14 @@ namespace Grapple
 		template<typename... T>
 		constexpr Entity CreateEntity(ComponentInitializationStrategy initStrategy = ComponentInitializationStrategy::DefaultConstructor)
 		{
-			ComponentId ids[sizeof...(T)];
-
-			size_t index = 0;
-			([&]
-			{
-				ids[index++] = COMPONENT_ID(T);
-			} (), ...);
-
-			return m_Registry.CreateEntity(ComponentSet(ids, sizeof...(T)), initStrategy);
+			ComponentGroup<T...> group;
+			return Entities.CreateEntity(ComponentSet(group.GetIds().data(), group.GetIds().size()), initStrategy);
 		}
 
 		template<typename T>
 		constexpr T& GetEntityComponent(Entity entity)
 		{
-			std::optional<void*> componentData = m_Registry.GetEntityComponent(entity, COMPONENT_ID(T));
+			std::optional<void*> componentData = Entities.GetEntityComponent(entity, COMPONENT_ID(T));
 			Grapple_CORE_ASSERT(componentData.has_value(), "Failed to get entity component");
 			return *(T*)componentData.value();
 		}
@@ -48,37 +41,28 @@ namespace Grapple
 		template<typename T>
 		constexpr std::optional<T*> TryGetEntityComponent(Entity entity)
 		{
-			std::optional<void*> componentData = m_Registry.GetEntityComponent(entity, COMPONENT_ID(T));
+			std::optional<void*> componentData = Entities.GetEntityComponent(entity, COMPONENT_ID(T));
 			if (componentData.has_value())
 				return (T*)componentData.value();
 			return {};
 		}
 
 		template<typename T>
-		constexpr std::optional<T*> TryGetEntityComponent(Entity entity, ComponentId component)
-		{
-			if (T::Id != component)
-				return {};
-
-			return TryGetEntityComponent<T>(entity);
-		}
-
-		template<typename T>
 		constexpr bool AddEntityComponent(Entity entity, const T& data)
 		{
-			return m_Registry.AddEntityComponent(entity, COMPONENT_ID(T), &data);
+			return Entities.AddEntityComponent(entity, COMPONENT_ID(T), &data);
 		}
 
 		template<typename T>
 		constexpr bool RemoveEntityComponent(Entity entity)
 		{
-			return m_Registry.RemoveEntityComponent(entity, COMPONENT_ID(T));
+			return Entities.RemoveEntityComponent(entity, COMPONENT_ID(T));
 		}
-		
+
 		template<typename T>
 		constexpr bool HasComponent(Entity entity)
 		{
-			return m_Registry.HasComponent(entity, COMPONENT_ID(T));
+			return Entities.HasComponent(entity, COMPONENT_ID(T));
 		}
 
 		void DeleteEntity(Entity entity);
@@ -89,7 +73,7 @@ namespace Grapple
 		template<typename T>
 		constexpr T& GetSingletonComponent()
 		{
-			auto result = m_Registry.GetSingletonComponent(COMPONENT_ID(T));
+			auto result = Entities.GetSingletonComponent(COMPONENT_ID(T));
 			Grapple_CORE_ASSERT(result.has_value(), "Failed to get singleton component");
 			return *(T*)result.value();
 		}
@@ -97,7 +81,7 @@ namespace Grapple
 		template<typename T>
 		constexpr std::optional<T*> TryGetSingletonComponent()
 		{
-			auto result = m_Registry.GetSingletonComponent(COMPONENT_ID(T));
+			auto result = Entities.GetSingletonComponent(COMPONENT_ID(T));
 			if (result.has_value())
 				return *(T*)result.value();
 			return {};
@@ -112,20 +96,15 @@ namespace Grapple
 
 		static World& GetCurrent();
 	public:
-		inline Archetypes& GetArchetypes() { return m_Archetypes; }
 		inline const Archetypes& GetArchetypes() const { return m_Archetypes; }
-
-		inline Registry& GetRegistry() { return m_Registry; }
-		inline const Registry& GetRegistry() const { return m_Registry; }
-
-		inline QueryCache& GetQueries() { return m_Queries; }
 		inline const QueryCache& GetQueries() const { return m_Queries; }
 
 		inline SystemsManager& GetSystemsManager() { return m_SystemsManager; }
 		inline const SystemsManager& GetSystemsManager() const { return m_SystemsManager; }
+
+		Grapple::Entities Entities;
 	private:
 		Archetypes m_Archetypes;
-		Registry m_Registry;
 		QueryCache m_Queries;
 		SystemsManager m_SystemsManager;
 	};

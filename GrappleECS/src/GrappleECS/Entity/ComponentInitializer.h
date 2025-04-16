@@ -9,7 +9,7 @@
 
 namespace Grapple
 {
-	class GrappleECS_API Registry;
+	class GrappleECS_API Entities;
 	class GrappleECS_API ComponentInitializer
 	{
 	public:
@@ -24,7 +24,7 @@ namespace Grapple
 	private:
 		ComponentId m_Id;
 
-		friend class Registry;
+		friend class Entities;
 	};
 }
 

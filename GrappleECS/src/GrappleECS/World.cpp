@@ -5,7 +5,7 @@ namespace Grapple
 	World* s_CurrentWorld = nullptr;
 
 	World::World()
-		: m_SystemsManager(*this), m_Registry(m_Queries, m_Archetypes), m_Queries(m_Registry, m_Archetypes)
+		: m_SystemsManager(*this), Entities(m_Queries, m_Archetypes), m_Queries(Entities, m_Archetypes)
 	{
 		Grapple_CORE_ASSERT(s_CurrentWorld == nullptr, "Multiple ECS Worlds");
 		s_CurrentWorld = this;
@@ -18,22 +18,22 @@ namespace Grapple
 
 	void World::DeleteEntity(Entity entity)
 	{
-		m_Registry.DeleteEntity(entity);
+		Entities.DeleteEntity(entity);
 	}
 
 	bool World::IsEntityAlive(Entity entity) const
 	{
-		return m_Registry.IsEntityAlive(entity);
+		return Entities.IsEntityAlive(entity);
 	}
 
 	const std::vector<ComponentId>& World::GetEntityComponents(Entity entity)
 	{
-		return m_Registry.GetEntityComponents(entity);
+		return Entities.GetEntityComponents(entity);
 	}
 
 	Entity World::GetSingletonEntity(const Query& query)
 	{
-		return m_Registry.GetSingletonEntity(query).value_or(Entity());
+		return Entities.GetSingletonEntity(query).value_or(Entity());
 	}
 
 	World& World::GetCurrent()

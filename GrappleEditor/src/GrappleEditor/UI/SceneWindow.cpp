@@ -4,8 +4,8 @@
 #include "Grapple/Scene/Scene.h"
 
 #include "GrappleECS/World.h"
-#include "GrappleECS/Query/EntityRegistryIterator.h"
-#include "GrappleECS/Registry.h"
+#include "GrappleECS/Query/EntitiesIterator.h"
+#include "GrappleECS/Entities.h"
 
 #include "GrappleEditor/ImGui/ImGuiLayer.h"
 #include "GrappleEditor/EditorLayer.h"
@@ -27,7 +27,7 @@ namespace Grapple
 		}
 
 		World& world = Scene::GetActive()->GetECSWorld();
-		const auto& records = world.GetRegistry().GetEntityRecords();
+		const auto& records = world.Entities.GetEntityRecords();
 
 		ImGui::BeginChild("Scene Entities");
 		ImGuiListClipper clipper;
@@ -96,14 +96,14 @@ namespace Grapple
 
 					if (ImGui::MenuItem("Duplicate"))
 					{
-						Registry& registry = world.GetRegistry();
-						ArchetypeId archetype = registry.GetEntityArchetype(entity);
-						Entity duplicated = registry.CreateEntityFromArchetype(archetype, ComponentInitializationStrategy::Zero);
+						Entities& entities = world.Entities;
+						ArchetypeId archetype = entities.GetEntityArchetype(entity);
+						Entity duplicated = entities.CreateEntityFromArchetype(archetype, ComponentInitializationStrategy::Zero);
 						
 						const ArchetypeRecord& record = world.GetArchetypes()[archetype];
-						std::memcpy(registry.GetEntityData(duplicated).value(),
-							registry.GetEntityData(entity).value(),
-							registry.GetEntityStorage(archetype).GetEntitySize());
+						std::memcpy(entities.GetEntityData(duplicated).value(),
+							entities.GetEntityData(entity).value(),
+							entities.GetEntityStorage(archetype).GetEntitySize());
 					}
 
 					ImGui::EndMenu();

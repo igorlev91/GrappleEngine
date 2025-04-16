@@ -9,7 +9,7 @@ namespace Grapple
 	
 	void AddComponentCommand::Apply(World& world)
 	{
-		world.GetRegistry().AddEntityComponent(m_Entity, m_Component, nullptr, m_InitStrategy);
+		world.Entities.AddEntityComponent(m_Entity, m_Component, nullptr, m_InitStrategy);
 	}
 
 	RemoveComponentCommand::RemoveComponentCommand(Entity entity, ComponentId component)
@@ -17,7 +17,7 @@ namespace Grapple
 
 	void RemoveComponentCommand::Apply(World& world)
 	{
-		world.GetRegistry().RemoveEntityComponent(m_Entity, m_Component);
+		world.Entities.RemoveEntityComponent(m_Entity, m_Component);
 	}
 
 	void DeleteEntityCommand::Apply(World& world)

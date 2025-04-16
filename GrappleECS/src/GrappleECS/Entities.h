@@ -21,7 +21,7 @@ namespace Grapple
 	class GrappleECS_API Query;
 
 	class EntityView;
-	class EntityRegistryIterator;
+	class EntitiesIterator;
 
 	enum class ComponentInitializationStrategy : uint8_t
 	{
@@ -29,12 +29,15 @@ namespace Grapple
 		DefaultConstructor,
 	};
 
-	class GrappleECS_API Registry
+	class GrappleECS_API Entities
 	{
 	public:
-		Registry(QueryCache& queries, Archetypes& archetypes);
-		Registry(const Registry&) = delete;
-		~Registry();
+		Entities(QueryCache& queries, Archetypes& archetypes);
+		Entities(const Entities&) = delete;
+
+		Entities& operator=(const Entities&) = delete;
+
+		~Entities();
 	public:
 		// Entity operations
 
@@ -92,8 +95,8 @@ namespace Grapple
 		
 		// Iterator
 
-		EntityRegistryIterator begin();
-		EntityRegistryIterator end();
+		EntitiesIterator begin();
+		EntitiesIterator end();
 	public:
 		EntityRecord& operator[](size_t index);
 		const EntityRecord& operator[](size_t index) const;
@@ -122,7 +125,7 @@ namespace Grapple
 
 		EntityIndex m_EntityIndex;
 
-		friend class EntityRegistryIterator;
+		friend class EntitiesIterator;
 		friend class QueryCache;
 	};
 }
