@@ -59,6 +59,14 @@ namespace Grapple
 		}
 
 		template<typename T>
+		constexpr const T& GetEntityComponent(Entity entity) const
+		{
+			std::optional<const void*> componentData = Entities.GetEntityComponent(entity, COMPONENT_ID(T));
+			Grapple_CORE_ASSERT(componentData.has_value(), "Failed to get entity component");
+			return *(const T*)componentData.value();
+		}
+
+		template<typename T>
 		constexpr std::optional<T*> TryGetEntityComponent(Entity entity)
 		{
 			std::optional<void*> componentData = Entities.GetEntityComponent(entity, COMPONENT_ID(T));

@@ -69,4 +69,11 @@ namespace Grapple
 		TextureTiling(glm::vec2(1.0f)),
 		Texture(texture),
 		Flags(SpriteRenderFlags::None) {}
+
+	Grapple_IMPL_COMPONENT(SpriteLayer, Grapple_FIELD(SpriteLayer, Layer));
+	SpriteLayer::SpriteLayer()
+		: Layer(0) {}
+
+	SpriteLayer::SpriteLayer(int32_t layer)
+		: Layer(layer) {}
 }

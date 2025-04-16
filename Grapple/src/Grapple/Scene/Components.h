@@ -60,4 +60,14 @@ namespace Grapple
 		AssetHandle Texture;
 		SpriteRenderFlags Flags;
 	};
+
+	struct SpriteLayer
+	{
+		Grapple_COMPONENT;
+
+		SpriteLayer();
+		SpriteLayer(int32_t layer);
+
+		int32_t Layer;
+	};
 }
