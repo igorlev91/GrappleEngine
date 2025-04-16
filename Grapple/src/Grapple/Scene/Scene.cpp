@@ -1,6 +1,8 @@
 #include "Scene.h"
 
+#include "Grapple/Renderer/Renderer.h"
 #include "Grapple/Renderer2D/Renderer2D.h"
+
 #include "Grapple/AssetManager/AssetManager.h"
 
 #include "Grapple/Scene/Components.h"
@@ -85,6 +87,9 @@ namespace Grapple
 	{
 		if (!renderData.IsEditorCamera)
 		{
+			Viewport& currentViewport = Renderer::GetCurrentViewport();
+			float aspectRation = currentViewport.GetAspectRatio();
+
 			for (EntityView entityView : m_CameraDataUpdateQuery)
 			{
 				ComponentView<CameraComponent> cameras = entityView.View<CameraComponent>();
@@ -95,7 +100,6 @@ namespace Grapple
 					CameraComponent& camera = cameras[entity];
 
 					float halfSize = camera.Size / 2;
-					float aspectRation = (float)renderData.Viewport.Size.x / (float)renderData.Viewport.Size.y;
 
 					renderData.Camera.View = glm::inverse(transforms[entity].GetTransformationMatrix());
 

@@ -2,6 +2,7 @@
 
 #include "Grapple/Renderer/FrameBuffer.h"
 #include "Grapple/Renderer/RenderData.h"
+#include "Grapple/Renderer/Viewport.h"
 
 #include <glm/glm.hpp>
 
@@ -18,10 +19,14 @@ namespace Grapple
 		virtual void OnRenderImGui();
 		virtual void OnRenderViewport();
 
-		const RenderData& GetRenderData() const;
+		const RenderData& GetRenderData() const { return m_Viewport.FrameData; }
+
+		Viewport& GetViewport() { return m_Viewport; }
+		const Viewport& GetViewport() const { return m_Viewport; }
+
 		void PrepareViewport();
 
-		void SetViewProjection(const glm::mat4& projection) { m_RenderData.Camera.ProjectionMatrix = projection; }
+		void SetViewProjection(const glm::mat4& projection) { m_Viewport.FrameData.Camera.Projection = projection; }
 	protected:
 		void BeginImGui();
 		void EndImGui();
@@ -32,7 +37,7 @@ namespace Grapple
 	protected:
 		std::string m_Name;
 		Ref<FrameBuffer> m_FrameBuffer;
-		RenderData m_RenderData;
+		Viewport m_Viewport;
 		bool m_IsFocused;
 		bool m_IsHovered;
 		glm::ivec2 m_RelativeMousePosition;

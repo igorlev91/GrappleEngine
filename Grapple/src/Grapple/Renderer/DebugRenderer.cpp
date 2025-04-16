@@ -2,6 +2,7 @@
 
 #include "GrappleCore/Assert.h"
 
+#include "Grapple/Renderer/Renderer.h"
 #include "Grapple/Renderer/VertexArray.h"
 #include "Grapple/Renderer/Buffer.h"
 #include "Grapple/Renderer/RenderCommand.h"
@@ -126,10 +127,10 @@ namespace Grapple
 		s_DebugRendererData.LinesBuffer = nullptr;
 	}
 
-	void DebugRenderer::Begin(const RenderData& renderData)
+	void DebugRenderer::Begin()
 	{
 		Grapple_CORE_ASSERT(!s_DebugRendererData.FrameData);
-		s_DebugRendererData.FrameData = &renderData;
+		s_DebugRendererData.FrameData = &Renderer::GetCurrentViewport().FrameData;
 	}
 
 	void DebugRenderer::End()
@@ -198,6 +199,15 @@ namespace Grapple
 		
 		if (s_DebugRendererData.RaysCount == s_DebugRendererData.MaxRaysCount)
 			FlushRays();
+	}
+
+	void DebugRenderer::DrawWireQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)
+	{
+		glm::vec3 halfSize = glm::vec3(size / 2.0f, 0.0f);
+		DrawLine(position + glm::vec3(-halfSize.x, halfSize.y, 0.0f), position + halfSize, color);
+		DrawLine(position + glm::vec3(-halfSize.x, -halfSize.y, 0.0f), position + glm::vec3(halfSize.x, -halfSize.y, 0.0f), color);
+		DrawLine(position + glm::vec3(-halfSize.x, halfSize.y, 0.0f), position + glm::vec3(-halfSize.x, -halfSize.y, 0.0f), color);
+		DrawLine(position + halfSize, position + glm::vec3(halfSize.x, -halfSize.y, 0.0f), color);
 	}
 
 	void DebugRenderer::FlushLines()

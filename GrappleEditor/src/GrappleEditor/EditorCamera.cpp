@@ -3,8 +3,6 @@
 #include "GrappleCore/Log.h"
 #include "GrapplePlatform/Events.h"
 
-#include "Grapple/Renderer2D/Renderer2D.h"
-
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
 
@@ -13,6 +11,11 @@ namespace Grapple
 	EditorCamera::EditorCamera()
 	{
 		RecalculateViewMatrix();
+	}
+
+	glm::vec3 EditorCamera::GetPosition() const
+	{
+		return m_Origin - TransformDirection(glm::vec3(0.0f, 0.0f, -1.0f)) * m_DistanceToOrigin;
 	}
 
 	void EditorCamera::ProcessEvents(Event& event)
@@ -104,11 +107,11 @@ namespace Grapple
 
 	void EditorCamera::RecalculateViewMatrix()
 	{
-		glm::vec3 position = m_Origin - TransformDirection(glm::vec3(0.0f, 0.0f, -1.0f)) * m_DistanceToOrigin;
+		glm::vec3 position = GetPosition();
 		m_ViewMatrix = glm::inverse(glm::translate(glm::mat4(1.0f), position) * glm::toMat4(glm::quat(glm::radians(-m_Rotation))));
 	}
 
-	glm::vec3 EditorCamera::TransformDirection(const glm::vec3& direction)
+	glm::vec3 EditorCamera::TransformDirection(const glm::vec3& direction) const
 	{
 		return glm::rotate(glm::quat(glm::radians(-m_Rotation)), direction);
 	}

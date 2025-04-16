@@ -20,7 +20,7 @@ namespace Grapple
 
 	void CameraFrustumRenderer::OnUpdate(SystemExecutionContext& context)
 	{
-		glm::uvec2 viewportSize = Renderer::GetMainViewportSize();
+		glm::uvec2 viewportSize = Renderer::GetMainViewport().GetSize();
 		float viewportAspectRatio = (float)viewportSize.x / (float)viewportSize.y;
 
 		glm::vec3 offsetSigns[4] = {
