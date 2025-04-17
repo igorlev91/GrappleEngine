@@ -45,7 +45,7 @@ namespace Grapple
 		virtual void Apply(CommandContext& context, World& world) = 0;
 	};
 
-	class GrappleECS_API EntityCreationCommand : public Command
+	class GrappleECS_API EntityCommand : public Command
 	{
 	public:
 		virtual void Initialize(FutureEntity entity) = 0;

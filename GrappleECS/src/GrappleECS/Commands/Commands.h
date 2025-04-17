@@ -108,4 +108,17 @@ namespace Grapple
 	private:
 		Entity m_Entity;
 	};
+
+	class GrappleECS_API GetEntityCommand : public EntityCommand
+	{
+	public:
+		GetEntityCommand() = default;
+		GetEntityCommand(Entity entity);
+
+		void Apply(CommandContext& context, World& world) override;
+		void Initialize(FutureEntity entity) override;
+	private:
+		FutureEntity m_OutputEntity;
+		Entity m_Entity;
+	};
 }
