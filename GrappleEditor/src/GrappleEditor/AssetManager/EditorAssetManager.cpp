@@ -8,6 +8,8 @@
 
 #include "Grapple/Renderer/Texture.h"
 
+#include "GrappleEditor/EditorLayer.h"
+
 #include "GrappleEditor/AssetManager/TextureImporter.h"
 #include "GrappleEditor/AssetManager/PrefabImporter.h"
 #include "GrappleEditor/Serialization/SceneSerializer.h"
@@ -37,7 +39,7 @@ namespace Grapple
         m_AssetImporters.emplace(AssetType::Prefab, PrefabImporter::ImportPrefab);
         m_AssetImporters.emplace(AssetType::Scene, [](const AssetMetadata& metadata) -> Ref<Asset>
         {
-            Ref<Scene> scene = CreateRef<Scene>();
+            Ref<Scene> scene = CreateRef<Scene>(EditorLayer::GetInstance().GetECSContext());
             SceneSerializer::Deserialize(scene, metadata.Path);
             return scene;
         });

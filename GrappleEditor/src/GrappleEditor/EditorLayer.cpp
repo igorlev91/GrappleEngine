@@ -24,6 +24,8 @@
 #include "GrappleEditor/UI/ProjectSettingsWindow.h"
 #include "GrappleEditor/UI/ECS/ECSInspector.h"
 
+#include "GrappleEditor/UI/PrefabEditor.h"
+
 #include "GrappleEditor/Scripting/BuildSystem/BuildSystem.h"
 
 #include <imgui.h>
@@ -98,6 +100,14 @@ namespace Grapple
 			if (projectPath.has_value())
 				Project::OpenProject(projectPath.value());
 		}
+
+		m_PrefabEditor = CreateRef<PrefabEditor>(m_ECSContext);
+		m_AssetEditorWindows.push_back(m_PrefabEditor);
+
+		m_AssetManagerWindow.SetOpenAction(AssetType::Prefab, [this](AssetHandle handle)
+		{
+			m_PrefabEditor->Open(handle);
+		});
 	}
 
 	void EditorLayer::OnDetach()
@@ -230,6 +240,9 @@ namespace Grapple
 
 		ECSInspector::GetInstance().OnImGuiRender();
 
+		for (auto& window : m_AssetEditorWindows)
+			window->OnUpdate();
+
 		ImGui::End();
 		ImGuiLayer::End();
 	}
@@ -297,6 +310,7 @@ namespace Grapple
 			active = nullptr;
 			Scene::SetActive(nullptr);
 			ScriptingEngine::UnloadAllModules();
+			m_ECSContext.Clear();
 
 			ScriptingEngine::LoadModules();
 
@@ -324,10 +338,11 @@ namespace Grapple
 		active = nullptr;
 		Scene::SetActive(nullptr);
 		ScriptingEngine::UnloadAllModules();
+		m_ECSContext.Clear();
 
 		ScriptingEngine::LoadModules();
 
-		active = CreateRef<Scene>();
+		active = CreateRef<Scene>(m_ECSContext);
 		active->Initialize();
 		active->InitializeRuntime();
 		Scene::SetActive(active);
@@ -352,9 +367,10 @@ namespace Grapple
 		active = nullptr;
 
 		ScriptingEngine::UnloadAllModules();
+		m_ECSContext.Clear();
 
 		ScriptingEngine::LoadModules();
-		Ref<Scene> playModeScene = CreateRef<Scene>();
+		Ref<Scene> playModeScene = CreateRef<Scene>(m_ECSContext);
 		SceneSerializer::Deserialize(playModeScene, activeScenePath);
 
 		Scene::SetActive(playModeScene);
@@ -372,6 +388,7 @@ namespace Grapple
 
 		Scene::SetActive(nullptr);
 		ScriptingEngine::UnloadAllModules();
+		m_ECSContext.Clear();
 
 		ScriptingEngine::LoadModules();
 	 	Ref<Scene> editorScene = AssetManager::GetAsset<Scene>(m_EditedSceneHandle);
@@ -397,11 +414,12 @@ namespace Grapple
 		active = nullptr;
 
 		ScriptingEngine::UnloadAllModules();
+		m_ECSContext.Clear();
 
 		BuildSystem::BuildModules();
 
 		ScriptingEngine::LoadModules();
-		active = CreateRef<Scene>();
+		active = CreateRef<Scene>(m_ECSContext);
 		active->Handle = activeSceneHandle;
 		SceneSerializer::Deserialize(active, activeScenePath);
 

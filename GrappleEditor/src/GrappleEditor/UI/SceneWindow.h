@@ -1,5 +1,7 @@
 #pragma once
 
+#include "GrappleEditor/UI/ECS/EntitiesHierarchy.h"
+
 namespace Grapple
 {
 	class SceneWindow
@@ -7,5 +9,6 @@ namespace Grapple
 	public:
 		void OnImGuiRender();
 	private:
+		EntitiesHierarchy m_Hierarchy;
 	};
 }

@@ -7,11 +7,34 @@
 #include "GrappleEditor/Serialization/Serialization.h"
 #include "GrappleEditor/Serialization/SceneSerializer.h"
 
+#include "GrappleEditor/AssetManager/EditorAssetManager.h"
+
 #include <exception>
+#include <fstream>
 #include <yaml-cpp/yaml.h>
 
 namespace Grapple
 {
+    void PrefabImporter::SerializePrefab(AssetHandle prefab, World& world, Entity entity)
+    {
+        Grapple_CORE_ASSERT(AssetManager::IsAssetHandleValid(prefab));
+
+        if (!world.IsEntityAlive(entity))
+            return;
+
+        const AssetMetadata* metadata = AssetManager::GetAssetMetadata(prefab);
+        
+        YAML::Emitter emitter;
+        SceneSerializer::SerializeEntity(emitter, world, entity);
+
+        std::ofstream output(metadata->Path);
+        output << emitter.c_str();
+        output.close();
+
+        Ref<EditorAssetManager> assetManager = As<EditorAssetManager>(AssetManager::GetInstance());
+        assetManager->ReloadAsset(prefab);
+    }
+
     Ref<Asset> PrefabImporter::ImportPrefab(const AssetMetadata& metadata)
     {
         try

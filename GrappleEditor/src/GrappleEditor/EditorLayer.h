@@ -4,11 +4,16 @@
 #include "Grapple/Core/Layer.h"
 #include "Grapple/Core/CommandLineArguments.h"
 
+#include "GrappleECS/ECSContext.h"
+
+#include "GrappleEditor/UI/AssetEditor.h"
+
 #include "GrappleEditor/UI/SceneWindow.h"
 #include "GrappleEditor/UI/PropertiesWindow.h"
 #include "GrappleEditor/UI/AssetManagerWindow.h"
 
 #include "GrappleEditor/UI//EditorTitleBar.h"
+#include "GrappleEditor/UI/PrefabEditor.h"
 
 #include "GrappleEditor/ViewportWindow.h"
 #include "GrappleEditor/EditorCamera.h"
@@ -63,6 +68,9 @@ namespace Grapple
 		inline GuizmoMode GetGuizmoMode() const { return m_Guizmo; }
 		inline EditorMode GetMode() const { return m_Mode; }
 
+		inline ECSContext& GetECSContext() { return m_ECSContext; }
+		inline const ECSContext& GetECSContext() const { return m_ECSContext; }
+
 		static EditorLayer& GetInstance();
 	private:
 		void UpdateWindowTitle();
@@ -72,6 +80,9 @@ namespace Grapple
 
 		EditorTitleBar m_TitleBar;
 		Ref<ViewportWindow> m_GameWindow;
+
+		std::vector<Ref<AssetEditor>> m_AssetEditorWindows;
+		Ref<PrefabEditor> m_PrefabEditor;
 
 		SceneWindow m_SceneWindow;
 		PropertiesWindow m_PropertiesWindow;
@@ -85,6 +96,8 @@ namespace Grapple
 		bool m_PlaymodePaused;
 		EditorMode m_Mode;
 		GuizmoMode m_Guizmo;
+
+		ECSContext m_ECSContext;
 	public:
 		EditorSelection Selection;
 	private:

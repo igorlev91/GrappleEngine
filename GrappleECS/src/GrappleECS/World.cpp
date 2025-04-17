@@ -11,13 +11,17 @@ namespace Grapple
 		Entities(context.Components, m_Queries, context.Archetypes),
 		m_Queries(Entities, context.Archetypes)
 	{
-		Grapple_CORE_ASSERT(s_CurrentWorld == nullptr, "Multiple ECS Worlds");
-		s_CurrentWorld = this;
 	}
 
 	World::~World()
 	{
-		s_CurrentWorld = nullptr;
+		if (s_CurrentWorld == this)
+			s_CurrentWorld = nullptr;
+	}
+
+	void World::MakeCurrent()
+	{
+		s_CurrentWorld = this;
 	}
 
 	void World::DeleteEntity(Entity entity)

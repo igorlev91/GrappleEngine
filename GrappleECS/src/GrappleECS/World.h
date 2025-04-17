@@ -26,6 +26,8 @@ namespace Grapple
 		~World();
 		World(const World&) = delete;
 
+		void MakeCurrent();
+
 		template<typename... T>
 		constexpr Entity CreateEntity(ComponentInitializationStrategy initStrategy = ComponentInitializationStrategy::DefaultConstructor)
 		{
