@@ -151,7 +151,9 @@ namespace Grapple
     };
 
 #define Grapple_GET_FIELD_TYPE(typeName, fieldName) decltype(((typeName*)nullptr)->fieldName)
+#define Grapple_GET_ENUM_FIELD_TYPE(typeName, fieldName) std::underlying_type_t<Grapple_GET_FIELD_TYPE(typeName, fieldName)>
 #define Grapple_FIELD(typeName, fieldName) Grapple::FieldDataFromType<Grapple_GET_FIELD_TYPE(typeName, fieldName)>().Get(#fieldName, offsetof(typeName, fieldName))
+#define Grapple_ENUM_FIELD(typeName, fieldName) Grapple::FieldDataFromType<Grapple_GET_ENUM_FIELD_TYPE(typeName, fieldName)>().Get(#fieldName, offsetof(typeName, fieldName))
 
     class GrappleCORE_API TypeInitializer
     {

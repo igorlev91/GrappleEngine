@@ -1,6 +1,8 @@
 #pragma once
 
+#include "GrappleECS/ECSContext.h"
 #include "GrappleECS/Entities.h"
+
 #include "GrappleECS/Entity/Component.h"
 #include "GrappleECS/Entity/Components.h"
 #include "GrappleECS/Entity/ComponentGroup.h"
@@ -20,7 +22,7 @@ namespace Grapple
 	class GrappleECS_API World
 	{
 	public:
-		World();
+		World(ECSContext& context);
 		~World();
 		World(const World&) = delete;
 
@@ -132,9 +134,9 @@ namespace Grapple
 		inline const SystemsManager& GetSystemsManager() const { return m_SystemsManager; }
 
 		Grapple::Entities Entities;
-		Grapple::Components Components;
+		Grapple::Components& Components;
 	private:
-		Archetypes m_Archetypes;
+		Archetypes& m_Archetypes;
 		QueryCache m_Queries;
 		SystemsManager m_SystemsManager;
 	};

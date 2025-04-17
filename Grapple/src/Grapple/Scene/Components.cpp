@@ -4,7 +4,11 @@
 
 namespace Grapple
 {
-	Grapple_IMPL_COMPONENT(TransformComponent);
+	Grapple_IMPL_COMPONENT(TransformComponent,
+		Grapple_FIELD(TransformComponent, Position),
+		Grapple_FIELD(TransformComponent, Rotation),
+		Grapple_FIELD(TransformComponent, Scale),
+	);
 
 	TransformComponent::TransformComponent()
 		: Position(glm::vec3(0.0f)),
@@ -20,7 +24,14 @@ namespace Grapple
 			glm::scale(glm::mat4(1.0f), Scale);
 	}
 
-	Grapple_IMPL_COMPONENT(CameraComponent);
+	Grapple_IMPL_COMPONENT(CameraComponent,
+		Grapple_ENUM_FIELD(CameraComponent, Projection),
+		Grapple_FIELD(CameraComponent, Size),
+		Grapple_FIELD(CameraComponent, FOV),
+		Grapple_FIELD(CameraComponent, Near),
+		Grapple_FIELD(CameraComponent, Far),
+	);
+
 	CameraComponent::CameraComponent()
 		: Projection(ProjectionType::Perspective),
 		  Size(10.0f),
@@ -57,7 +68,13 @@ namespace Grapple
 		return inverseProjection * glm::vec4(point, 0.0f, 1.0f);
 	}
 
-	Grapple_IMPL_COMPONENT(SpriteComponent);
+	Grapple_IMPL_COMPONENT(SpriteComponent,
+		Grapple_FIELD(SpriteComponent, Color),
+		Grapple_FIELD(SpriteComponent, TextureTiling),
+		Grapple_FIELD(SpriteComponent, Texture),
+		Grapple_ENUM_FIELD(SpriteComponent, Flags),
+	);
+
 	SpriteComponent::SpriteComponent()
 		: Color(glm::vec4(1.0f)),
 		  TextureTiling(glm::vec2(1.0f)),
