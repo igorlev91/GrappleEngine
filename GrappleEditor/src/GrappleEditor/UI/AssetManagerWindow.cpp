@@ -155,11 +155,20 @@ namespace Grapple
 				if (node.IsImported && ImGui::MenuItem("Open"))
 					OnOpenFile(node);
 
-				if (node.IsImported && ImGui::MenuItem("Remove"))
+				if (node.IsImported)
 				{
-					Grapple_CORE_ASSERT(node.Handle != NULL_ASSET_HANDLE);
-					m_AssetManager->RemoveFromRegistry(node.Handle);
-					node.IsImported = false;
+					Grapple_CORE_ASSERT(AssetManager::IsAssetHandleValid(node.Handle));
+					if (ImGui::MenuItem("Remove"))
+					{
+						m_AssetManager->RemoveFromRegistry(node.Handle);
+						node.IsImported = false;
+					}
+
+					if (ImGui::MenuItem("Reload"))
+					{
+						if (AssetManager::IsAssetLoaded(node.Handle))
+							m_AssetManager->ReloadAsset(node.Handle);
+					}
 				}
 
 				if (!node.IsImported && ImGui::MenuItem("Import"))
@@ -176,7 +185,6 @@ namespace Grapple
 
 		if (node.IsImported && ImGui::BeginDragDropSource())
 		{
-			Grapple_CORE_INFO("ljsdlf");
 			ImGui::SetDragDropPayload(ASSET_PAYLOAD_NAME, &node.Handle, sizeof(AssetHandle));
 			ImGui::EndDragDropSource();
 		}
