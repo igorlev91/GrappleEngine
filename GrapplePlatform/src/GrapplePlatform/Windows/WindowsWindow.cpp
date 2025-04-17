@@ -1,8 +1,8 @@
 #include "WindowsWindow.h"
 
-#include "Grapple/Core/Assert.h"
-#include "Grapple/Core/KeyCode.h"
-#include "Grapple/Core/MouseCode.h"
+#include "GrappleCore/Assert.h"
+#include "GrappleCore/KeyCode.h"
+#include "GrappleCore/MouseCode.h"
 
 #include <optional>
 

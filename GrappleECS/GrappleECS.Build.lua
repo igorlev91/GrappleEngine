@@ -6,7 +6,7 @@ project "GrappleECS"
 	staticruntime "off"
 
 	build_tool.define_module("GrappleECS")
-	build_tool.add_module_ref("GrappleCommon")
+	build_tool.add_module_ref("GrappleCore")
 
     files
     {
@@ -18,14 +18,14 @@ project "GrappleECS"
 	{
 		"src/",
 		"include/",
-		"%{wks.location}/GrappleCommon/src/",
+		"%{wks.location}/GrappleCore/src/",
 		INCLUDE_DIRS.spdlog,
 		INCLUDE_DIRS.glm,
 	}
 
 	links
 	{
-		"GrappleCommon",
+		"GrappleCore",
 	}
 
 	filter "system:windows"

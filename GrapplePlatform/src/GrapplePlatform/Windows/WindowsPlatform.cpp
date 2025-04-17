@@ -1,7 +1,7 @@
 #include "GrapplePlatform/Platform.h"
 
-#include "Grapple/Core/Assert.h"
-#include "Grapple/Core/Assert.h"
+#include "GrappleCore/Assert.h"
+#include "GrappleCore/Assert.h"
 
 #include "GrapplePlatform/Window.h"
 

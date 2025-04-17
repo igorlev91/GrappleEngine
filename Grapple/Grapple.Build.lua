@@ -7,7 +7,7 @@ project "Grapple"
 
 	build_tool.define_module("Grapple")
 	build_tool.add_module_ref("GrapplePlatform")
-	build_tool.add_module_ref("GrappleCommon")
+	build_tool.add_module_ref("GrappleCore")
 	build_tool.add_module_ref("GrappleECS")
 
     files
@@ -22,7 +22,7 @@ project "Grapple"
     includedirs
 	{
 		"src/",
-		"%{wks.location}/GrappleCommon/src/",
+		"%{wks.location}/GrappleCore/src/",
 		"%{wks.location}/GrapplePlatform/src/",
 		"%{wks.location}/GrappleECS/src/",
 
@@ -42,7 +42,7 @@ project "Grapple"
 		"GLFW",
 		"ImGUI",
 		"GrappleECS",
-		"GrappleCommon",
+		"GrappleCore",
 		"GrapplePlatform",
 		"yaml-cpp"
 	}
@@ -58,7 +58,7 @@ project "Grapple"
 		systemversion "latest"
 
 		links { "dwmapi.lib" }
-	
+
 	filter "configurations:Debug"
 		defines "Grapple_DEBUG"
 		runtime "Debug"

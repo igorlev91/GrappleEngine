@@ -6,7 +6,7 @@ project "GrapplePlatform"
 	staticruntime "off"
 
 	build_tool.define_module("GrapplePlatform")
-	build_tool.add_module_ref("GrappleCommon")
+	build_tool.add_module_ref("GrappleCore")
 
     files
     {
@@ -17,7 +17,7 @@ project "GrapplePlatform"
     includedirs
 	{
 		"src/",
-		"%{wks.location}/GrappleCommon/src/",
+		"%{wks.location}/GrappleCore/src/",
 
 		INCLUDE_DIRS.GLFW,
 		INCLUDE_DIRS.glm,
@@ -28,7 +28,7 @@ project "GrapplePlatform"
 	{
 		"GLFW",
 		"ImGUI",
-		"GrappleCommon",
+		"GrappleCore",
 	}
 
 	defines

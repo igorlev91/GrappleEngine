@@ -15,11 +15,24 @@ namespace Grapple
 			delete[] m_Buffer;
 	}
 
-	void CommandsStorage::Push(const CommandMetadata& meta, const void* commandData)
+	std::optional<size_t> CommandsStorage::Allocate(size_t size)
 	{
-		Grapple_CORE_ASSERT(commandData);
+		if (m_Size + size > m_Capacity)
+			Reallocate();
 
-		size_t itemSize = sizeof(meta) + meta.CommandSize;
+		if (m_Buffer != nullptr)
+		{
+			size_t offset = m_Size;
+			m_Size += size;
+			return offset;
+		}
+
+		return {};
+	}
+
+	std::pair<CommandMetadata*, void*> CommandsStorage::AllocateCommand(size_t commandSize)
+	{
+		size_t itemSize = sizeof(CommandMetadata) + commandSize;
 		size_t newSize = m_Size + itemSize;
 
 		if (m_Buffer == nullptr || newSize > m_Capacity)
@@ -27,23 +40,25 @@ namespace Grapple
 
 		if (m_Buffer != nullptr)
 		{
-			std::memcpy(m_Buffer + m_Size, &meta, sizeof(meta));
-			std::memcpy(m_Buffer + m_Size + sizeof(meta), commandData, meta.CommandSize);
-
+			size_t oldSize = m_Size;
 			m_Size = newSize;
+
+			return { (CommandMetadata*)(m_Buffer + oldSize), m_Buffer + oldSize + sizeof(CommandMetadata) };
 		}
+
+		return { nullptr, nullptr };
 	}
 
-	std::pair<const CommandMetadata&, void*> CommandsStorage::Pop()
+	std::pair<CommandMetadata&, Command*> CommandsStorage::Pop()
 	{
 		Grapple_CORE_ASSERT(m_ReadPosition + sizeof(CommandMetadata) <= m_Size);
-		const CommandMetadata& metadata = *(CommandMetadata*)(m_Buffer + m_ReadPosition);
+		CommandMetadata& metadata = *(CommandMetadata*)(m_Buffer + m_ReadPosition);
 
 		Grapple_CORE_ASSERT(m_ReadPosition + sizeof(CommandMetadata) + metadata.CommandSize <= m_Size);
 		void* command = m_Buffer + m_ReadPosition + sizeof(CommandMetadata);
 
 		m_ReadPosition += sizeof(CommandMetadata) + metadata.CommandSize;
-		return { metadata, command };
+		return { metadata, (Command*) command };
 	}
 
 	bool CommandsStorage::CanRead()

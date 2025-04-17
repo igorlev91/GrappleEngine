@@ -20,7 +20,11 @@ namespace Grapple
 		while (m_Storage.CanRead())
 		{
 			auto [meta, command] = m_Storage.Pop();
-			meta.Apply((Command*)command, m_World);
+
+			CommandContext context(meta, m_Storage);
+
+			command->Apply(context, m_World);
+			command->~Command();
 		}
 
 		m_Storage.Clear();

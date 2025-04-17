@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Grapple/Core/Core.h"
-#include "Grapple/Core/Log.h"
-#include "Grapple/Core/Assert.h"
+#include "GrappleCore/Core.h"
+#include "GrappleCore/Log.h"
+#include "GrappleCore/Assert.h"
 
 // Rendering
 

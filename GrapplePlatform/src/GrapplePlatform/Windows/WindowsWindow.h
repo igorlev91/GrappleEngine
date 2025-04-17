@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Grapple/Core/Core.h"
+#include "GrappleCore/Core.h"
 #include "GrapplePlatform/Window.h"
 
 #include <GLFW/glfw3.h>

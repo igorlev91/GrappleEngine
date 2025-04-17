@@ -8,7 +8,11 @@
 
 #include <Grapple/Core/Time.h>
 #include <GrappleCore/Serialization/TypeInitializer.h>
+
+#include <Grapple/AssetManager/AssetManager.h>
+
 #include <Grapple/Scene/Components.h>
+#include <Grapple/Scene/Prefab.h>
 
 #include <Grapple/Input/InputManager.h>
 
@@ -21,9 +25,11 @@ namespace Sandbox
 	{
 		Grapple_COMPONENT;
 		float RotationSpeed;
+		AssetHandle PrefabHandle;
 	};
 	Grapple_IMPL_COMPONENT(RotatingQuadData,
-		Grapple_FIELD(RotatingQuadData, RotationSpeed)
+		Grapple_FIELD(RotatingQuadData, RotationSpeed),
+		Grapple_FIELD(RotatingQuadData, PrefabHandle)
 	);
 
 	struct SomeComponent
@@ -67,6 +73,8 @@ namespace Sandbox
 		{
 			const RotatingQuadData& data = World::GetCurrent().GetSingletonComponent<RotatingQuadData>();
 
+			Ref<Prefab> prefab = AssetManager::GetAsset<Prefab>(data.PrefabHandle);
+
 			uint32_t op = 0;
 			if (InputManager::IsKeyPressed(KeyCode::D1))
 				op = 1;
@@ -93,10 +101,12 @@ namespace Sandbox
 					switch (op)
 					{
 					case 1:
-						context.Commands->AddComponent<SomeComponent>(e);
+						context.Commands->AddEntityCommand(InstantiatePrefab(prefab))
+							.AddComponent<SomeComponent>();
+						//context.Commands->AddComponent<SomeComponent>(e);
 						break;
 					case 2:
-						context.Commands->RemoveComponent<SomeComponent>(e);
+						//context.Commands->RemoveComponent<SomeComponent>(e);
 						break;
 					case 3:
 						context.Commands->CreateEntity<TransformComponent, SpriteComponent, SomeComponent>();
