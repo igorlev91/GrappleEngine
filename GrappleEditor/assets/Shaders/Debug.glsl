@@ -1,25 +1,41 @@
 #type vertex
-#version 410
+#version 450
 
 layout(location = 0) in vec3 i_Position;
 layout(location = 1) in vec4 i_Color;
 
-uniform mat4 u_ViewProjection;
+struct CameraData
+{
+	vec3 Position;
 
-out vec4 VertexColor;
+	mat4 Projection;
+	mat4 View;
+	mat4 ViewProjection;
+
+	mat4 InverseProjection;
+	mat4 InverseView;
+	mat4 InverseViewProjection;
+};
+
+layout(std140, binding = 0) uniform Camera
+{
+	CameraData u_Camera;
+};
+
+layout(location = 0) out vec4 VertexColor;
 
 void main()
 {
 	VertexColor = i_Color;
-	gl_Position = u_ViewProjection * vec4(i_Position, 1.0);
+	gl_Position = u_Camera.ViewProjection * vec4(i_Position, 1.0);
 }
 
 #type fragment
-#version 410
+#version 450
 
-in vec4 VertexColor;
+layout(location = 0) in vec4 VertexColor;
 
-out vec4 o_Color;
+layout(location = 0) out vec4 o_Color;
 
 void main()
 {

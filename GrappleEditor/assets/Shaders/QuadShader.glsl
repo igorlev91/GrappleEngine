@@ -1,5 +1,5 @@
 #type vertex
-#version 330
+#version 450
 
 layout(location = 0) in vec3 i_Position;
 layout(location = 1) in vec4 i_Color;
@@ -7,12 +7,28 @@ layout(location = 2) in vec2 i_UV;
 layout(location = 3) in float i_TextureIndex;
 layout(location = 4) in int i_EntityIndex;
 
-uniform mat4 u_Projection;
+struct CameraData
+{
+	vec3 Position;
 
-out vec4 VertexColor;
-out vec2 UV;
-flat out float TextureIndex;
-flat out int EntityIndex;
+	mat4 Projection;
+	mat4 View;
+	mat4 ViewProjection;
+
+	mat4 InverseProjection;
+	mat4 InverseView;
+	mat4 InverseViewProjection;
+};
+
+layout(std140, binding = 0) uniform Camera
+{
+	CameraData u_Camera;
+};
+
+layout(location = 0) out vec4 VertexColor;
+layout(location = 1) out vec2 UV;
+layout(location = 2) flat out float TextureIndex;
+layout(location = 3) flat out int EntityIndex;
 
 void main()
 {
@@ -20,21 +36,21 @@ void main()
     UV = i_UV;
     TextureIndex = i_TextureIndex;
     EntityIndex = i_EntityIndex;
-    gl_Position = u_Projection * vec4(i_Position, 1.0);
+    gl_Position = u_Camera.ViewProjection * vec4(i_Position, 1.0);
 }
 
 #type fragment
-#version 330
+#version 450
 
-uniform sampler2D u_Textures[32];
+layout(binding = 0) uniform sampler2D u_Textures[32];
 
-in vec2 UV;
-in vec4 VertexColor;
-flat in float TextureIndex;
-flat in int EntityIndex;
+layout(location = 0) in vec4 VertexColor;
+layout(location = 1) in vec2 UV;
+layout(location = 2) flat in float TextureIndex;
+layout(location = 3) flat in int EntityIndex;
 
-out vec4 o_Color;
-out int o_EntityIndex;
+layout(location = 0) out vec4 o_Color;
+layout(location = 1) out int o_EntityIndex;
 
 void main()
 {
