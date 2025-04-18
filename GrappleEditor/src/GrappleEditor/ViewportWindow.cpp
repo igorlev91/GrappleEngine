@@ -34,6 +34,7 @@ namespace Grapple
 			OnClear();
 
 			Scene::GetActive()->OnBeforeRender(m_Viewport.FrameData);
+			m_Viewport.FrameData.UploadCameraData();
 			Scene::GetActive()->OnRender(m_Viewport.FrameData);
 
 			m_FrameBuffer->Unbind();
