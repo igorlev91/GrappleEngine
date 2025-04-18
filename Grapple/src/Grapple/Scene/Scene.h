@@ -5,6 +5,7 @@
 
 #include "Grapple/Renderer/Shader.h"
 #include "Grapple/Renderer/RenderData.h"
+#include "Grapple/Renderer/Viewport.h"
 
 #include "Grapple/Scene/SceneRenderer.h"
 
@@ -25,8 +26,8 @@ namespace Grapple
 		void OnRuntimeStart();
 		void OnRuntimeEnd();
 
-		void OnBeforeRender(RenderData& renderData);
-		void OnRender(const RenderData& renderData);
+		void OnBeforeRender(Viewport& viewport);
+		void OnRender(const Viewport& viewport);
 
 		void OnUpdateRuntime();
 		void OnViewportResize(uint32_t width, uint32_t height);
