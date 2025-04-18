@@ -2,15 +2,22 @@
 
 #include "GrappleCore/Core.h"
 
+#include "Grapple/AssetManager/Asset.h"
+
 #include <filesystem>
 
 #include <glm/glm.hpp>
 
 namespace Grapple
 {
-	class Grapple_API Shader
+	class Grapple_API Shader : public Asset
 	{
 	public:
+		Shader()
+			: Asset(AssetType::Shader) {}
+
+		virtual ~Shader() = default;
+
 		virtual void Bind() = 0;
 
 		virtual void SetInt(const std::string& name, int value) = 0;
