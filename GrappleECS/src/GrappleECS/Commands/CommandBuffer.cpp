@@ -22,6 +22,9 @@ namespace Grapple
 
 	void CommandBuffer::Execute()
 	{
+		if (!m_Storage.CanRead())
+			return;
+
 		while (m_Storage.CanRead())
 		{
 			auto [meta, command] = m_Storage.Pop();
