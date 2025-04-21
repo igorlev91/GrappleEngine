@@ -1,5 +1,7 @@
 #include "Renderer.h"
 
+#include "Grapple/AssetManager/AssetManager.h"
+
 #include "Grapple/Renderer/UniformBuffer.h"
 #include "Grapple/Renderer2D/Renderer2D.h"
 
@@ -40,6 +42,12 @@ namespace Grapple
 
 	void Renderer::EndScene()
 	{
+	}
+
+	void Renderer::DrawMesh(const Ref<VertexArray>& mesh, const Ref<Material>& material)
+	{
+		material->SetShaderParameters();
+		RenderCommand::DrawIndexed(mesh);
 	}
 
 	Viewport& Renderer::GetMainViewport()

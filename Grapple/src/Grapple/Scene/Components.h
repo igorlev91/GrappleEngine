@@ -70,4 +70,14 @@ namespace Grapple
 
 		int32_t Layer;
 	};
+
+	struct MaterialComponent
+	{
+		Grapple_COMPONENT;
+
+		MaterialComponent();
+		MaterialComponent(AssetHandle handle);
+
+		AssetHandle Material;
+	};
 }

@@ -13,6 +13,7 @@
 #include "GrappleEditor/AssetManager/TextureImporter.h"
 #include "GrappleEditor/AssetManager/PrefabImporter.h"
 #include "GrappleEditor/Serialization/SceneSerializer.h"
+#include "GrappleEditor/AssetManager/MaterialImporter.h"
 
 #include <yaml-cpp/yaml.h>
 
@@ -37,6 +38,7 @@ namespace Grapple
     {
         m_AssetImporters.emplace(AssetType::Texture, TextureImporter::ImportTexture);
         m_AssetImporters.emplace(AssetType::Prefab, PrefabImporter::ImportPrefab);
+        m_AssetImporters.emplace(AssetType::Material, MaterialImporter::ImportMaterial);
         m_AssetImporters.emplace(AssetType::Scene, [](const AssetMetadata& metadata) -> Ref<Asset>
         {
             Ref<Scene> scene = CreateRef<Scene>(EditorLayer::GetInstance().GetECSContext());
@@ -116,6 +118,8 @@ namespace Grapple
             type = AssetType::Scene;
         else if (extension == ".flrprefab")
             type = AssetType::Prefab;
+        else if (extension == ".flrmat")
+            type = AssetType::Material;
         else if (extension == ".glsl")
             type = AssetType::Shader;
 
@@ -126,6 +130,26 @@ namespace Grapple
         metadata.Handle = handle;
 
         m_Registry.emplace(handle, metadata);
+        m_FilepathToAssetHandle.emplace(path, handle);
+
+        SerializeRegistry();
+
+        return handle;
+    }
+
+    AssetHandle EditorAssetManager::ImportAsset(const std::filesystem::path& path, const Ref<Asset> asset)
+    {
+        AssetHandle handle;
+
+        AssetMetadata metadata;
+        metadata.Handle = handle;
+        metadata.Path = path;
+        metadata.Type = asset->GetType();
+
+        asset->Handle = handle;
+
+        m_Registry.emplace(handle, metadata);
+        m_LoadedAssets.emplace(asset->Handle, asset);
         m_FilepathToAssetHandle.emplace(path, handle);
 
         SerializeRegistry();

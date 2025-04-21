@@ -39,6 +39,7 @@ namespace Grapple
 		Texture,
 		Prefab,
 		Shader,
+		Material,
 	};
 
 	Grapple_API std::string_view AssetTypeToString(AssetType type);

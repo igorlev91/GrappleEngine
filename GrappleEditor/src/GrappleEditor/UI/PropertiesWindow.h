@@ -21,6 +21,7 @@ namespace Grapple
 		void RenderAssetProperties(AssetHandle handle);
 
 		bool RenderTextureImportSettingsEditor(AssetHandle handle, TextureImportSettings& importSettings);
+		bool RenderMaterialEditor(AssetHandle handle);
 	private:
 		AssetManagerWindow& m_AssetManagerWindow;
 	};

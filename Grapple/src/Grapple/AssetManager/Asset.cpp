@@ -18,6 +18,8 @@ namespace Grapple
 			return "Prefab";
 		case AssetType::Shader:
 			return "Shader";
+		case AssetType::Material:
+			return "Material";
 		}
 
 		Grapple_CORE_ASSERT(false, "Unhandled asset type");
@@ -34,6 +36,8 @@ namespace Grapple
 			return AssetType::Prefab;
 		else if (string == "Shader")
 			return AssetType::Shader;
+		else if (string == "Material")
+			return AssetType::Material;
 
 		Grapple_CORE_ASSERT(false, "Unknown asset type string");
 		return AssetType::None;

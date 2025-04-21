@@ -31,6 +31,8 @@ namespace Grapple
 		std::optional<AssetHandle> FindAssetByPath(const std::filesystem::path& path);
 
 		AssetHandle ImportAsset(const std::filesystem::path& path);
+		AssetHandle ImportAsset(const std::filesystem::path& path, const Ref<Asset> asset);
+
 		void ReloadAsset(AssetHandle handle);
 		void UnloadAsset(AssetHandle handle);
 

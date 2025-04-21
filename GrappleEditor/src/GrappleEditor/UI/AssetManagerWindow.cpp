@@ -4,8 +4,12 @@
 
 #include "Grapple/Project/Project.h"
 
+#include "Grapple/Renderer/Material.h"
+
 #include "GrappleEditor/EditorLayer.h"
 #include "GrappleEditor/UI/EditorGUI.h"
+
+#include "GrappleEditor/AssetManager/MaterialImporter.h"
 
 #include <fstream>
 #include <imgui.h>
@@ -169,6 +173,30 @@ namespace Grapple
 						if (AssetManager::IsAssetLoaded(node.Handle))
 							m_AssetManager->ReloadAsset(node.Handle);
 					}
+				}
+
+				if (ImGui::BeginMenu("New"))
+				{
+					Grapple_CORE_ASSERT(AssetManager::IsAssetHandleValid(node.Handle));
+					const AssetMetadata* metadata = AssetManager::GetAssetMetadata(node.Handle);
+
+					if (metadata->Type == AssetType::Shader && ImGui::MenuItem("Material"))
+					{
+						m_ShowNewFileNamePopup = true;
+						m_OnNewFileNameEntered = [this, nodeIndex = m_NodeRenderIndex](std::string_view name)
+						{
+							Grapple_CORE_ASSERT(!m_AssetTree[nodeIndex].IsDirectory);
+							std::filesystem::path path = m_AssetTree[nodeIndex].Path.parent_path() / name;
+							path.replace_extension(".flrmat");
+
+							Ref<Material> material = CreateRef<Material>(m_AssetTree[nodeIndex].Handle);
+							MaterialImporter::SerializeMaterial(material, path);
+
+							m_AssetManager->ImportAsset(path, material);
+						};
+					}
+
+					ImGui::EndMenu();
 				}
 
 				if (!node.IsImported && ImGui::MenuItem("Import"))
