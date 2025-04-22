@@ -26,7 +26,6 @@ namespace Grapple
 	private:
 		EditorCamera& m_Camera;
 		Ref<Shader> m_SelectionOutlineShader;
-		Ref<VertexArray> m_FullscreenQuad;
 		Ref<FrameBuffer> m_ScreenBuffer;
 	};
 }
