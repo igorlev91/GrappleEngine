@@ -2,6 +2,8 @@
 
 #include "GrappleCore/Core.h"
 
+#include "Grapple/AssetManager/Asset.h"
+
 #include "Grapple/Renderer/Texture.h"
 
 #define MSDF_ATLAS_PUBLIC
@@ -18,7 +20,7 @@ namespace Grapple
 		msdf_atlas::FontGeometry Geometry;
 	};
 
-	class Grapple_API Font
+	class Grapple_API Font : public Asset
 	{
 	public:
 		Font(const std::filesystem::path& path);

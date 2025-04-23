@@ -7,6 +7,7 @@
 #include "Grapple/Project/Project.h"
 
 #include "Grapple/Renderer/Texture.h"
+#include "Grapple/Renderer/Font.h"
 
 #include "GrappleEditor/EditorLayer.h"
 
@@ -49,6 +50,11 @@ namespace Grapple
         m_AssetImporters.emplace(AssetType::Shader, [](const AssetMetadata& metadata) -> Ref<Asset>
         {
             return Shader::Create(metadata.Path);
+        });
+
+        m_AssetImporters.emplace(AssetType::Font, [](const AssetMetadata& metadata) -> Ref<Asset>
+        {
+            return CreateRef<Font>(metadata.Path);
         });
     }
 
@@ -122,6 +128,8 @@ namespace Grapple
             type = AssetType::Material;
         else if (extension == ".glsl")
             type = AssetType::Shader;
+        else if (extension == ".ttf")
+            type = AssetType::Font;
 
         AssetHandle handle;
         AssetMetadata metadata;

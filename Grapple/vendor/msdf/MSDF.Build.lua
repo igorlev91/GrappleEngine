@@ -22,7 +22,8 @@ project "msdfgen"
 
 	includedirs
 	{
-		"%{wks.location}/Grapple/vendor/msdf/freetype/include"
+		"%{wks.location}/Grapple/vendor/msdf/freetype/include",
+		"%{prj.location}/tinyxml2/"
 	}
 
 	defines
