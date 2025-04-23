@@ -41,6 +41,7 @@ namespace Grapple
 		Shader,
 		Material,
 		Font,
+		Mesh,
 	};
 
 	Grapple_API std::string_view AssetTypeToString(AssetType type);
