@@ -112,4 +112,14 @@ namespace Grapple
 
 	TextComponent::TextComponent(std::string_view text, const glm::vec4& color, AssetHandle font)
 		: Text(text), Color(color), Font(font) {}
+
+	Grapple_IMPL_COMPONENT(MeshComponent,
+		Grapple_FIELD(MeshComponent, Mesh),
+		Grapple_FIELD(MeshComponent, Material)
+	);
+	MeshComponent::MeshComponent()
+		: Mesh(NULL_ASSET_HANDLE), Material(NULL_ASSET_HANDLE) {}
+
+	MeshComponent::MeshComponent(AssetHandle mesh, AssetHandle material)
+		: Mesh(mesh), Material(material) {}
 }

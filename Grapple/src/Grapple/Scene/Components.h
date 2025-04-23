@@ -3,6 +3,9 @@
 #include "Grapple.h"
 #include "Grapple/Renderer2D/Renderer2D.h"
 
+#include "Grapple/Renderer/Mesh.h"
+#include "Grapple/Renderer/Material.h"
+
 #include "GrappleECS/World.h"
 #include "GrappleECS/Entity/ComponentInitializer.h"
 
@@ -91,5 +94,16 @@ namespace Grapple
 		std::string Text;
 		glm::vec4 Color;
 		AssetHandle Font;
+	};
+
+	struct Grapple_API MeshComponent
+	{
+		Grapple_COMPONENT;
+
+		MeshComponent();
+		MeshComponent(AssetHandle mesh, AssetHandle material);
+
+		AssetHandle Mesh;
+		AssetHandle Material;
 	};
 }
