@@ -418,7 +418,7 @@ namespace Grapple
 			else if (text[charIndex] == '\n')
 			{
 				position.x = 0;
-				position.y -= fontScale * metrics.lineHeight + lineHeightOffset;
+				position.y -= fontScale * (float)metrics.lineHeight + lineHeightOffset;
 				continue;
 			}
 			else if (!std::isspace(text[charIndex]))
