@@ -3,6 +3,7 @@
 #include "GrappleCore/Core.h"
 #include "Grapple/Renderer/RenderData.h"
 #include "Grapple/Renderer/Viewport.h"
+#include "Grapple/Renderer/RenderPass.h"
 
 #include "Grapple/Renderer/VertexArray.h"
 #include "Grapple/Renderer/Material.h"
@@ -25,6 +26,9 @@ namespace Grapple
 		static Ref<const VertexArray> GetFullscreenQuad();
 
 		static void DrawMesh(const Ref<VertexArray>& mesh, const Ref<Material>& material, size_t indicesCount = SIZE_MAX);
+
+		static void AddRenderPass(Scope<RenderPass> pass);
+		static void ExecuteRenderPasses();
 
 		static Viewport& GetMainViewport();
 		static Viewport& GetCurrentViewport();

@@ -97,6 +97,8 @@ namespace Grapple
 
 		m_World.GetSystemsManager().ExecuteGroup(m_2DRenderingGroup);
 
+		Renderer::ExecuteRenderPasses();
+
 		Renderer2D::End();
 		RenderCommand::SetDepthTestEnabled(true);
 	}
