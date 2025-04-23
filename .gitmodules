@@ -16,3 +16,9 @@
 [submodule "Grapple/vendor/ImGuizmo"]
 	path = Grapple/vendor/ImGuizmo
 	url = git@github.com:CedricGuillemet/ImGuizmo.git
+[submodule ".\\Grapple\\vendor\\msdf/msdf-atlas-gen"]
+	path = .\\Grapple\\vendor\\msdf/msdf-atlas-gen
+	url = git@github.com:Chlumsky/msdf-atlas-gen.git
+[submodule ".\\Grapple\\vendor\\msdf\\freetype\\"]
+	path = .\\Grapple\\vendor\\msdf\\freetype\\
+	url = git@github.com:freetype/freetype.git
