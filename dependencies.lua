@@ -9,6 +9,8 @@ print(vulkan_sdk)
 local vulkan_include = vulkan_sdk .. "/include/"
 local vulkan_lib = vulkan_sdk .. "/lib/"
 
+local assimp_path = "%{wks.location}/Grapple/vendor/assimp/assimp/"
+
 INCLUDE_DIRS = {
 	GLAD = "%{wks.location}/Grapple/vendor/GLAD/include",
 	GLFW = "%{wks.location}/Grapple/vendor/GLFW/include",
@@ -19,6 +21,11 @@ INCLUDE_DIRS = {
 	imguizmo = "%{wks.location}/Grapple/vendor/ImGuizmo/",
 	yaml_cpp = "%{wks.location}/Grapple/vendor/yaml-cpp/include/",
 	vulkan_sdk = vulkan_include,
+
+	msdf_gen = "%{wks.location}/Grapple/vendor/msdf/msdf-atlas-gen/msdfgen",
+	msdf_atlas_gen = "%{wks.location}/Grapple/vendor/msdf/msdf-atlas-gen/msdf-atlas-gen",
+
+	assimp = assimp_path .. "/include/",
 }
 
 LIBRARIES = {
@@ -31,4 +38,10 @@ LIBRARIES = {
 	shaderc_release = vulkan_lib .. "shaderc_shared.lib",
 	spriv_cross_release = vulkan_lib .. "spirv-cross-core.lib",
 	spriv_cross_glsl_release = vulkan_lib .. "spirv-cross-glsl.lib",
+
+	assimp_debug = assimp_path .. "/lib/Debug/assimp-vc143-mtd.lib",
+	assimp_release = assimp_path .. "/lib/Release/assimp-vc143-mtd.lib",
+
+	assimp_zlib_debug = assimp_path .. "contrib/zlib/Debug/zlibstaticd.lib",
+	assimp_zlib_release = assimp_path .. "contrib/zlib/Release/zlibstatic.lib",
 }

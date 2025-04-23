@@ -112,6 +112,7 @@ namespace Grapple
 		{
 			m_PrefabEditor->Open(handle);
 		});
+
 	}
 
 	void EditorLayer::OnDetach()

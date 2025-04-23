@@ -80,4 +80,3 @@ project "GrappleEditor"
 		defines "Grapple_DIST"
 		runtime "Release"
 		optimize "on"
-
