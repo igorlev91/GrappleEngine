@@ -61,7 +61,7 @@ namespace Grapple
 		SpriteRenderFlags Flags;
 	};
 
-	struct SpriteLayer
+	struct Grapple_API SpriteLayer
 	{
 		Grapple_COMPONENT;
 
@@ -71,7 +71,7 @@ namespace Grapple
 		int32_t Layer;
 	};
 
-	struct MaterialComponent
+	struct Grapple_API MaterialComponent
 	{
 		Grapple_COMPONENT;
 
@@ -79,5 +79,16 @@ namespace Grapple
 		MaterialComponent(AssetHandle handle);
 
 		AssetHandle Material;
+	};
+
+	struct Grapple_API TextComponent
+	{
+		Grapple_COMPONENT;
+
+		TextComponent();
+		TextComponent(std::string_view text, const glm::vec4& color = glm::vec4(1.0f));
+
+		std::string Text;
+		glm::vec4 Color;
 	};
 }

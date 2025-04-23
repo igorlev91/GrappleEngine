@@ -1,32 +1,32 @@
 local build_tool = require("BuildTool")
 
-project "FlareEditor"
+project "GrappleEditor"
     kind "ConsoleApp"
 	language "C++"
 	cppdialect "C++17"
 	staticruntime "off"
 
-	build_tool.add_module_ref("Flare")
-	build_tool.add_module_ref("FlarePlatform")
-	build_tool.add_module_ref("FlareCore")
-	build_tool.add_module_ref("FlareECS")
+	build_tool.add_module_ref("Grapple")
+	build_tool.add_module_ref("GrapplePlatform")
+	build_tool.add_module_ref("GrappleCore")
+	build_tool.add_module_ref("GrappleECS")
 
     files
     {
         "src/**.h",
         "src/**.cpp",
 
-		"%{wks.location}/Flare/vendor/ImGuizmo/ImGuizmo.h",
-		"%{wks.location}/Flare/vendor/ImGuizmo/ImGuizmo.cpp",
+		"%{wks.location}/Grapple/vendor/ImGuizmo/ImGuizmo.h",
+		"%{wks.location}/Grapple/vendor/ImGuizmo/ImGuizmo.cpp",
     }
 
     includedirs
     {
         "src",
-		"%{wks.location}/Flare/src",
-		"%{wks.location}/FlareCore/src",
-		"%{wks.location}/FlarePlatform/src",
-		"%{wks.location}/FlareECS/src",
+		"%{wks.location}/Grapple/src",
+		"%{wks.location}/GrappleCore/src",
+		"%{wks.location}/GrapplePlatform/src",
+		"%{wks.location}/GrappleECS/src",
 
 		INCLUDE_DIRS.msdf_gen,
 		INCLUDE_DIRS.msdf_atlas_gen,
@@ -41,12 +41,12 @@ project "FlareEditor"
 
 	links
 	{
-		"Flare",
+		"Grapple",
 		"GLFW",
 		"ImGUI",
-		"FlareCore",
-		"FlarePlatform",
-		"FlareECS",
+		"GrappleCore",
+		"GrapplePlatform",
+		"GrappleECS",
 		"yaml-cpp",
 	}
 
@@ -57,7 +57,7 @@ project "FlareEditor"
 
 	debugargs
 	{
-		"%{wks.location}/Sandbox/Sandbox.flareproj"
+		"%{wks.location}/Sandbox/Sandbox.Grappleproj"
 	}
 
 	targetdir("%{wks.location}/bin/" .. OUTPUT_DIRECTORY)
@@ -67,17 +67,17 @@ project "FlareEditor"
 		systemversion "latest"
 
 	filter "configurations:Debug"
-		defines "FLARE_DEBUG"
+		defines "Grapple_DEBUG"
 		runtime "Debug"
 		symbols "on"
 
 	filter "configurations:Release"
-		defines "FLARE_RELEASE"
+		defines "Grapple_RELEASE"
 		runtime "Release"
 		optimize "on"
 
 	filter "configurations:Dist"
-		defines "FLARE_DIST"
+		defines "Grapple_DIST"
 		runtime "Release"
 		optimize "on"
 

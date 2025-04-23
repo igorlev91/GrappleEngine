@@ -4,6 +4,7 @@
 #include "Grapple/Core/Application.h"
 #include "Grapple/Renderer2D/Renderer2D.h"
 #include "Grapple/Renderer/Renderer.h"
+#include "Grapple/Renderer/Font.h"
 
 #include "Grapple/AssetManager/AssetManager.h"
 
@@ -55,6 +56,9 @@ namespace Grapple
 	{
 		m_PropertiesWindow.OnAttach();
 		ImGuiLayer::OnAttach();
+
+		Ref<Font> defaultFont = CreateRef<Font>("assets/Fonts/Roboto/Roboto-Regular.ttf");
+		Font::SetDefault(defaultFont);
 
 		Project::OnProjectOpen.Bind(Grapple_BIND_EVENT_CALLBACK(OnOpenProject));
 		Project::OnUnloadActiveProject.Bind([this]()

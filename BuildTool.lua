@@ -57,6 +57,8 @@ M.setup_project = function(name)
 	includedirs({
 		root .. "Grapple/vendor/spdlog/include",
 		root .. "Grapple/vendor/glm",
+		root .. "Grapple/vendor/msdf/msdf-atlas-gen/msdf-atlas-gen",
+		root .. "Grapple/vendor/msdf/msdf-atlas-gen/msdfgen",
 	})
 
 	filter "configurations:not Dist"

@@ -17,6 +17,9 @@ namespace Grapple
 		virtual void OnConfig(SystemConfig& config) override {}
 		virtual void OnUpdate(SystemExecutionContext& context) override;
 	private:
+		void RenderQuads(SystemExecutionContext& context);
+		void RenderText(SystemExecutionContext& context);
+	private:
 		struct EntityQueueElement
 		{
 			Entity Id;
@@ -25,6 +28,7 @@ namespace Grapple
 		};
 
 		Query m_SpritesQuery;
+		Query m_TextQuery;
 		std::vector<EntityQueueElement> m_SortedEntities;
 	};
 }

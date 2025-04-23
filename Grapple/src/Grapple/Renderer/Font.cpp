@@ -7,6 +7,8 @@
 
 namespace Grapple
 {
+    static Ref<Font> s_DefualtFont = nullptr;
+
 	Font::Font(const std::filesystem::path& path)
 	{
         msdfgen::FreetypeHandle* freetype = msdfgen::initializeFreetype();
@@ -84,4 +86,14 @@ namespace Grapple
 
         msdfgen::deinitializeFreetype(freetype);
 	}
+
+    Ref<Font> Font::GetDefault()
+    {
+        return s_DefualtFont;
+    }
+
+    void Font::SetDefault(const Ref<Font>& font)
+    {
+        s_DefualtFont = font;
+    }
 }

@@ -28,6 +28,7 @@ group "Dependencies"
     include "Grapple/vendor/GLAD"
     include "Grapple/vendor/ImGUI"
     include "Grapple/vendor/yaml-cpp"
+	include "Grapple/vendor/msdf/MSDF.Build.lua"
 group ""
 
 group "Core"

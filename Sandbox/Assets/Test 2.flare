@@ -118,3 +118,10 @@ Entities:
         Flags: 0
       - Name: struct Grapple::MaterialComponent
         Material: 8220382724088785445
+  - Components:
+      - Name: struct Grapple::TransformComponent
+        Position: [0, 0, 0]
+        Rotation: [0, 0, 0]
+        Scale: [1, 1, 1]
+      - Name: struct Grapple::TextComponent
+        Text: Hello world
