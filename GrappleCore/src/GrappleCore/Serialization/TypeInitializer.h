@@ -44,6 +44,7 @@ namespace Grapple
         UInt4,
 
         Array,
+        String,
 
         Custom,
     };
@@ -129,6 +130,8 @@ namespace Grapple
     GET_FIELD_DATA(glm::uvec2, Grapple::SerializableFieldType::UInt2);
     GET_FIELD_DATA(glm::uvec3, Grapple::SerializableFieldType::UInt3);
     GET_FIELD_DATA(glm::uvec4, Grapple::SerializableFieldType::UInt4);
+
+    GET_FIELD_DATA(std::string, Grapple::SerializableFieldType::String);
 
 #undef GET_FIELD_DATA
 
