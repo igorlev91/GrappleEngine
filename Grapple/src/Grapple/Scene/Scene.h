@@ -5,6 +5,7 @@
 
 #include "Grapple/Renderer/RenderData.h"
 #include "Grapple/Renderer/Viewport.h"
+#include "Grapple/Renderer/Font.h"
 
 #include "Grapple/Scene/SceneRenderer.h"
 
