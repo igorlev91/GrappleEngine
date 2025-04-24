@@ -41,5 +41,7 @@ namespace Grapple
 
 		static Viewport& GetMainViewport();
 		static Viewport& GetCurrentViewport();
+
+		static Ref<Texture> GetWhiteTexture();
 	};
 }

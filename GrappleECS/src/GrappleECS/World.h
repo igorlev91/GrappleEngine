@@ -117,7 +117,7 @@ namespace Grapple
 		{
 			auto result = Entities.GetSingletonComponent(COMPONENT_ID(T));
 			if (result.has_value())
-				return *(T*)result.value();
+				return (T*)result.value();
 			return {};
 		}
 
