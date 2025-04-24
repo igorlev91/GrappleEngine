@@ -45,6 +45,7 @@ namespace Grapple
 		SystemGroupId m_OnRuntimeEndGroup;
 
 		Query m_CameraDataUpdateQuery;
+		Query m_DirectionalLightQuery;
 	private:
 		friend SceneSerializer;
 	};

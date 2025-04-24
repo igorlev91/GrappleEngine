@@ -24,6 +24,11 @@ namespace Grapple
 			glm::scale(glm::mat4(1.0f), Scale);
 	}
 
+	glm::vec3 TransformComponent::TransformDirection(const glm::vec3& direction) const
+	{
+		return glm::rotate(glm::quat(glm::radians(Rotation)), direction);
+	}
+
 	Grapple_IMPL_COMPONENT(CameraComponent,
 		Grapple_ENUM_FIELD(CameraComponent, Projection),
 		Grapple_FIELD(CameraComponent, Size),
@@ -122,4 +127,14 @@ namespace Grapple
 
 	MeshComponent::MeshComponent(AssetHandle mesh, AssetHandle material)
 		: Mesh(mesh), Material(material) {}
+
+	Grapple_IMPL_COMPONENT(DirectionalLight,
+		Grapple_FIELD(DirectionalLight, Color),
+		Grapple_FIELD(DirectionalLight, Intensity)
+	);
+	DirectionalLight::DirectionalLight()
+		: Color(1.0f), Intensity(1.0f) {}
+
+	DirectionalLight::DirectionalLight(const glm::vec3& color, float intensity)
+		: Color(color), Intensity(intensity) {}
 }
