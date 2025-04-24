@@ -13,11 +13,18 @@
 
 namespace Grapple
 {
+	struct RendererStatistics
+	{
+		uint32_t DrawCallsCount;
+	};
+
 	class Grapple_API Renderer
 	{
 	public:
 		static void Initialize();
 		static void Shutdown();
+
+		static const RendererStatistics& GetStatistics();
 
 		static void SetMainViewport(Viewport& viewport);
 
