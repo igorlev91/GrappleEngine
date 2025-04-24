@@ -4,6 +4,8 @@
 #include "Grapple/Renderer/RenderData.h"
 #include "Grapple/Renderer/Viewport.h"
 
+#include "GrapplePlatform/Event.h"
+
 #include <glm/glm.hpp>
 
 #include <string>
@@ -19,6 +21,7 @@ namespace Grapple
 	public:
 		virtual void OnRenderImGui();
 		virtual void OnRenderViewport();
+		virtual void OnEvent(Event& event) {}
 
 		const RenderData& GetRenderData() const { return m_Viewport.FrameData; }
 
