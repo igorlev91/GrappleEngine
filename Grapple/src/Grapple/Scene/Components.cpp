@@ -4,12 +4,21 @@
 
 namespace Grapple
 {
+	Grapple_IMPL_COMPONENT(NameComponent, Grapple_FIELD(NameComponent, Value));
+	NameComponent::NameComponent() {}
+
+	NameComponent::NameComponent(std::string_view name)
+		: Value(name) {}
+
+	NameComponent::~NameComponent()
+	{
+	}
+
 	Grapple_IMPL_COMPONENT(TransformComponent,
 		Grapple_FIELD(TransformComponent, Position),
 		Grapple_FIELD(TransformComponent, Rotation),
 		Grapple_FIELD(TransformComponent, Scale),
 	);
-
 	TransformComponent::TransformComponent()
 		: Position(glm::vec3(0.0f)),
 		  Rotation(glm::vec3(0.0f)),

@@ -13,6 +13,17 @@
 
 namespace Grapple
 {
+	struct Grapple_API NameComponent
+	{
+		Grapple_COMPONENT;
+
+		NameComponent();
+		NameComponent(std::string_view name);
+		~NameComponent();
+
+		std::string Value;
+	};
+
 	struct Grapple_API TransformComponent
 	{
 		Grapple_COMPONENT;
