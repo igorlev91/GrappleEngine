@@ -6,9 +6,9 @@
 
 #include <stdint.h>
 
-namespace Grapple
+namespace Grapple	
 {
-	struct EntityDataStorage
+	struct GrappleECS_API EntityDataStorage
 	{
 	public:
 		EntityDataStorage();
