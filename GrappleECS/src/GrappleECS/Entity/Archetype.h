@@ -21,7 +21,7 @@ namespace Grapple
 	struct GrappleECS_API ArchetypeRecord
 	{
 		size_t Id;
-
+		
 		std::vector<ComponentId> Components; // Sorted
 		std::vector<size_t> ComponentOffsets;
 
