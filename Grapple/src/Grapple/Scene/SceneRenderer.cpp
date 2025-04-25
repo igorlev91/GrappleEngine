@@ -8,8 +8,8 @@ namespace Grapple
 {
 	SpritesRendererSystem::SpritesRendererSystem()
 	{
-		m_SpritesQuery = World::GetCurrent().CreateQuery<With<TransformComponent>, With<SpriteComponent>>();
-		m_TextQuery = World::GetCurrent().CreateQuery<With<TransformComponent>, With<TextComponent>>();
+		m_SpritesQuery = World::GetCurrent().NewQuery().With<TransformComponent, SpriteComponent>().Create();
+		m_TextQuery = World::GetCurrent().NewQuery().With<TransformComponent, TextComponent>().Create();
 	}
 
 	void SpritesRendererSystem::OnUpdate(SystemExecutionContext& context)
@@ -112,7 +112,7 @@ namespace Grapple
 
 	MeshesRendererSystem::MeshesRendererSystem()
 	{
-		m_Query = World::GetCurrent().CreateQuery<With<TransformComponent>, With<MeshComponent>>();
+		m_Query = World::GetCurrent().NewQuery().With<TransformComponent, MeshComponent>().Create();
 	}
 
 	void MeshesRendererSystem::OnConfig(SystemConfig& config) {}

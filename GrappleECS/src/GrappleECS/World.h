@@ -10,6 +10,7 @@
 #include "GrappleECS/Entity/Archetypes.h"
 
 #include "GrappleECS/Query/QueryFilters.h"
+#include "GrappleECS/Query/QueyrBuilder.h"
 #include "GrappleECS/Query/Query.h"
 
 #include "GrappleECS/System/SystemsManager.h"
@@ -121,11 +122,9 @@ namespace Grapple
 			return {};
 		}
 
-		template<typename... T>
-		constexpr Query CreateQuery()
+		inline QueryBuilder NewQuery()
 		{
-			FilteredComponentsGroup<T...> components;
-			return m_Queries.AddQuery(ComponentSet(components.GetComponents().data(), components.GetComponents().size()));
+			return QueryBuilder(m_Queries);
 		}
 
 		static World& GetCurrent();
