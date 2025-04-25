@@ -6,6 +6,8 @@
 #include "Grapple/Renderer/Renderer.h"
 #include "Grapple/Renderer/Font.h"
 
+#include "Grapple/Renderer/PostProcessing/ToneMapping.h"
+
 #include "Grapple/AssetManager/AssetManager.h"
 
 #include "Grapple/Project/Project.h"
@@ -20,6 +22,7 @@
 #include "GrappleEditor/AssetManager/EditorAssetManager.h"
 
 #include "GrappleEditor/ImGui/ImGuiLayer.h"
+#include "GrappleEditor/UI/EditorGUI.h"
 #include "GrappleEditor/UI/SceneViewportWindow.h"
 #include "GrappleEditor/UI/EditorTitleBar.h"
 #include "GrappleEditor/UI/ProjectSettingsWindow.h"
@@ -204,6 +207,21 @@ namespace Grapple
 			{
 				const auto& stats = Renderer::GetStatistics();
 				ImGui::Text("Draw calls %d", stats.DrawCallsCount);
+			}
+
+			if (ImGui::CollapsingHeader("Post Processing"))
+			{
+				auto postProcessing = Scene::GetActive()->GetPostProcessingManager();
+				Ref<ToneMapping> toneMapping = postProcessing.ToneMappingPass;
+
+				if (ImGui::CollapsingHeader("Tone Mapping"))
+				{
+					if (EditorGUI::BeginPropertyGrid())
+					{
+						EditorGUI::BoolPropertyField("Enabled", toneMapping->Enabled);
+						EditorGUI::EndPropertyGrid();
+					}
+				}
 			}
 
 			ImGui::End();
