@@ -26,6 +26,9 @@ project "Grapple"
 		"%{wks.location}/GrapplePlatform/src/",
 		"%{wks.location}/GrappleECS/src/",
 
+		INCLUDE_DIRS.msdf_gen,
+		INCLUDE_DIRS.msdf_atlas_gen,
+
 		INCLUDE_DIRS.GLAD,
 		INCLUDE_DIRS.GLFW,
 		INCLUDE_DIRS.glm,
@@ -34,6 +37,9 @@ project "Grapple"
 		INCLUDE_DIRS.imguizmo,
 		INCLUDE_DIRS.yaml_cpp,
 		INCLUDE_DIRS.imgui,
+
+		INCLUDE_DIRS.vulkan_sdk,
+		INCLUDE_DIRS.assimp,
 	}
 
 	links
@@ -44,7 +50,10 @@ project "Grapple"
 		"GrappleECS",
 		"GrappleCore",
 		"GrapplePlatform",
-		"yaml-cpp"
+		"yaml-cpp",
+
+		"msdfgen",
+		"msdf-atlas-gen",
 	}
 
 	defines
@@ -73,3 +82,26 @@ project "Grapple"
 		defines "Grapple_DIST"
 		runtime "Release"
 		optimize "on"
+
+	filter "configurations:Debug"
+		links
+		{
+			LIBRARIES.shaderc_debug,
+			LIBRARIES.spriv_cross_glsl_debug,
+			LIBRARIES.spriv_cross_debug,
+			LIBRARIES.spriv_tools_debug,
+
+			LIBRARIES.assimp_debug,
+			LIBRARIES.assimp_zlib_debug,
+		}
+
+	filter "configurations:Release or Dist"
+		links
+		{
+			LIBRARIES.shaderc_release,
+			LIBRARIES.spriv_cross_glsl_release,
+			LIBRARIES.spriv_cross_release,
+
+			LIBRARIES.assimp_release,
+			LIBRARIES.assimp_zlib_release,
+		}

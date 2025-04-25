@@ -8,6 +8,8 @@ namespace Grapple
 	class Grapple_API Vignette : public RenderPass
 	{
 	public:
+		Grapple_TYPE;
+
 		Vignette();
 
 		void OnRender(RenderingContext& context) override;

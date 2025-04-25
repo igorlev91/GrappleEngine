@@ -8,6 +8,8 @@ namespace Grapple
 	class Grapple_API ToneMapping : public RenderPass
 	{
 	public:
+		Grapple_TYPE;
+
 		ToneMapping();
 
 		void OnRender(RenderingContext& context) override;

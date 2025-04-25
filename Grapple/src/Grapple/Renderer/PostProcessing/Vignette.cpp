@@ -5,6 +5,13 @@
 
 namespace Grapple
 {
+	Grapple_IMPL_TYPE(Vignette,
+		Grapple_FIELD(Vignette, Enabled),
+		Grapple_FIELD(Vignette, Color),
+		Grapple_FIELD(Vignette, Radius),
+		Grapple_FIELD(Vignette, Smoothness),
+	);
+
 	Vignette::Vignette()
 		: Enabled(false), Color(0.0f, 0.0f, 0.0f, 0.5f), Radius(1.0f), Smoothness(1.0f)
 	{

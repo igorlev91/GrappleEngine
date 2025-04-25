@@ -5,6 +5,8 @@
 
 namespace Grapple
 {
+	Grapple_IMPL_TYPE(ToneMapping, Grapple_FIELD(ToneMapping, Enabled));
+
 	ToneMapping::ToneMapping()
 		: Enabled(false)
 	{
