@@ -142,6 +142,17 @@ namespace Sandbox
 					entityIndex++;
 				}
 			}
+
+			Grapple_INFO("Deleted entities:");
+			for (EntityView view : m_DeletionQuery)
+			{
+				for (EntityViewIterator entity = view.begin(); entity != view.end(); ++entity)
+				{
+					auto id = view.GetEntity(entity.GetEntityIndex());
+					if (id.has_value())
+						Grapple_INFO("{}", id->GetIndex());
+				}
+			}
 		}
 	private:
 		Query m_Query;

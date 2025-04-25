@@ -11,6 +11,9 @@
 #include "GrappleECS/Entity/Archetypes.h"
 #include "GrappleECS/Entity/EntityIndex.h"
 
+#include "GrappleECS/EntityStorage/EntityStorage.h"
+#include "GrappleECS/EntityStorage/DeletedEntitiesStorage.h"
+
 #include "GrappleECS/Query/QueryCache.h"
 
 #include <unordered_map>
@@ -76,7 +79,11 @@ namespace Grapple
 
 		EntityStorage& GetEntityStorage(ArchetypeId archetype);
 		const EntityStorage& GetEntityStorage(ArchetypeId archetype) const;
-		const EntityDataStorage& GetDeletedEntityStorage(ArchetypeId archetype) const;
+
+		DeletedEntitiesStorage& GetDeletedEntityStorage(ArchetypeId archetype);
+		const DeletedEntitiesStorage& GetDeletedEntityStorage(ArchetypeId archetype) const;
+
+		void ClearQueuedForDeletion();
 
 		// Component operations
 
@@ -127,7 +134,7 @@ namespace Grapple
 		Components& m_Components;
 
 		std::vector<EntityStorage> m_EntityStorages;
-		std::vector<EntityDataStorage> m_DeletedEntitiesStorages;
+		std::vector<DeletedEntitiesStorage> m_DeletedEntitiesStorages;
 
 		std::vector<EntityRecord> m_EntityRecords;
 		std::unordered_map<Entity, size_t> m_EntityToRecord;

@@ -12,7 +12,7 @@ namespace Grapple
 	using QueryId = size_t;
 	constexpr QueryId INVALID_QUERY_ID = SIZE_MAX;
 
-	enum class QueryTarget
+	enum class QueryTarget : uint8_t
 	{
 		AllEntities,
 		DeletedEntities,

@@ -57,5 +57,7 @@ namespace Grapple
 			other.DeletionQueryReferences = 0;
 			return *this;
 		}
+
+		constexpr bool IsUsedInDeletionQuery() const { return DeletionQueryReferences > 0; }
 	};
 }
