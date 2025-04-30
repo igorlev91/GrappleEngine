@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Grapple/Renderer/RenderPass.h"
-#include "Grapple/Renderer/Shader.h"
+#include "Grapple/Renderer/Material.h"
 
 namespace Grapple
 {
@@ -16,6 +16,6 @@ namespace Grapple
 	public:
 		bool Enabled;
 	private:
-		Ref<Shader> m_Shader;
+		Ref<Material> m_Material;
 	};
 }
