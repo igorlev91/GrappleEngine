@@ -14,6 +14,7 @@ namespace Grapple
 
     void CommandContext::SetEntity(FutureEntity futureEntity, Entity entity)
     {
-        Grapple_CORE_ASSERT(m_Storage.Write<Entity>(futureEntity.Location, entity));
+        bool result = m_Storage.Write<Entity>(futureEntity.Location, entity);
+        Grapple_CORE_ASSERT(result);
     }
 }
