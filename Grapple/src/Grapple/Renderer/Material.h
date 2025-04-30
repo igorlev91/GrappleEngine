@@ -2,9 +2,19 @@
 
 #include "Grapple/AssetManager/Asset.h"
 #include "Grapple/Renderer/Shader.h"
+#include "Grapple/Renderer/RendererAPI.h"
 
 namespace Grapple
 {
+	struct MaterialFeatures
+	{
+		MaterialFeatures()
+			: Culling(CullingMode::Back), DepthTesting(true) {}
+
+		CullingMode Culling;
+		bool DepthTesting;
+	};
+
 	class Grapple_API Material : public Asset
 	{
 	public:
@@ -42,10 +52,11 @@ namespace Grapple
 		void SetShaderParameters();
 	private:
 		void Initialize();
+	public:
+		MaterialFeatures Features;
 	private:
 		Ref<Shader> m_Shader;
 
-		size_t m_ShaderParametersCount;
 		size_t m_BufferSize;
 		uint8_t* m_Buffer;
 	};

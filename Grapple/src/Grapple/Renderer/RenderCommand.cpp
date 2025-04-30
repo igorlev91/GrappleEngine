@@ -48,4 +48,9 @@ namespace Grapple
 	{
 		s_API->SetDepthTestEnabled(enabled);
 	}
+
+	void RenderCommand::SetCullingMode(CullingMode mode)
+	{
+		s_API->SetCullingMode(mode);
+	}
 }

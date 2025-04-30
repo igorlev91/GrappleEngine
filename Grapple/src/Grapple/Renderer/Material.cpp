@@ -37,7 +37,6 @@ namespace Grapple
 	void Material::Initialize()
 	{
 		const ShaderParameters& parameters = m_Shader->GetParameters();
-		m_ShaderParametersCount = parameters.size();
 
 		for (const auto& param : parameters)
 			m_BufferSize += param.Offset;
@@ -61,7 +60,7 @@ namespace Grapple
 	void Material::SetIntArray(uint32_t index, const int32_t* values, uint32_t count)
 	{
 		const ShaderParameters& parameters = m_Shader->GetParameters();
-		Grapple_CORE_ASSERT((size_t)index < m_ShaderParametersCount);
+		Grapple_CORE_ASSERT((size_t)index < parameters.size());
 		memcpy_s(m_Buffer + parameters[index].Offset, parameters[index].Size, values, sizeof(*values) * count);
 	}
 
@@ -74,7 +73,7 @@ namespace Grapple
 			Ref<OpenGLShader> glShader = As<OpenGLShader>(m_Shader);
 			glShader->Bind();
 
-			if (m_ShaderParametersCount == 0)
+			if (parameters.size() == 0)
 				return;
 			
 			Grapple_CORE_ASSERT(m_Buffer);
