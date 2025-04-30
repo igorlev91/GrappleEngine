@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Grapple/Renderer/Shader.h"
+#include "Grapple/Renderer/Material.h"
 #include "Grapple/Renderer/VertexArray.h"
 
 #include "GrappleECS/Entity/Entity.h"
@@ -29,7 +30,7 @@ namespace Grapple
 	private:
 		EditorCamera& m_Camera;
 		Ref<Shader> m_SelectionOutlineShader;
-		Ref<Shader> m_GridShader;
+		Ref<Material> m_GridMaterial;
 		Ref<FrameBuffer> m_ScreenBuffer;
 		Ref<FrameBuffer> m_FinalImageBuffer;
 	};
