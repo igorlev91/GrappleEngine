@@ -1,15 +1,15 @@
 #include "QuickSearch.h"
 
-#include "Grapple/AssetManager/AssetManager.h"
+#include "Flare/AssetManager/AssetManager.h"
 
-#include "GrappleEditor/AssetManager/EditorAssetManager.h"
-#include "GrappleEditor/UI/EditorGUI.h"
+#include "FlareEditor/AssetManager/EditorAssetManager.h"
+#include "FlareEditor/UI/EditorGUI.h"
 
 #include <wchar.h>
 
-#include "GrappleEditor/ImGui/ImGuiLayer.h"
+#include "FlareEditor/ImGui/ImGuiLayer.h"
 
-namespace Grapple
+namespace Flare
 {
 	static QuickSearch* s_Instance = nullptr;
 
@@ -128,7 +128,7 @@ namespace Grapple
 
 	QuickSearch& QuickSearch::GetInstance()
 	{
-		Grapple_CORE_ASSERT(s_Instance);
+		FLARE_CORE_ASSERT(s_Instance);
 		return *s_Instance;
 	}
 

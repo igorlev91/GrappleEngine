@@ -456,7 +456,7 @@ namespace Grapple
 		Ref<Shader> shader = material->GetShader();
 		Grapple_CORE_ASSERT(shader);
 
-		std::optional<uint32_t> texturesParameterIndex = shader->GetParameterIndex("u_Textures");
+		std::optional<uint32_t> texturesParameterIndex = shader->GetPropertyIndex("u_Textures");
 
 		if (texturesParameterIndex.has_value())
 			material->SetIntArray(texturesParameterIndex.value(), slots, s_Renderer2DData.TextureIndex);
