@@ -1,15 +1,15 @@
 #include "QuickSearch.h"
 
-#include "Flare/AssetManager/AssetManager.h"
+#include "Grapple/AssetManager/AssetManager.h"
 
-#include "FlareEditor/AssetManager/EditorAssetManager.h"
-#include "FlareEditor/UI/EditorGUI.h"
+#include "GrappleEditor/AssetManager/EditorAssetManager.h"
+#include "GrappleEditor/UI/EditorGUI.h"
 
 #include <wchar.h>
 
-#include "FlareEditor/ImGui/ImGuiLayer.h"
+#include "GrappleEditor/ImGui/ImGuiLayer.h"
 
-namespace Flare
+namespace Grapple
 {
 	static QuickSearch* s_Instance = nullptr;
 
@@ -41,9 +41,9 @@ namespace Flare
 
 			m_AssetSearchResult.clear();
 			
-			for (const auto& [key, value] : assetRegistry)
+			for (const auto& [key, entry] : assetRegistry)
 			{
-				const wchar_t* path = value.Path.c_str();
+				const wchar_t* path = entry.Metadata.Path.c_str();
 				size_t pathLength = wcslen(path);
 
 				if (pathLength < m_CurrentInput.size())
@@ -128,7 +128,7 @@ namespace Flare
 
 	QuickSearch& QuickSearch::GetInstance()
 	{
-		FLARE_CORE_ASSERT(s_Instance);
+		Grapple_CORE_ASSERT(s_Instance);
 		return *s_Instance;
 	}
 
