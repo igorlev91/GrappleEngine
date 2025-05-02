@@ -12,8 +12,9 @@
 #include "GrappleEditor/UI/PropertiesWindow.h"
 #include "GrappleEditor/UI/AssetManagerWindow.h"
 
-#include "GrappleEditor/UI//EditorTitleBar.h"
+#include "GrappleEditor/UI/EditorTitleBar.h"
 #include "GrappleEditor/UI/PrefabEditor.h"
+#include "GrappleEditor/UI/QuickSearch/QuickSearch.h"
 
 #include "GrappleEditor/ViewportWindow.h"
 #include "GrappleEditor/EditorCamera.h"
@@ -86,6 +87,7 @@ namespace Grapple
 		SceneWindow m_SceneWindow;
 		PropertiesWindow m_PropertiesWindow;
 		AssetManagerWindow m_AssetManagerWindow;
+		QuickSearch m_QuickSearch;
 
 		std::vector<Ref<ViewportWindow>> m_ViewportWindows;
 		glm::vec4 m_ClearColor = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);

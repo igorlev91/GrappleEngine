@@ -39,6 +39,8 @@ namespace Grapple
 		void ReloadPrefabs();
 
 		void RemoveFromRegistry(AssetHandle handle);
+
+		inline const std::map<AssetHandle, AssetMetadata>& GetRegistry() const { return m_Registry; }
 	private:
 		Ref<Asset> LoadAsset(const AssetMetadata& metadata);
 
