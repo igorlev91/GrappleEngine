@@ -25,6 +25,7 @@ namespace Grapple
 		static void Shutdown();
 
 		static const RendererStatistics& GetStatistics();
+		static void ClearStatistics();
 
 		static void SetMainViewport(Viewport& viewport);
 
