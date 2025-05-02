@@ -175,6 +175,24 @@ namespace YAML
 			return true;
 		}
 	};
+
+	template<>
+	struct convert<Grapple::UUID>
+	{
+		static Node encode(const Grapple::UUID& id)
+		{
+			return Node((uint64_t)id);
+		}
+
+		static bool decode(const Node& node, Grapple::UUID& out)
+		{
+			if (!node.IsScalar())
+				return false;
+
+			out = node.as<uint64_t>();
+			return true;
+		}
+	};
 }
 
 inline YAML::Emitter& operator<<(YAML::Emitter& emitter, const glm::vec2& vector)
@@ -224,5 +242,11 @@ inline YAML::Emitter& operator<<(YAML::Emitter& emitter, const glm::ivec4& vecto
 inline YAML::Emitter& operator<<(YAML::Emitter& emitter, Grapple::AssetHandle handle)
 {
 	emitter << (uint64_t)handle;
+	return emitter;
+}
+
+inline YAML::Emitter& operator<<(YAML::Emitter& emitter, Grapple::UUID id)
+{
+	emitter << (uint64_t)id;
 	return emitter;
 }
