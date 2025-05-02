@@ -34,6 +34,8 @@ namespace Grapple
 	public:
 		static QuickSearch& GetInstance();
 	private:
+		void CollectMatchedAssets();
+
 		void Close();
 		void ClearResult();
 	private:
