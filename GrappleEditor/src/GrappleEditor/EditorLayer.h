@@ -71,6 +71,8 @@ namespace Grapple
 		inline ECSContext& GetECSContext() { return m_ECSContext; }
 		inline const ECSContext& GetECSContext() const { return m_ECSContext; }
 
+		inline const std::vector<Ref<ViewportWindow>>& GetViewportWindows() const { return m_ViewportWindows; }
+
 		static EditorLayer& GetInstance();
 	private:
 		void UpdateWindowTitle();
