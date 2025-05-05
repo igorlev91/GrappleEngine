@@ -1,0 +1,48 @@
+Entities:
+  - Components:
+      - Name: struct Grapple::CameraComponent
+        Projection: 1
+        Size: 10
+        FOV: 60
+        Near: 0.100000001
+        Far: 1000
+      - Name: struct Grapple::TransformComponent
+        Position: [0, 0, 0]
+        Rotation: [0, 0, 0]
+        Scale: [1, 1, 1]
+      - Name: struct Grapple::NameComponent
+        Value: Camera
+  - Components:
+      - Name: struct Grapple::DirectionalLight
+        Color: [1, 1, 1]
+        Intensity: 3
+      - Name: struct Grapple::TransformComponent
+        Position: [-4.48597717, 0, -9.83735752]
+        Rotation: [-111.439842, -18.9467926, 60.1869926]
+        Scale: [0.999998093, 0.999999642, 0.999998391]
+      - Name: struct Grapple::NameComponent
+        Value: Light
+  - Components:
+      - Name: struct Grapple::MeshComponent
+        Mesh: 10342322337781790464
+        Material: 13576769737354600278
+      - Name: struct Grapple::TransformComponent
+        Position: [-1.41076672, 0.391516805, -8.93382263]
+        Rotation: [0, -0, 0]
+        Scale: [1, 1, 1]
+  - Components:
+      - Name: struct Grapple::MeshComponent
+        Mesh: 10342322337781790464
+        Material: 13576769737354600278
+      - Name: struct Grapple::TransformComponent
+        Position: [-1.41076672, 0, -8.93382263]
+        Rotation: [0, -0, 0]
+        Scale: [10, 0.100000001, 10]
+PostProcessing:
+  - Name: class Grapple::ToneMapping
+    Enabled: false
+  - Name: class Grapple::Vignette
+    Enabled: false
+    Color: [0, 0, 0, 0.5]
+    Radius: 1
+    Smoothness: 1
