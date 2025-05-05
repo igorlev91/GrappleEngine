@@ -14,34 +14,25 @@ namespace Grapple
 		Front,
 	};
 
-	inline const char* CullingModeToString(CullingMode mode)
+	enum class DepthComparisonFunction : uint8_t
 	{
-		switch (mode)
-		{
-		case CullingMode::Front:
-			return "Front";
-		case CullingMode::Back:
-			return "Back";
-		case CullingMode::None:
-			return "None";
-		}
+		Less,
+		Greater,
 
-		Grapple_CORE_ASSERT(false, "Unhandled culling mode");
-		return nullptr;
-	}
+		LessOrEqual,
+		GreaterOrEqual,
 
-	inline CullingMode CullinModeFromString(std::string_view mode)
-	{
-		if (mode == "None")
-			return CullingMode::None;
-		if (mode == "Front")
-			return CullingMode::Front;
-		if (mode == "Back")
-			return CullingMode::Back;
-		
-		Grapple_CORE_ASSERT(false, "Invalid culling mode");
-		return CullingMode::None;
-	}
+		Equal,
+		NotEqual,
+
+		Never,
+		Always,
+	};
+
+	Grapple_API const char* CullingModeToString(CullingMode mode);
+	Grapple_API CullingMode CullinModeFromString(std::string_view mode);
+	Grapple_API const char* DepthComparisonFunctionToString(DepthComparisonFunction function);
+	Grapple_API std::optional<DepthComparisonFunction> DepthComparisonFunctionFromString(std::string_view function);
 
 	class Grapple_API RendererAPI
 	{
@@ -60,6 +51,7 @@ namespace Grapple
 
 		virtual void SetDepthTestEnabled(bool enabled) = 0;
 		virtual void SetCullingMode(CullingMode mode) = 0;
+		virtual void SetDepthComparisonFunction(DepthComparisonFunction function) = 0;
 
 		virtual void SetLineWidth(float width) = 0;
 
