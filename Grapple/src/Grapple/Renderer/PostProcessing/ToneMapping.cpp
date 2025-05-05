@@ -1,7 +1,10 @@
 #include "Tonemapping.h"
 
+#include "Grapple/AssetManager/AssetManager.h"
+
 #include "Grapple/Renderer/Renderer.h"
 #include "Grapple/Renderer/RenderCommand.h"
+#include "Grapple/Renderer/ShaderLibrary.h"
 
 namespace Grapple
 {
@@ -10,7 +13,14 @@ namespace Grapple
 	ToneMapping::ToneMapping()
 		: Enabled(false)
 	{
-		m_Material = CreateRef<Material>(Shader::Create("assets/Shaders/AcesToneMapping.glsl"));
+		std::optional<AssetHandle> shaderHandle = ShaderLibrary::FindShader("AcesToneMapping");
+		if (!shaderHandle || !AssetManager::IsAssetHandleValid(shaderHandle.value()))
+		{
+			Grapple_CORE_ERROR("ToneMapping: Failed to find ToneMapping shader");
+			return;
+		}
+
+		m_Material = CreateRef<Material>(AssetManager::GetAsset<Shader>(shaderHandle.value()));
 		m_Material->Features.DepthTesting = false;
 	}
 
