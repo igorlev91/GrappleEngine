@@ -1,6 +1,8 @@
 #include "EditorCamera.h"
 
 #include "GrappleCore/Log.h"
+#include "Grapple/Input/InputManager.h"
+
 #include "GrapplePlatform/Events.h"
 
 #define GLM_ENABLE_EXPERIMENTAL
@@ -49,7 +51,14 @@ namespace Grapple
 
 		dispatcher.Dispatch<MouseMoveEvent>([this](MouseMoveEvent& event) -> bool
 		{
+			bool isControlled = InputManager::IsMouseButtonHeld(MouseCode::ButtonMiddle);
+
 			glm::vec2 delta = event.GetPosition() - m_ViewportPosition - m_PreviousMousePosition;
+
+			if (isControlled && !m_IsControlled)
+				delta = glm::vec2(0, 0);
+
+			m_IsControlled = isControlled;
 
 			if (m_IsControlled && !m_IsMoved)
 				Rotate(delta);
