@@ -16,6 +16,7 @@ namespace Grapple
 	struct RendererStatistics
 	{
 		uint32_t DrawCallsCount;
+		uint32_t DrawCallsSavedByInstances;
 	};
 
 	class Grapple_API Renderer
@@ -30,9 +31,8 @@ namespace Grapple
 		static void SetMainViewport(Viewport& viewport);
 
 		static void BeginScene(Viewport& viewport);
+		static void Flush();
 		static void EndScene();
-
-		static Ref<const VertexArray> GetFullscreenQuad();
 
 		static void DrawFullscreenQuad(const Ref<Material>& material);
 		static void DrawMesh(const Ref<VertexArray>& mesh, const Ref<Material>& material, size_t indicesCount = SIZE_MAX);
@@ -44,6 +44,9 @@ namespace Grapple
 		static Viewport& GetMainViewport();
 		static Viewport& GetCurrentViewport();
 
+		static Ref<const VertexArray> GetFullscreenQuad();
 		static Ref<Texture> GetWhiteTexture();
+	private:
+		static void FlushInstances();
 	};
 }

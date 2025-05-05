@@ -84,6 +84,8 @@ namespace Grapple
 
 			scene->OnRender(m_Viewport);
 			
+			Renderer::Flush();
+
 			m_ScreenBuffer->Unbind();
 			m_Viewport.RenderTarget = m_FinalImageBuffer;
 			m_Viewport.RenderTarget->Blit(m_ScreenBuffer, 0, 0);
@@ -121,9 +123,9 @@ namespace Grapple
 				RenderCommand::DrawIndexed(Renderer::GetFullscreenQuad());
 			}
 
-			m_Viewport.RenderTarget->Unbind();
-
 			Renderer::EndScene();
+
+			m_Viewport.RenderTarget->Unbind();
 		}
 	}
 
@@ -151,8 +153,6 @@ namespace Grapple
 		if (!m_IsFocused)
 			return;
 
-		m_Camera.ProcessEvents(event);
-
 		EventDispatcher dispatcher(event);
 		dispatcher.Dispatch<KeyReleasedEvent>([this](KeyReleasedEvent& e) -> bool
 		{
@@ -175,6 +175,17 @@ namespace Grapple
 			EditorLayer::GetInstance().Guizmo = guizmoMode;
 			return false;
 		});
+
+		if (!m_IsHovered)
+		{
+			// Block the scroll event when the window is not hovered, to dsiallow camera zooming
+			dispatcher.Dispatch<MouseScrollEvent>([this](MouseScrollEvent& e) -> bool
+			{
+				return true;
+			});
+		}
+
+		m_Camera.ProcessEvents(event);
 	}
 
 	void SceneViewportWindow::CreateFrameBuffer()
