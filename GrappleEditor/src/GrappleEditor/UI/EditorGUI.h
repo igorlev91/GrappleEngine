@@ -8,6 +8,8 @@
 #include "GrappleECS/Entity/Entity.h"
 #include "GrappleECS/World.h"
 
+#include "GrappleEditor/ImGui/ImGuiLayer.h"
+
 namespace Grapple
 {
 	constexpr char* ENTITY_PAYLOAD_NAME = "ENTITY_PAYLOAD";
@@ -17,6 +19,8 @@ namespace Grapple
 	public:
 		static bool BeginPropertyGrid();
 		static void EndPropertyGrid();
+
+		static void MoveCursor(ImVec2 offset);
 
 		static bool BeginMenu(const char* name);
 		static void EndMenu();
