@@ -56,6 +56,7 @@ namespace Grapple
 	{
 		CameraData Camera;
 		LightData Light;
+		CameraData LightView;
 		bool IsEditorCamera = false;
 	};
 }
