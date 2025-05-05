@@ -20,6 +20,7 @@
 
 #include "GrappleEditor/Serialization/SceneSerializer.h"
 #include "GrappleEditor/AssetManager/EditorAssetManager.h"
+#include "GrappleEditor/AssetManager/EditorShaderCache.h"
 
 #include "GrappleEditor/ImGui/ImGuiLayer.h"
 #include "GrappleEditor/UI/EditorGUI.h"
@@ -69,6 +70,8 @@ namespace Grapple
 
     void EditorLayer::OnAttach()
     {
+        ShaderCacheManager::SetInstance(CreateScope<EditorShaderCache>());
+
         m_PropertiesWindow.OnAttach();
         ImGuiLayer::OnAttach();
 
