@@ -8,9 +8,10 @@
 
 namespace Grapple
 {
-	ShaderSourceParser::ShaderSourceParser(std::string_view shaderSource)
+	ShaderSourceParser::ShaderSourceParser(const std::filesystem::path& shaderPath, std::string_view shaderSource)
 		: m_ShaderSource(shaderSource),
 		m_ReadPosition(0),
+		m_ShaderPath(shaderPath),
 		m_CurrentBlockIndex(UINT32_MAX) {}
 
 	void ShaderSourceParser::Parse()
@@ -38,7 +39,7 @@ namespace Grapple
 					shaderType = ShaderStageType::Pixel;
 				else
 				{
-					Grapple_CORE_ERROR("Unknown shader type {}", shaderTypeString.value().Value);
+					Grapple_CORE_ERROR("{}: Unknown shader type {}", m_ShaderPath.string(), shaderTypeString.value().Value);
 					break;
 				}
 
