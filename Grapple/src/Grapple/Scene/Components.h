@@ -2,6 +2,7 @@
 
 #include "Grapple.h"
 #include "Grapple/Renderer2D/Renderer2D.h"
+#include "Grapple/Renderer/Renderer.h"
 
 #include "Grapple/Renderer/Mesh.h"
 #include "Grapple/Renderer/Material.h"
@@ -112,11 +113,12 @@ namespace Grapple
 	{
 		Grapple_COMPONENT;
 
-		MeshComponent();
-		MeshComponent(AssetHandle mesh, AssetHandle material);
+		MeshComponent(MeshRenderFlags flags = MeshRenderFlags::None);
+		MeshComponent(AssetHandle mesh, AssetHandle material, MeshRenderFlags flags = MeshRenderFlags::None);
 
 		AssetHandle Mesh;
 		AssetHandle Material;
+		MeshRenderFlags Flags;
 	};
 
 	struct Grapple_API DirectionalLight

@@ -1,7 +1,5 @@
 #include "Components.h"
 
-#include "Grapple/Renderer/Renderer.h"
-
 namespace Grapple
 {
 	Grapple_IMPL_COMPONENT(NameComponent, Grapple_FIELD(NameComponent, Value));
@@ -119,6 +117,7 @@ namespace Grapple
 		: Material(handle) {}
 
 
+
 	Grapple_IMPL_COMPONENT(TextComponent,
 		Grapple_FIELD(TextComponent, Text),
 		Grapple_FIELD(TextComponent, Font),
@@ -129,15 +128,20 @@ namespace Grapple
 	TextComponent::TextComponent(std::string_view text, const glm::vec4& color, AssetHandle font)
 		: Text(text), Color(color), Font(font) {}
 
+
+
 	Grapple_IMPL_COMPONENT(MeshComponent,
 		Grapple_FIELD(MeshComponent, Mesh),
-		Grapple_FIELD(MeshComponent, Material)
+		Grapple_FIELD(MeshComponent, Material),
+		Grapple_ENUM_FIELD(MeshComponent, Flags),
 	);
-	MeshComponent::MeshComponent()
-		: Mesh(NULL_ASSET_HANDLE), Material(NULL_ASSET_HANDLE) {}
+	MeshComponent::MeshComponent(MeshRenderFlags flags)
+		: Mesh(NULL_ASSET_HANDLE), Material(NULL_ASSET_HANDLE), Flags(flags) {}
 
-	MeshComponent::MeshComponent(AssetHandle mesh, AssetHandle material)
-		: Mesh(mesh), Material(material) {}
+	MeshComponent::MeshComponent(AssetHandle mesh, AssetHandle material, MeshRenderFlags flags)
+		: Mesh(mesh), Material(material), Flags(flags) {}
+
+
 
 	Grapple_IMPL_COMPONENT(DirectionalLight,
 		Grapple_FIELD(DirectionalLight, Color),

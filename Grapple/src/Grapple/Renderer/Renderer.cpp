@@ -5,6 +5,7 @@
 #include "Grapple/Renderer/UniformBuffer.h"
 #include "Grapple/Renderer/ShaderLibrary.h"
 #include "Grapple/Renderer2D/Renderer2D.h"
+#include "Grapple/Renderer/Renderer.h"
 
 #include "Grapple/Project/Project.h"
 
@@ -21,6 +22,7 @@ namespace Grapple
 		Ref<Mesh> Mesh;
 		Ref<Material> Material;
 		glm::mat4 Transform;
+		MeshRenderFlags Flags;
 		int32_t EntityIndex;
 	};
 
@@ -205,6 +207,9 @@ namespace Grapple
 
 		for (const RenderableObject& object : s_RendererData.Queue)
 		{
+			if (shadowPass && HAS_BIT(object.Flags, MeshRenderFlags::DontCastShadows))
+				continue;
+
 			if (object.Mesh->GetSubMesh().InstanceBuffer == nullptr)
 				object.Mesh->SetInstanceBuffer(s_RendererData.InstanceBuffer);
 
@@ -310,7 +315,7 @@ namespace Grapple
 		s_RendererData.CurrentViewport->RenderTarget->SetWriteMask(previousMask);
 	}
 
-	void Renderer::DrawMesh(const Ref<Mesh>& mesh, const Ref<Material>& material, const glm::mat4& transform, int32_t entityIndex)
+	void Renderer::DrawMesh(const Ref<Mesh>& mesh, const Ref<Material>& material, const glm::mat4& transform, MeshRenderFlags flags, int32_t entityIndex)
 	{
 		if (s_RendererData.ErrorMaterial == nullptr)
 			return;
@@ -322,6 +327,7 @@ namespace Grapple
 		else
 			object.Material = s_RendererData.ErrorMaterial;
 
+		object.Flags = flags;
 		object.Mesh = mesh;
 		object.Transform = transform;
 		object.EntityIndex = entityIndex;
