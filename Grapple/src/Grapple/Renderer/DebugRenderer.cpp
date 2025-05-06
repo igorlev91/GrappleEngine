@@ -2,11 +2,16 @@
 
 #include "GrappleCore/Assert.h"
 
+#include "Grapple/AssetManager/AssetManager.h"
+
 #include "Grapple/Renderer/Renderer.h"
 #include "Grapple/Renderer/VertexArray.h"
 #include "Grapple/Renderer/Buffer.h"
 #include "Grapple/Renderer/RenderCommand.h"
+#include "Grapple/Renderer/ShaderLibrary.h"
 #include "Grapple/Renderer/Shader.h"
+
+#include "Grapple/Project/Project.h"
 
 namespace Grapple
 {
@@ -47,6 +52,15 @@ namespace Grapple
 	constexpr uint32_t VerticesPerLine = 2;
 	constexpr uint32_t VerticesPerRay = 7;
 	constexpr uint32_t IndicesPerRay = 9;
+
+	static void ReloadShader()
+	{
+		s_DebugRendererData.DebugShader = nullptr;
+
+		AssetHandle debugShaderHandle = ShaderLibrary::FindShader("Debug").value_or(NULL_ASSET_HANDLE);
+		if (AssetManager::IsAssetHandleValid(debugShaderHandle))
+			s_DebugRendererData.DebugShader = AssetManager::GetAsset<Shader>(debugShaderHandle);
+	}
 
 	void DebugRenderer::Initialize(uint32_t maxLinesCount)
 	{
@@ -103,9 +117,6 @@ namespace Grapple
 
 		s_DebugRendererData.FrameData = nullptr;
 
-		s_DebugRendererData.DebugShader = Shader::Create("assets/Shaders/Debug.glsl");
-
-
 		s_DebugRendererData.RaysCount = 0;
 		s_DebugRendererData.LinesCount = 0;
 
@@ -115,6 +126,8 @@ namespace Grapple
 
 		s_DebugRendererData.RaysBufferBase = new Vertex[s_DebugRendererData.MaxRaysCount * VerticesPerRay];
 		s_DebugRendererData.RaysBuffer = s_DebugRendererData.RaysBufferBase;
+
+		Project::OnProjectOpen.Bind(ReloadShader);
 	}
 
 	void DebugRenderer::Shutdown()
@@ -212,12 +225,14 @@ namespace Grapple
 	void DebugRenderer::FlushLines()
 	{
 		Grapple_CORE_ASSERT(s_DebugRendererData.FrameData);
-		s_DebugRendererData.LinesVertexBuffer->SetData(s_DebugRendererData.LinesBufferBase, sizeof(Vertex) * VerticesPerLine * s_DebugRendererData.LinesCount);
 
-		s_DebugRendererData.DebugShader->Bind();
-		//s_DebugRendererData.DebugShader->SetMatrix4("u_ViewProjection", s_DebugRendererData.FrameData->Camera.ViewProjection);
-
-		RenderCommand::DrawLines(s_DebugRendererData.LinesMesh, s_DebugRendererData.LinesCount * VerticesPerLine);
+		if (s_DebugRendererData.DebugShader)
+		{
+			s_DebugRendererData.LinesVertexBuffer->SetData(s_DebugRendererData.LinesBufferBase, sizeof(Vertex) * VerticesPerLine * s_DebugRendererData.LinesCount);
+			s_DebugRendererData.DebugShader->Bind();
+		
+			RenderCommand::DrawLines(s_DebugRendererData.LinesMesh, s_DebugRendererData.LinesCount * VerticesPerLine);
+		}
 
 		s_DebugRendererData.LinesCount = 0;
 		s_DebugRendererData.LinesBuffer = s_DebugRendererData.LinesBufferBase;
@@ -226,12 +241,14 @@ namespace Grapple
 	void DebugRenderer::FlushRays()
 	{
 		Grapple_CORE_ASSERT(s_DebugRendererData.FrameData);
-		s_DebugRendererData.RayVertexBuffer->SetData(s_DebugRendererData.RaysBufferBase, sizeof(Vertex) * VerticesPerRay * s_DebugRendererData.RaysCount);
 
-		s_DebugRendererData.DebugShader->Bind();
-		//s_DebugRendererData.DebugShader->SetMatrix4("u_ViewProjection", s_DebugRendererData.FrameData->Camera.ViewProjection);
+		if (s_DebugRendererData.DebugShader)
+		{
+			s_DebugRendererData.RayVertexBuffer->SetData(s_DebugRendererData.RaysBufferBase, sizeof(Vertex) * VerticesPerRay * s_DebugRendererData.RaysCount);
+			s_DebugRendererData.DebugShader->Bind();
 
-		RenderCommand::DrawIndexed(s_DebugRendererData.RaysMesh, s_DebugRendererData.RaysCount * IndicesPerRay);
+			RenderCommand::DrawIndexed(s_DebugRendererData.RaysMesh, s_DebugRendererData.RaysCount * IndicesPerRay);
+		}
 
 		s_DebugRendererData.RaysCount = 0;
 		s_DebugRendererData.RaysBuffer = s_DebugRendererData.RaysBufferBase;
