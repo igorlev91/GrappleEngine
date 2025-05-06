@@ -25,6 +25,7 @@ namespace Grapple
 		virtual void SetDepthTestEnabled(bool enabled) = 0;
 		virtual void SetCullingMode(CullingMode mode) = 0;
 		virtual void SetDepthComparisonFunction(DepthComparisonFunction function) = 0;
+		virtual void SetDepthWriteEnabled(bool enabled) = 0;
 
 		virtual void SetLineWidth(float width) = 0;
 

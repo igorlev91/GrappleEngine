@@ -145,11 +145,13 @@ namespace Grapple
 			: Blending(BlendMode::Opaque),
 			Culling(CullingMode::Back),
 			DepthFunction(DepthComparisonFunction::Less),
-			DepthTesting(true) {}
+			DepthTesting(true),
+			DepthWrite(true) {}
 
 		BlendMode Blending;
 		CullingMode Culling;
 		DepthComparisonFunction DepthFunction;
 		bool DepthTesting;
+		bool DepthWrite;
 	};
 }

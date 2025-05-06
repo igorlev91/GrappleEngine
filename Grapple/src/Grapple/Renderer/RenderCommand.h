@@ -22,5 +22,6 @@ namespace Grapple
 		static void SetDepthTestEnabled(bool enabled);
 		static void SetCullingMode(CullingMode mode);
 		static void SetDepthComparisonFunction(DepthComparisonFunction function);
+		static void SetDepthWriteEnabled(bool enabled);
 	};
 }

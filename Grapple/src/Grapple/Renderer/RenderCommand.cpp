@@ -63,4 +63,9 @@ namespace Grapple
 	{
 		s_API->SetDepthComparisonFunction(function);
 	}
+
+	void RenderCommand::SetDepthWriteEnabled(bool enabled)
+	{
+		s_API->SetDepthWriteEnabled(enabled);
+	}
 }
