@@ -42,6 +42,8 @@ namespace Grapple
 			memcpy_s(m_Buffer + properties[index].Offset, sizeof(value), &value, properties[index].Size);
 		}
 
+		inline uint8_t* GetPropertiesBuffer() { return m_Buffer; }
+
 		void SetShaderProperties();
 	private:
 		void Initialize();

@@ -3,6 +3,8 @@
 #include "Grapple.h"
 
 #include "Grapple/Scripting/ScriptingEngine.h"
+
+#include "GrappleCore/Serialization/Serialization.h"
 #include "GrappleCore/Serialization/TypeInitializer.h"
 
 #include "GrappleECS/Entity/Entity.h"
@@ -24,6 +26,9 @@ namespace Grapple
 
 		static bool BeginMenu(const char* name);
 		static void EndMenu();
+
+		static bool ObjectField(SerializableObject& object);
+		static bool PropertyField(SerializableProperty& property);
 
 		static bool BoolPropertyField(const char* name, bool& value);
 		static bool IntPropertyField(const char* name, int32_t& value);
