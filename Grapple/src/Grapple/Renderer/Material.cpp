@@ -36,6 +36,9 @@ namespace Grapple
 
 	void Material::Initialize()
 	{
+		if (m_Shader == nullptr)
+			return;
+
 		const ShaderProperties& properties = m_Shader->GetProperties();
 
 		for (const auto& param : properties)
@@ -79,6 +82,9 @@ namespace Grapple
 
 	void Material::SetShaderProperties()
 	{
+		if (!m_Shader)
+			return;
+
 		const ShaderProperties& properties = m_Shader->GetProperties();
 
 		if (RendererAPI::GetAPI() == RendererAPI::API::OpenGL)
