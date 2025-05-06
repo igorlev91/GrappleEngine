@@ -161,6 +161,8 @@ namespace Grapple
 		RenderCommand::Clear();
 	}
 
+	void ViewportWindow::OnAttach() {}
+
 	void ViewportWindow::OnRenderImGui()
 	{
 		if (!ShowWindow)

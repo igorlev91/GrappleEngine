@@ -23,6 +23,8 @@ namespace Grapple
 
 		SceneViewportWindow(EditorCamera& camera);
 
+		virtual void OnAttach() override;
+
 		virtual void OnRenderViewport() override;
 		virtual void OnViewportChanged() override;
 		virtual void OnRenderImGui() override;

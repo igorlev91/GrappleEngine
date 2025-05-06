@@ -59,12 +59,23 @@ namespace Grapple
         size_t size = inputStream.tellg();
         inputStream.seekg(0, std::ios::beg);
 
-        Grapple_CORE_INFO("Reading SPIRV: Size = {}", size);
-
         compiledShader.resize(size / sizeof(uint32_t));
         inputStream.read((char*)compiledShader.data(), size);
 
         return compiledShader;
+    }
+
+    bool EditorShaderCache::HasCache(AssetHandle shaderHandle, ShaderTargetEnvironment targetEnvironment, ShaderStageType stage)
+    {
+        Grapple_CORE_ASSERT(AssetManager::IsAssetHandleValid(shaderHandle));
+
+        const AssetMetadata* assetMetadata = AssetManager::GetAssetMetadata(shaderHandle);
+        Grapple_CORE_ASSERT(assetMetadata);
+
+        std::filesystem::path cacheFile = GetCacheDirectoryPath(shaderHandle)
+            / GetCacheFileName(assetMetadata->Path.filename().string(), targetEnvironment, stage);
+
+        return std::filesystem::exists(cacheFile);
     }
 
     std::filesystem::path EditorShaderCache::GetCacheDirectoryPath(AssetHandle shaderHandle)
