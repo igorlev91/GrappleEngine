@@ -3,7 +3,10 @@
 #include "Grapple/AssetManager/AssetManager.h"
 
 #include "Grapple/Renderer/UniformBuffer.h"
+#include "Grapple/Renderer/ShaderLibrary.h"
 #include "Grapple/Renderer2D/Renderer2D.h"
+
+#include "Grapple/Project/Project.h"
 
 namespace Grapple
 {
@@ -43,9 +46,20 @@ namespace Grapple
 
 		Ref<Mesh> CurrentInstancingMesh = nullptr;
 		Ref<FrameBuffer> ShadowsRenderTarget = nullptr;
+
+		Ref<Material> ErrorMaterial = nullptr;
 	};
 	
 	RendererData s_RendererData;
+
+	static void ReloadShaders()
+	{
+		std::optional<AssetHandle> errorShaderHandle = ShaderLibrary::FindShader("Error");
+		if (errorShaderHandle && AssetManager::IsAssetHandleValid(*errorShaderHandle))
+			s_RendererData.ErrorMaterial = CreateRef<Material>(AssetManager::GetAsset<Shader>(*errorShaderHandle));
+		else
+			Grapple_CORE_ERROR("Renderer: Failed to find Error shader");
+	}
 
 	void Renderer::Initialize()
 	{
@@ -91,6 +105,8 @@ namespace Grapple
 		);
 
 		s_RendererData.ShadowsRenderTarget = FrameBuffer::Create(specs);
+
+		Project::OnProjectOpen.Bind(ReloadShaders);
 	}
 
 	void Renderer::Shutdown()
@@ -295,11 +311,16 @@ namespace Grapple
 
 	void Renderer::DrawMesh(const Ref<Mesh>& mesh, const Ref<Material>& material, const glm::mat4& transform, int32_t entityIndex)
 	{
-		if (!material->GetShader())
+		if (s_RendererData.ErrorMaterial == nullptr)
 			return;
 
 		RenderableObject& object = s_RendererData.Queue.emplace_back();
-		object.Material = material;
+
+		if (material)
+			object.Material = material->GetShader() == nullptr ? s_RendererData.ErrorMaterial : material;
+		else
+			object.Material = s_RendererData.ErrorMaterial;
+
 		object.Mesh = mesh;
 		object.Transform = transform;
 		object.EntityIndex = entityIndex;

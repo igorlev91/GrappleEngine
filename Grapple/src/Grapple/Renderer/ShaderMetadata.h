@@ -37,7 +37,7 @@ namespace Grapple
 	};
 
 	Grapple_API const char* CullingModeToString(CullingMode mode);
-	Grapple_API CullingMode CullingModeFromString(std::string_view mode);
+	Grapple_API std::optional<CullingMode> CullingModeFromString(std::string_view mode);
 
 	Grapple_API const char* DepthComparisonFunctionToString(DepthComparisonFunction function);
 	Grapple_API std::optional<DepthComparisonFunction> DepthComparisonFunctionFromString(std::string_view function);

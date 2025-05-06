@@ -108,7 +108,18 @@ namespace Grapple
         shaderc::SpvCompilationResult shaderModule = compiler.CompileGlslToSpv(source.c_str(), source.size(), programKind, path.c_str(), "main", options);
         if (shaderModule.GetCompilationStatus() != shaderc_compilation_status_success)
         {
-            Grapple_CORE_ERROR("Failed to compile Vulkan GLSL '{0}'", path);
+            std::string_view stageName = "";
+            switch (programKind)
+            {
+            case shaderc_vertex_shader:
+                stageName = "Vertex";
+                break;
+            case shaderc_fragment_shader:
+                stageName = "Pixel";
+                break;
+            }
+
+            Grapple_CORE_ERROR("Failed to compile Vulkan GLSL '{}' Stage = {}", path, stageName);
             Grapple_CORE_ERROR("Shader Error: {0}", shaderModule.GetErrorMessage());
             return {};
         }
@@ -132,7 +143,18 @@ namespace Grapple
         shaderc::SpvCompilationResult shaderModule = compiler.CompileGlslToSpv(glsl, programKind, path.c_str(), options);
         if (shaderModule.GetCompilationStatus() != shaderc_compilation_status_success)
         {
-            Grapple_CORE_ERROR("Failed to compile shader '{0}'", path);
+            std::string_view stageName = "";
+            switch (programKind)
+            {
+            case shaderc_vertex_shader:
+                stageName = "Vertex";
+                break;
+            case shaderc_fragment_shader:
+                stageName = "Pixel";
+                break;
+            }
+
+            Grapple_CORE_ERROR("Failed to compile shader '{}' Stage = {}", path, stageName);
             Grapple_CORE_ERROR("Shader Error: {0}", shaderModule.GetErrorMessage());
             return {};
         }
