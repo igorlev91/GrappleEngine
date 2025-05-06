@@ -7,33 +7,6 @@
 
 namespace Grapple
 {
-	enum class CullingMode : uint8_t
-	{
-		None,
-		Back,
-		Front,
-	};
-
-	enum class DepthComparisonFunction : uint8_t
-	{
-		Less,
-		Greater,
-
-		LessOrEqual,
-		GreaterOrEqual,
-
-		Equal,
-		NotEqual,
-
-		Never,
-		Always,
-	};
-
-	Grapple_API const char* CullingModeToString(CullingMode mode);
-	Grapple_API CullingMode CullinModeFromString(std::string_view mode);
-	Grapple_API const char* DepthComparisonFunctionToString(DepthComparisonFunction function);
-	Grapple_API std::optional<DepthComparisonFunction> DepthComparisonFunctionFromString(std::string_view function);
-
 	class Grapple_API RendererAPI
 	{
 	public:

@@ -2,7 +2,7 @@
 
 #include "GrappleCore/Core.h"
 
-#include "Grapple/Renderer/Shader.h"
+#include "Grapple/Renderer/ShaderMetadata.h"
 
 #include <stdint.h>
 #include <string>
