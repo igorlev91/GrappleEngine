@@ -190,6 +190,8 @@ namespace Grapple
 				}
 			}
 
+			ImGui::BeginDisabled(true);
+
 			EditorGUI::BoolPropertyField("Depth Test", material->Features.DepthTesting);
 			EditorGUI::PropertyName("Culling Mode");
 
@@ -212,7 +214,7 @@ namespace Grapple
 
 			// Blend Mode
 
-			preview = MaterialBlendModeToString(material->Features.BlendMode);
+			preview = BlendModeToString(material->Features.Blending);
 
 			EditorGUI::PropertyName("Blend Mode");
 
@@ -220,9 +222,9 @@ namespace Grapple
 			if (ImGui::BeginCombo("", preview, ImGuiComboFlags_HeightRegular))
 			{
 				if (ImGui::MenuItem("Opaque"))
-					material->Features.BlendMode = MaterialBlendMode::Opaque;
+					material->Features.Blending = BlendMode::Opaque;
 				if (ImGui::MenuItem("Transparent"))
-					material->Features.BlendMode = MaterialBlendMode::Transparent;
+					material->Features.Blending = BlendMode::Transparent;
 
 				ImGui::EndCombo();
 			}
@@ -259,6 +261,8 @@ namespace Grapple
 			}
 
 			ImGui::PopID();
+
+			ImGui::EndDisabled();
 
 			EditorGUI::EndPropertyGrid();
 		}

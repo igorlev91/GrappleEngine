@@ -3,54 +3,10 @@
 #include "Grapple/AssetManager/Asset.h"
 #include "Grapple/Renderer/Shader.h"
 #include "Grapple/Renderer/RendererAPI.h"
+#include "Grapple/Renderer/ShaderMetadata.h"
 
 namespace Grapple
 {
-	enum class MaterialBlendMode
-	{
-		Opaque,
-		Transparent,
-	};
-
-	inline const char* MaterialBlendModeToString(MaterialBlendMode blendMode)
-	{
-		switch (blendMode)
-		{
-		case MaterialBlendMode::Opaque:
-			return "Opaque";
-		case MaterialBlendMode::Transparent:
-			return "Transparent";
-		}
-
-		Grapple_CORE_ASSERT(false, "Unhandled material blend mode");
-		return "";
-	}
-
-	inline MaterialBlendMode MaterialBlendModeFromString(std::string_view string)
-	{
-		if (string == "Opaque")
-			return MaterialBlendMode::Opaque;
-		if (string == "Transparent")
-			return MaterialBlendMode::Transparent;
-
-		Grapple_CORE_ASSERT(false, "Unknown material blend mode");
-		return MaterialBlendMode::Opaque;
-	}
-
-	struct MaterialFeatures
-	{
-		MaterialFeatures()
-			: Culling(CullingMode::Back),
-			BlendMode(MaterialBlendMode::Opaque),
-			DepthTesting(true),
-			DepthFunction(DepthComparisonFunction::Less) {}
-
-		CullingMode Culling;
-		MaterialBlendMode BlendMode;
-		DepthComparisonFunction DepthFunction;
-		bool DepthTesting;
-	};
-
 	class Grapple_API Material : public Asset
 	{
 	public:
@@ -90,7 +46,7 @@ namespace Grapple
 	private:
 		void Initialize();
 	public:
-		MaterialFeatures Features;
+		ShaderFeatures Features;
 	private:
 		Ref<Shader> m_Shader;
 
