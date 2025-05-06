@@ -12,6 +12,8 @@
 
 #include "GrappleEditor/EditorLayer.h"
 
+#include "GrappleEditor/ShaderCompiler/ShaderCompiler.h"
+
 #include "GrappleEditor/AssetManager/TextureImporter.h"
 #include "GrappleEditor/AssetManager/PrefabImporter.h"
 #include "GrappleEditor/Serialization/SceneSerializer.h"
@@ -245,6 +247,15 @@ namespace Grapple
         auto registryIterator = m_Registry.find(handle);
         if (registryIterator == m_Registry.end())
             return;
+
+        if (registryIterator->second.Metadata.Type == AssetType::Shader)
+        {
+            ShaderCompiler::Compile(handle, true);
+
+            Ref<Shader> shader = As<Shader>(m_LoadedAssets[handle]);
+            shader->Load();
+            return;
+        }
 
         LoadAsset(registryIterator->second.Metadata);
     }

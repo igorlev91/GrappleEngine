@@ -10,6 +10,6 @@ namespace Grapple
 	class ShaderCompiler
 	{
 	public:
-		static bool Compile(AssetHandle shaderHandle);
+		static bool Compile(AssetHandle shaderHandle, bool forceRecompile = false);
 	};
 }
