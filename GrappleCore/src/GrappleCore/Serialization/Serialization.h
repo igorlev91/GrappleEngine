@@ -42,6 +42,8 @@ namespace Grapple
 
         String,
 
+        UUID,
+
         Color,
         Texture2D,
 

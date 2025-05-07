@@ -188,6 +188,9 @@ namespace Grapple
 		case SerializablePropertyType::String:
 			result |= EditorGUI::TextProperty(property.Descriptor.Name.c_str(), property.ValueAs<std::string>());
 			break;
+		case SerializablePropertyType::UUID:
+			EditorGUI::UUIDField(property.Descriptor.Name.c_str(), property.ValueAs<UUID>());
+			break;
 		}
 		
 		return result;
@@ -424,6 +427,17 @@ namespace Grapple
 
 		ImGui::TableSetColumnIndex(1);
 		ImGui::PushItemWidth(-1);
+	}
+
+	void EditorGUI::UUIDField(const char* name, UUID uuid)
+	{
+		PropertyName(name);
+
+		float y = ImGui::GetCursorPosY();
+
+		ImGui::SetCursorPosY(y + ImGui::GetStyle().FramePadding.y);
+
+		ImGui::Text("%llu", (uint64_t)uuid);
 	}
 
 	bool EditorGUI::TextureField(const char* name, AssetHandle& textureHandle)

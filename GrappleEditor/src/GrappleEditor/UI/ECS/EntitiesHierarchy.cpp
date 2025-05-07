@@ -6,6 +6,8 @@
 #include "GrappleEditor/UI/EditorGUI.h"
 #include "GrappleEditor/ImGui/ImGuiLayer.h"
 
+#include "GrappleEditor/Serialization/SerializationId.h"
+
 #include <imgui.h>
 
 namespace Grapple
@@ -30,7 +32,7 @@ namespace Grapple
 		if (ImGui::BeginPopupContextWindow("Entity Hierarchy Context Menu"))
 		{
 			if (HAS_BIT(m_Features, EntitiesHierarchyFeatures::CreateEntity) && ImGui::MenuItem("Create Entity"))
-				m_World->CreateEntity<TransformComponent>();
+				m_World->CreateEntity<TransformComponent, SerializationId>();
 
 			ImGui::EndMenu();
 		}

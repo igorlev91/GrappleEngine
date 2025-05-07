@@ -1,5 +1,7 @@
 #include "Serialization.h"
 
+#include "GrappleCore/UUID.h"
+
 #include <glm/glm.hpp>
 
 namespace Grapple
@@ -82,6 +84,8 @@ namespace Grapple
             return sizeof(std::string);
         case SerializablePropertyType::Color:
             return sizeof(glm::vec4);
+        case SerializablePropertyType::UUID:
+            return sizeof(UUID);
         case SerializablePropertyType::Texture2D:
             return 0;
         case SerializablePropertyType::Array:

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GrappleCore/Core.h"
+#include "GrappleCore/UUID.h"
 #include "GrappleCore/Serialization/Serialization.h"
 
 #include <glm/glm.hpp>
@@ -56,6 +57,7 @@ namespace Grapple
     TYPE_TO_PROPERTY_TYPE(glm::uvec4, Grapple::SerializablePropertyType::UIntVector4);
     
     TYPE_TO_PROPERTY_TYPE(std::string, Grapple::SerializablePropertyType::String);
+    TYPE_TO_PROPERTY_TYPE(UUID, Grapple::SerializablePropertyType::UUID);
 
 #undef TYPE_TO_PROPERTY_TYPE
 
