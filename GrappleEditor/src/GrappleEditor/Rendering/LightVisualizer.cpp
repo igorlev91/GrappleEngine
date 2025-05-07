@@ -5,6 +5,8 @@
 #include "Grapple/Scene/Components.h"
 #include "Grapple/Renderer/DebugRenderer.h"
 
+#include "GrappleEditor/EditorLayer.h"
+
 namespace Grapple
 {
 	Grapple_IMPL_SYSTEM(LightVisualizer);
@@ -17,6 +19,9 @@ namespace Grapple
 
 	void LightVisualizer::OnUpdate(SystemExecutionContext& context)
 	{
+		if (!EditorLayer::GetInstance().GetSceneViewSettings().ShowLights)
+			return;
+
 		for (EntityView view : m_Query)
 		{
 			auto transforms = view.View<TransformComponent>();

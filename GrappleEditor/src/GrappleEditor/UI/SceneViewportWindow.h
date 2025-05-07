@@ -11,7 +11,6 @@
 
 namespace Grapple
 {
-
 	class SceneViewportWindow : public ViewportWindow
 	{
 	public:

@@ -2,6 +2,7 @@
 
 #include "GrappleCore/Core.h"
 #include "Grapple/Renderer/RenderData.h"
+#include "Grapple/Math/Math.h"
 
 namespace Grapple
 {
@@ -22,6 +23,7 @@ namespace Grapple
 		static void DrawWireQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color = glm::vec4(1.0f));
 		static void DrawWireQuad(const glm::vec3* corners, const glm::vec4& color = glm::vec4(1.0f));
 		static void DrawFrustum(const glm::mat4& inverseViewProjection, const glm::vec4& color = glm::vec4(1.0f));
+		static void DrawAABB(const Math::AABB& aabb, const glm::vec4& color = glm::vec4(1.0f));
 	private:
 		static void FlushLines();
 		static void FlushRays();

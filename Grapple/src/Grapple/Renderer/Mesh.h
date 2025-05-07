@@ -3,6 +3,7 @@
 #include "Grapple/AssetManager/Asset.h"
 #include "Grapple/Renderer/VertexArray.h"
 #include "Grapple/Renderer/Buffer.h"
+#include "Grapple//Math/Math.h"
 
 namespace Grapple
 {
@@ -15,6 +16,8 @@ namespace Grapple
 		Ref<VertexBuffer> UVs = nullptr;
 
 		Ref<VertexBuffer> InstanceBuffer = nullptr;
+
+		Math::AABB Bounds;
 	};
 
 	class Grapple_API Mesh : public Asset
