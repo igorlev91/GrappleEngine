@@ -74,10 +74,9 @@ layout(std140, binding = 1) uniform DirLight
 
 layout(std140, binding = 2) uniform ShadowData
 {
-	float u_Smoothness;
 	float u_Bias;
-	float u_Resolution;
-	float u_TexelSize;
+	float u_LightFrustumSize;
+	float u_LightSize;
 };
 
 struct VertexData
@@ -129,27 +128,28 @@ const vec2[] POISSON_POINTS = {
 };
 
 const int NUMBER_OF_SAMPLES = 24;
-const float LIGHT_SIZE = 16.0;
+#define LIGHT_SIZE (u_LightSize / u_LightFrustumSize)
 
 float Random(vec2 co)
 {
     return fract(sin(dot(co, vec2(12.9898, 78.233))) * 43758.5453);
 }
 
-float CalculateBlockerDistance(vec3 projectedLightSpacePosition)
+float CalculateBlockerDistance(vec3 projectedLightSpacePosition, vec2 rotation)
 {
 	float receieverDepth = projectedLightSpacePosition.z;
 	float blockerDistance = 0.0;
 	float samplesCount = 0;
-	float searchSize = ((receieverDepth - u_LightNear) * LIGHT_SIZE * u_Smoothness);
-
-	float random = Random(projectedLightSpacePosition.xy);
-	vec2 rotation = vec2(cos(random), sin(random));
+	float searchSize = LIGHT_SIZE * (receieverDepth - u_LightNear) / receieverDepth;
 
 	for (int i = 0; i < NUMBER_OF_SAMPLES; i++)
 	{
-		vec2 offset = searchSize * POISSON_POINTS[i] * u_TexelSize * rotation;
-		float depth = texture(u_ShadowMap, projectedLightSpacePosition.xy + offset).r;
+		vec2 offset = vec2(
+			rotation.x * POISSON_POINTS[i].x - rotation.y * POISSON_POINTS[i].y,
+			rotation.y * POISSON_POINTS[i].x + rotation.x * POISSON_POINTS[i].y
+		);
+
+		float depth = texture(u_ShadowMap, projectedLightSpacePosition.xy + offset * searchSize).r;
 		if (depth - u_Bias < receieverDepth)
 		{
 			samplesCount += 1.0;
@@ -163,16 +163,21 @@ float CalculateBlockerDistance(vec3 projectedLightSpacePosition)
 	return max(0.01, blockerDistance / samplesCount);
 }
 
-float CalculatePCFKernelSize(vec3 projectedLightSpacePosition)
+float PCF(vec2 uv, float receieverDepth, float filterRadius, vec2 rotation)
 {
-	float blockerDistance = CalculateBlockerDistance(projectedLightSpacePosition);
+	float shadow = 0.0f;
+	for (int i = 0; i < NUMBER_OF_SAMPLES; i++)
+	{
+		vec2 offset = vec2(
+			rotation.x * POISSON_POINTS[i].x - rotation.y * POISSON_POINTS[i].y,
+			rotation.y * POISSON_POINTS[i].x + rotation.x * POISSON_POINTS[i].y
+		);
 
-	if (blockerDistance == -1.0)
-		return 1.0;
-
-	float receieverDepth = projectedLightSpacePosition.z;
-	float penumbraWidth = (receieverDepth - blockerDistance) * LIGHT_SIZE * u_Smoothness / blockerDistance;
-	return penumbraWidth;
+		float sampledDepth = texture(u_ShadowMap, uv + offset * filterRadius).r;
+		shadow += (receieverDepth - u_Bias > sampledDepth ? 1.0 : 0.0);
+	}
+	
+	return shadow / NUMBER_OF_SAMPLES;
 }
 
 float CalculateShadow(vec4 lightSpacePosition)
@@ -180,25 +185,25 @@ float CalculateShadow(vec4 lightSpacePosition)
 	vec3 projected = lightSpacePosition.xyz / lightSpacePosition.w;
 	projected = projected * 0.5 + vec3(0.5);
 
-	if (projected.z > 1.0)
+	vec2 uv = projected.xy;
+	float receieverDepth = projected.z;
+
+	if (receieverDepth > 1.0)
 		return 1.0;
 
 	if (projected.x > 1.0 || projected.y > 1.0 || projected.x < 0 || projected.y < 0)
 		return 1.0;
 
-	float PCFKernelSize = max(0.1, CalculatePCFKernelSize(projected));
-	float shadow = 0.0;
-
-	float random = Random(projected.xy);
+	float random = Random(lightSpacePosition.xz) * pi;
 	vec2 rotation = vec2(cos(random), sin(random));
-	for (int i = 0; i < NUMBER_OF_SAMPLES; i++)
-	{
-		float sampledDepth = texture(u_ShadowMap, projected.xy + POISSON_POINTS[i] * u_TexelSize * PCFKernelSize * rotation).r;
-		shadow += (projected.z - u_Bias > sampledDepth ? 1.0 : 0.0);
-	}
-	
-	shadow = shadow / NUMBER_OF_SAMPLES;
-	return 1.0 - shadow;
+
+	float blockerDistance = CalculateBlockerDistance(projected, rotation);
+	if (blockerDistance == -1.0f)
+		return 1.0f;
+
+	float penumbraWidth = (receieverDepth - blockerDistance) / blockerDistance;
+	float filterRadius = penumbraWidth * LIGHT_SIZE * u_LightNear / receieverDepth;
+	return 1.0f - PCF(uv, receieverDepth, filterRadius, rotation);
 }
 
 void main()

@@ -28,10 +28,9 @@ namespace Grapple
 
 	struct ShadowData
 	{
-		float Smoothness;
 		float Bias;
-		float Resolution;
-		float TexelSize;
+		float FrustumSize;
+		float LightSize;
 	};
 
 	struct RendererData
@@ -83,7 +82,7 @@ namespace Grapple
 		s_RendererData.ShadowMappingSettings.MaxDistance = 40.0f;
 		s_RendererData.ShadowMappingSettings.Resolution = 2048;
 		s_RendererData.ShadowMappingSettings.Bias = 0.001f;
-		s_RendererData.ShadowMappingSettings.Smoothness = 2.0f;
+		s_RendererData.ShadowMappingSettings.LightSize = 0.02f;
 
 		float vertices[] = {
 			-1, -1,
@@ -203,11 +202,13 @@ namespace Grapple
 
 		ShadowData shadowData;
 		shadowData.Bias = s_RendererData.ShadowMappingSettings.Bias;
-		shadowData.Resolution = (float)s_RendererData.ShadowMappingSettings.Resolution;
-		shadowData.TexelSize = 1.0f / shadowData.Resolution;
-		shadowData.Smoothness = s_RendererData.ShadowMappingSettings.Smoothness;
+		shadowData.LightSize = s_RendererData.ShadowMappingSettings.LightSize;
 
-		s_RendererData.ShadowDataBuffer->SetData(&shadowData, sizeof(shadowData), 0);
+		shadowData.FrustumSize = 2.0f * s_RendererData.CurrentViewport->FrameData.Camera.Near
+			* glm::tan(glm::radians(s_RendererData.CurrentViewport->FrameData.Camera.FOV / 2.0f))
+			* s_RendererData.CurrentViewport->GetAspectRatio();
+
+ 		s_RendererData.ShadowDataBuffer->SetData(&shadowData, sizeof(shadowData), 0);
 
 		s_RendererData.WhiteTexture->Bind(2);
 
