@@ -145,7 +145,7 @@ namespace Grapple
 	void OpenGLRendererAPI::DrawInstanced(const Ref<const VertexArray>& mesh, size_t instancesCount)
 	{
 		mesh->Bind();
-		glDrawElementsInstanced(GL_TRIANGLES, mesh->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, (const void*)0, instancesCount);
+		glDrawElementsInstanced(GL_TRIANGLES, (int32_t)mesh->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, (const void*)0, (int32_t)instancesCount);
 		mesh->Unbind();
 	}
 

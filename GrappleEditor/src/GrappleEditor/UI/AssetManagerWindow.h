@@ -17,12 +17,6 @@ namespace Grapple
 	class AssetManagerWindow
 	{
 	private:
-		enum class AssetTreeViewMode
-		{
-			All,
-			Registry,
-		};
-
 		struct AssetTreeNode
 		{
 			bool IsDirectory;
@@ -53,13 +47,12 @@ namespace Grapple
 
 		void BuildDirectory(uint32_t parentIndex, const std::filesystem::path& path);
 
-		void OnOpenFile(const AssetTreeNode& node);
+		void OnOpenFile(AssetHandle handle);
 
 		void RenderCreateNewFilePopup();
 	public:
 		Signal<AssetHandle> OnAssetSelectionChanged;
 	private:
-		AssetTreeViewMode m_Mode = AssetTreeViewMode::All;
 		Ref<EditorAssetManager> m_AssetManager;
 
 		uint32_t m_NodeRenderIndex;

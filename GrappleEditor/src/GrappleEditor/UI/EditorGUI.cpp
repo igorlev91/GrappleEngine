@@ -250,7 +250,7 @@ namespace Grapple
 
 	bool EditorGUI::TextField(UUID id, std::string& text)
 	{
-		ImGui::PushID(id);
+		ImGui::PushID((int32_t)(uint64_t)id);
 		bool result = ImGui::InputText("",
 			text.data(),
 			text.size(),
@@ -279,7 +279,12 @@ namespace Grapple
 			const AssetMetadata* metadata = AssetManager::GetAssetMetadata(handle);
 
 			if (metadata != nullptr)
-				ImGui::Button(metadata->Path.filename().string().c_str(), buttonSize);
+			{
+				if (metadata->Name.empty())
+					ImGui::Button(metadata->Path.filename().string().c_str(), buttonSize);
+				else
+					ImGui::Button(metadata->Name.c_str(), buttonSize);
+			}
 			else
 				ImGui::Button("Invalid", buttonSize);
 		}
