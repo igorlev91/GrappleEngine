@@ -6,7 +6,6 @@ namespace Grapple
 
 	void ShaderLibrary::AddShader(const std::string_view& name, AssetHandle handle)
 	{
-		Grapple_CORE_INFO(name);
 		s_ShaderNameToHandle.emplace(name, handle);
 	}
 

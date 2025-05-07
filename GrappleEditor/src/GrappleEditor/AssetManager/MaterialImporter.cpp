@@ -5,6 +5,8 @@
 
 #include "Grapple/Serialization/Serialization.h"
 
+#include "GrappleEditor/AssetManager/EditorAssetManager.h"
+
 #include <fstream>
 #include <yaml-cpp/yaml.h>
 
@@ -81,6 +83,12 @@ namespace Grapple
 
 	Ref<Material> MaterialImporter::ImportMaterial(const AssetMetadata& metadata)
 	{
+		if (metadata.Source == AssetSource::Memory)
+		{
+			As<EditorAssetManager>(AssetManager::GetInstance())->LoadAsset(metadata.Parent);
+			return AssetManager::GetAsset<Material>(metadata.Handle);
+		}
+
 		Ref<Material> material = nullptr;
 
 		try

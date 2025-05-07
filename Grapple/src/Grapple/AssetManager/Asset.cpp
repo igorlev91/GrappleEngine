@@ -4,6 +4,31 @@ namespace Grapple
 {
 	Grapple_IMPL_TYPE(AssetHandle);
 
+	Grapple_API std::string_view AssetSourceToString(AssetSource source)
+	{
+		switch (source)
+		{
+		case AssetSource::File:
+			return "File";
+		case AssetSource::Memory:
+			return "Memory";
+		}
+
+		Grapple_CORE_ASSERT("Unhandled asset source type");
+		return "";
+	}
+
+	Grapple_API AssetSource AssetSourceFromString(std::string_view string)
+	{
+		if (string == "File")
+			return AssetSource::File;
+		if (string == "Memory")
+			return AssetSource::Memory;
+
+		Grapple_CORE_ASSERT("Unknown asset source type '{}'", string);
+		return AssetSource::File;
+	}
+
 	std::string_view AssetTypeToString(AssetType type)
 	{
 		switch (type)

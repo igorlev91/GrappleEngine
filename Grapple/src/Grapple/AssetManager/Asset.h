@@ -44,14 +44,29 @@ namespace Grapple
 		Mesh,
 	};
 
+	enum class AssetSource
+	{
+		File,
+		Memory,
+	};
+
+	Grapple_API std::string_view AssetSourceToString(AssetSource soruce);
+	Grapple_API AssetSource AssetSourceFromString(std::string_view string);
+
 	Grapple_API std::string_view AssetTypeToString(AssetType type);
 	Grapple_API AssetType AssetTypeFromString(std::string_view string);
 
 	struct AssetMetadata
 	{
 		AssetType Type;
+		AssetSource Source;
 		AssetHandle Handle;
+		AssetHandle Parent;
+
+		std::string Name;
 		std::filesystem::path Path;
+
+		std::vector<AssetHandle> SubAssets;
 	};
 
 	class Grapple_API Asset
