@@ -29,8 +29,8 @@ namespace Sandbox
 		AssetHandle PrefabHandle;
 	};
 	Grapple_IMPL_COMPONENT(RotatingQuadData,
-		Grapple_FIELD(RotatingQuadData, RotationSpeed),
-		Grapple_FIELD(RotatingQuadData, PrefabHandle)
+		Grapple_PROPERTY(RotatingQuadData, RotationSpeed),
+		Grapple_PROPERTY(RotatingQuadData, PrefabHandle)
 	);
 
 	struct SomeComponent
@@ -43,8 +43,8 @@ namespace Sandbox
 			: a(100), b(-234) {}
 	};
 	Grapple_IMPL_COMPONENT(SomeComponent,
-		Grapple_FIELD(SomeComponent, a),
-		Grapple_FIELD(SomeComponent, b),
+		Grapple_PROPERTY(SomeComponent, a),
+		Grapple_PROPERTY(SomeComponent, b),
 	);
 
 	struct TestComponent
@@ -55,7 +55,7 @@ namespace Sandbox
 		TestComponent()
 			: a(1000) {}
 	};
-	Grapple_IMPL_COMPONENT(TestComponent, Grapple_FIELD(TestComponent, a));
+	Grapple_IMPL_COMPONENT(TestComponent, Grapple_PROPERTY(TestComponent, a));
 
 	class RotatingQuadSystem : public Grapple::System
 	{

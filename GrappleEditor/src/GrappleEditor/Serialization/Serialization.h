@@ -1,11 +1,15 @@
 #pragma once
 
+#include "GrappleCore/Serialization/Serialization.h"
 #include "GrappleCore/Serialization/TypeInitializer.h"
 
 #include <yaml-cpp/yaml.h>
 
 namespace Grapple
 {
+	void SerializeObject(YAML::Emitter& emitter, const SerializableObject& object);
+	void DeserializeObject(YAML::Node& node, SerializableObject& object);
+
 	void SerializeType(YAML::Emitter& emitter, const TypeInitializer& type, const uint8_t* data);
 	void DeserializeType(YAML::Node& node, const TypeInitializer& type, uint8_t* data);
 

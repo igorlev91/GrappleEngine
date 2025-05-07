@@ -9,10 +9,10 @@
 namespace Grapple
 {
 	Grapple_IMPL_TYPE(Vignette,
-		Grapple_FIELD(Vignette, Enabled),
-		Grapple_FIELD(Vignette, Color),
-		Grapple_FIELD(Vignette, Radius),
-		Grapple_FIELD(Vignette, Smoothness),
+		Grapple_PROPERTY(Vignette, Enabled),
+		Grapple_PROPERTY(Vignette, Color),
+		Grapple_PROPERTY(Vignette, Radius),
+		Grapple_PROPERTY(Vignette, Smoothness),
 	);
 
 	static uint32_t s_ColorPropertyIndex = UINT32_MAX;

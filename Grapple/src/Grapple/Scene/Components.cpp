@@ -2,7 +2,7 @@
 
 namespace Grapple
 {
-	Grapple_IMPL_COMPONENT(NameComponent, Grapple_FIELD(NameComponent, Value));
+	Grapple_IMPL_COMPONENT(NameComponent, Grapple_PROPERTY(NameComponent, Value));
 	NameComponent::NameComponent() {}
 
 	NameComponent::NameComponent(std::string_view name)
@@ -13,9 +13,9 @@ namespace Grapple
 	}
 
 	Grapple_IMPL_COMPONENT(TransformComponent,
-		Grapple_FIELD(TransformComponent, Position),
-		Grapple_FIELD(TransformComponent, Rotation),
-		Grapple_FIELD(TransformComponent, Scale),
+		Grapple_PROPERTY(TransformComponent, Position),
+		Grapple_PROPERTY(TransformComponent, Rotation),
+		Grapple_PROPERTY(TransformComponent, Scale),
 	);
 	TransformComponent::TransformComponent()
 		: Position(glm::vec3(0.0f)),
@@ -37,11 +37,11 @@ namespace Grapple
 	}
 
 	Grapple_IMPL_COMPONENT(CameraComponent,
-		Grapple_ENUM_FIELD(CameraComponent, Projection),
-		Grapple_FIELD(CameraComponent, Size),
-		Grapple_FIELD(CameraComponent, FOV),
-		Grapple_FIELD(CameraComponent, Near),
-		Grapple_FIELD(CameraComponent, Far),
+		Grapple_ENUM_PROPERTY(CameraComponent, Projection),
+		Grapple_PROPERTY(CameraComponent, Size),
+		Grapple_PROPERTY(CameraComponent, FOV),
+		Grapple_PROPERTY(CameraComponent, Near),
+		Grapple_PROPERTY(CameraComponent, Far),
 	);
 
 	CameraComponent::CameraComponent()
@@ -83,10 +83,10 @@ namespace Grapple
 	}
 
 	Grapple_IMPL_COMPONENT(SpriteComponent,
-		Grapple_FIELD(SpriteComponent, Color),
-		Grapple_FIELD(SpriteComponent, TextureTiling),
-		Grapple_FIELD(SpriteComponent, Texture),
-		Grapple_ENUM_FIELD(SpriteComponent, Flags),
+		Grapple_PROPERTY(SpriteComponent, Color),
+		Grapple_PROPERTY(SpriteComponent, TextureTiling),
+		Grapple_PROPERTY(SpriteComponent, Texture),
+		Grapple_ENUM_PROPERTY(SpriteComponent, Flags),
 	);
 
 	SpriteComponent::SpriteComponent()
@@ -101,14 +101,14 @@ namespace Grapple
 		Texture(texture),
 		Flags(SpriteRenderFlags::None) {}
 
-	Grapple_IMPL_COMPONENT(SpriteLayer, Grapple_FIELD(SpriteLayer, Layer));
+	Grapple_IMPL_COMPONENT(SpriteLayer, Grapple_PROPERTY(SpriteLayer, Layer));
 	SpriteLayer::SpriteLayer()
 		: Layer(0) {}
 
 	SpriteLayer::SpriteLayer(int32_t layer)
 		: Layer(layer) {}
 
-	Grapple_IMPL_COMPONENT(MaterialComponent, Grapple_FIELD(MaterialComponent, Material));
+	Grapple_IMPL_COMPONENT(MaterialComponent, Grapple_PROPERTY(MaterialComponent, Material));
 
 	MaterialComponent::MaterialComponent()
 		: Material(NULL_ASSET_HANDLE) {}
@@ -119,8 +119,8 @@ namespace Grapple
 
 
 	Grapple_IMPL_COMPONENT(TextComponent,
-		Grapple_FIELD(TextComponent, Text),
-		Grapple_FIELD(TextComponent, Font),
+		Grapple_PROPERTY(TextComponent, Text),
+		Grapple_PROPERTY(TextComponent, Font),
 	);
 	TextComponent::TextComponent()
 		: Color(1.0f), Font(NULL_ASSET_HANDLE) {}
@@ -131,9 +131,9 @@ namespace Grapple
 
 
 	Grapple_IMPL_COMPONENT(MeshComponent,
-		Grapple_FIELD(MeshComponent, Mesh),
-		Grapple_FIELD(MeshComponent, Material),
-		Grapple_ENUM_FIELD(MeshComponent, Flags),
+		Grapple_PROPERTY(MeshComponent, Mesh),
+		Grapple_PROPERTY(MeshComponent, Material),
+		Grapple_ENUM_PROPERTY(MeshComponent, Flags),
 	);
 	MeshComponent::MeshComponent(MeshRenderFlags flags)
 		: Mesh(NULL_ASSET_HANDLE), Material(NULL_ASSET_HANDLE), Flags(flags) {}
@@ -144,8 +144,8 @@ namespace Grapple
 
 
 	Grapple_IMPL_COMPONENT(DirectionalLight,
-		Grapple_FIELD(DirectionalLight, Color),
-		Grapple_FIELD(DirectionalLight, Intensity)
+		Grapple_PROPERTY(DirectionalLight, Color),
+		Grapple_PROPERTY(DirectionalLight, Intensity)
 	);
 	DirectionalLight::DirectionalLight()
 		: Color(1.0f), Intensity(1.0f) {}
