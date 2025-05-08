@@ -11,7 +11,7 @@
 	#endif
 #endif
 
-#ifdef Grapple_DEBUG
+#if defined(Grapple_DEBUG) || defined(Grapple_RELEASE)
 	#ifdef Grapple_PLATFORM_WINDOWS
 		#define Grapple_DEBUGBREAK __debugbreak()
 	#else

@@ -4,6 +4,8 @@
 #include "GrappleCore/UUID.h"
 #include "GrappleCore/Serialization/Serialization.h"
 
+#include "GrappleCore/Serialization/TypeSerializer.h"
+
 #include <glm/glm.hpp>
 
 namespace Grapple
@@ -104,7 +106,8 @@ namespace Grapple
 
 #define Grapple_SERIALIZABLE_IMPL(typeName, ...) \
     Grapple::SerializableObjectDescriptor typeName::_SerializationDescriptor( \
-        typeid(typeName).name(), sizeof(typeName), { __VA_ARGS__ });
+        typeid(typeName).name(), sizeof(typeName), { __VA_ARGS__ },         \
+        [](void* object, SerializationStream& stream) { Grapple::TypeSerializer<typeName>().OnSerialize(*(typeName*)object, stream); });
 
 #define Grapple_PROPERTY(typeName, propertyName)                                                        \
     Grapple::SerializablePropertyDescriptor(                                                            \

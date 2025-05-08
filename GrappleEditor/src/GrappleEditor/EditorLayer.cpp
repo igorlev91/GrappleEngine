@@ -1,5 +1,9 @@
 #include "EditorLayer.h"
 
+#include "GrappleCore/Profiler/Profiler.h"
+#include "GrappleCore/Serialization/SerializationStream.h"
+#include "GrappleCore/Serialization/Serializer.h"
+
 #include "Grapple.h"
 #include "Grapple/Core/Application.h"
 #include "Grapple/Renderer2D/Renderer2D.h"
@@ -28,18 +32,174 @@
 #include "GrappleEditor/UI/EditorTitleBar.h"
 #include "GrappleEditor/UI/ProjectSettingsWindow.h"
 #include "GrappleEditor/UI/ECS/ECSInspector.h"
-
 #include "GrappleEditor/UI/PrefabEditor.h"
+#include "GrappleEditor/UI/SerializablePropertyRenderer.h"
 
 #include "GrappleEditor/Scripting/BuildSystem/BuildSystem.h"
 
-#include "GrappleCore/Profiler/Profiler.h"
-
 #include <imgui.h>
 #include <imgui_internal.h>
+#include <string_view>
 
 namespace Grapple
 {
+    struct CustomType
+    {
+        Grapple_SERIALIZABLE;
+
+        int32_t IntValue;
+        float FloatValue;
+        glm::vec2 Vector;
+
+        std::vector<int32_t> Ints;
+        std::vector<glm::vec3> Vectors;
+        std::vector<glm::ivec3> IntVectors;
+    };
+
+    struct Outer
+    {
+        Grapple_SERIALIZABLE;
+
+        CustomType t;
+        int32_t a;
+    };
+
+    template<>
+    struct TypeSerializer<CustomType>
+    {
+        void OnSerialize(CustomType& value, SerializationStream& stream)
+        {
+            stream.Serialize("Int", SerializationValue(value.IntValue));
+            stream.Serialize("Float", SerializationValue(value.FloatValue));
+            stream.Serialize("Vector", SerializationValue(value.Vector));
+            stream.Serialize("Ints", SerializationValue(value.Ints));
+            stream.Serialize("Vectors", SerializationValue(value.Vectors));
+            stream.Serialize("IntVectors", SerializationValue(value.IntVectors));
+        }
+    };
+
+    Grapple_SERIALIZABLE_IMPL(CustomType);
+
+    template<>
+    struct TypeSerializer<Outer>
+    {
+        void OnSerialize(Outer& value, SerializationStream& stream)
+        {
+            stream.Serialize("a", SerializationValue(value.a));
+            stream.Serialize("t", SerializationValue(value.t));
+        }
+    };
+
+    Grapple_SERIALIZABLE_IMPL(Outer);
+
+    template<>
+    struct TypeSerializer<TransformComponent>
+    {
+        void OnSerialize(TransformComponent& transform, SerializationStream& stream)
+        {
+            stream.Serialize("Position", SerializationValue(transform.Position));
+            stream.Serialize("Rotation", SerializationValue(transform.Rotation));
+            stream.Serialize("Scale", SerializationValue(transform.Scale));
+        }
+    };
+
+    class TestSerializationStream : public SerializationStreamBase
+    {
+        void SerializeInt32(SerializationValue<int32_t> value) override
+        {
+            Grapple_CORE_INFO("{}", value.IsArray);
+
+            for (size_t i = 0; i < value.Values.GetSize(); i++)
+            {
+                Grapple_CORE_INFO("\t{} = {}", i, value.Values[i]);
+            }
+        }
+
+        void SerializeUInt32(SerializationValue<uint32_t> value) override
+        {
+            Grapple_CORE_INFO("{}", value.IsArray);
+
+            for (size_t i = 0; i < value.Values.GetSize(); i++)
+            {
+                Grapple_CORE_INFO("\t{} = {}", i, value.Values[i]);
+            }
+        }
+
+        void SerializeFloat(SerializationValue<float> value) override
+        {
+            Grapple_CORE_INFO("{} {}", value.IsArray, value.Values[0]);
+        }
+
+        void BeginArray() override
+        {
+            Grapple_CORE_INFO("Begin Array");
+        }
+
+        void EndArray() override
+        {
+            Grapple_CORE_INFO("End Array");
+        }
+
+        void PropertyKey(std::string_view key) override
+        {
+            Grapple_CORE_INFO("Property {}", key);
+        }
+
+        void BeginObject(const SerializableObjectDescriptor* descriptor) override
+        {
+            Grapple_CORE_INFO("Begin Object");
+        }
+
+        void EndObject() override
+        {
+            Grapple_CORE_INFO("End Object");
+        }
+
+        void SerializeFloatVector(SerializationValue<float> value, uint32_t componentsCount) override
+        {
+            char componentNames[] = "xyzw";
+
+            Grapple_CORE_ASSERT(componentsCount <= 4);
+            Grapple_CORE_INFO("Vector{}", componentsCount);
+
+            for (size_t j = 0; j < value.Values.GetSize(); j += (size_t)componentsCount)
+            {
+                if (value.IsArray)
+                    Grapple_CORE_INFO("\t{} = ", j / (size_t)componentsCount);
+
+                for (uint32_t i = 0; i < componentsCount; i++)
+                {
+                    if (value.IsArray)
+                        Grapple_CORE_INFO("\t\t{} = {}", componentNames[i], value.Values[(size_t)i + j]);
+                    else
+                        Grapple_CORE_INFO("\t{} = {}", componentNames[i], value.Values[(size_t)i + j]);
+                }
+            }
+        }
+
+        void SerializeIntVector(SerializationValue<int32_t> value, uint32_t componentsCount) override
+        {
+            char componentNames[] = "xyzw";
+
+            Grapple_CORE_ASSERT(componentsCount <= 4);
+            Grapple_CORE_INFO("Vector{}", componentsCount);
+
+            for (size_t j = 0; j < value.Values.GetSize(); j += (size_t)componentsCount)
+            {
+                if (value.IsArray)
+                    Grapple_CORE_INFO("\t{} = ", j / (size_t)componentsCount);
+
+                for (uint32_t i = 0; i < componentsCount; i++)
+                {
+                    if (value.IsArray)
+                        Grapple_CORE_INFO("\t\t{} = {}", componentNames[i], value.Values[(size_t)i + j]);
+                    else
+                        Grapple_CORE_INFO("\t{} = {}", componentNames[i], value.Values[(size_t)i + j]);
+                }
+            }
+        }
+    };
+
     EditorLayer* EditorLayer::s_Instance = nullptr;
 
     EditorLayer::EditorLayer()
@@ -70,8 +230,29 @@ namespace Grapple
         s_Instance = nullptr;
     }
 
+    static Scope<SerializablePropertyRenderer> s_PropertiesRenderer;
+
     void EditorLayer::OnAttach()
     {
+        s_PropertiesRenderer = CreateScope<SerializablePropertyRenderer>();
+
+        Scope<TestSerializationStream> serializationStream = CreateScope<TestSerializationStream>();
+        SerializationStream stream(*serializationStream);
+
+        CustomType t = { 10, 0.54545f };
+        t.Ints = { 10, 11, 12, 13 };
+        t.Vectors = { glm::vec3(1.0f), glm::vec3(2.0f), glm::vec3(-10.0f) };
+        //stream.Serialize("Object", SerializationValue(t));
+
+        TransformComponent transform;
+        transform.Position = glm::vec3(8, 92, 1);
+        transform.Rotation = glm::vec3(-993, 12, 1);
+        transform.Scale = glm::vec3(10, 10, 20);
+
+        //stream.Serialize("Transform", SerializationValue(transform));
+
+
+
         ShaderCacheManager::SetInstance(CreateScope<EditorShaderCache>());
 
         m_PropertiesWindow.OnAttach();
@@ -207,6 +388,33 @@ namespace Grapple
         ImGui::DockSpace(dockspaceId, ImVec2(0.0f, 0.0f), dockspaceFlags);
 
         m_TitleBar.OnRenderImGui();
+
+        {
+            ImGui::Begin("Test");
+
+            SerializationStream stream(*s_PropertiesRenderer);
+
+            Outer o;
+            o.a = 88;
+            CustomType& t = o.t;
+
+            t.IntValue = 10;
+            t.FloatValue = 0.54545f;
+            t.Ints = { 10, 11, 12, 13 };
+            t.Vector = glm::vec2(1000, -99);
+            t.Vectors = { glm::vec3(1.0f), glm::vec3(2.0f), glm::vec3(-10.0f) };
+            t.IntVectors = { glm::ivec3(1), glm::ivec3(2), glm::ivec3(-993294) };
+
+            TransformComponent transform;
+            transform.Position = glm::vec3(8, 92, 1);
+            transform.Rotation = glm::vec3(-993, 12, 1);
+            transform.Scale = glm::vec3(10, 10, 20);
+
+            stream.Serialize("Outer", SerializationValue(o));
+            stream.Serialize("Transform", SerializationValue(transform));
+
+            ImGui::End();
+        }
 
         {
             ImGui::Begin("Shadows");
