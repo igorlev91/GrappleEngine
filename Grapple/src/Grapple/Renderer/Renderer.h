@@ -24,7 +24,10 @@ namespace Grapple
 	struct RendererStatistics
 	{
 		uint32_t DrawCallsCount;
-		uint32_t DrawCallsSavedByInstances;
+		uint32_t DrawCallsSavedByInstancing;
+
+		uint32_t ObjectsSubmitted;
+		uint32_t ObjectsCulled;
 	};
 
 	struct ShadowSettings

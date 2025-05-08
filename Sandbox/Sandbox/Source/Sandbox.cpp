@@ -84,7 +84,7 @@ namespace Sandbox
 
 				static std::random_device s_Device;
 				static std::mt19937_64 s_Engine(s_Device());
-				static std::uniform_real_distribution<float> s_UniformDistricution;
+				static std::uniform_real_distribution<float> s_UniformDistricution(-50.0f, 50.0f);
 
 				uint32_t op = 0;
 				if (InputManager::IsKeyPressed(KeyCode::D1))
@@ -160,5 +160,5 @@ namespace Sandbox
 		Query m_SingletonQuery;
 		Query m_DeletionQuery;
 	};
-	Grapple_IMPL_SYSTEM(RotatingQuadSystem);
+	//Grapple_IMPL_SYSTEM(RotatingQuadSystem);
 }
