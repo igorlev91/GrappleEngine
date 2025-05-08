@@ -39,6 +39,8 @@ namespace Grapple
 		float LightSize;
 		float Bias;
 		uint32_t Resolution;
+
+		float CascadeSplits[4] = { 0.0f };
 	};
 
 	class Grapple_API Renderer
@@ -73,7 +75,7 @@ namespace Grapple
 		static Ref<const VertexArray> GetFullscreenQuad();
 		static Ref<Texture> GetWhiteTexture();
 
-		static Ref<FrameBuffer> GetShadowsRenderTarget();
+		static Ref<FrameBuffer> GetShadowsRenderTarget(size_t index);
 		static ShadowSettings& GetShadowSettings();
 	private:
 		static void DrawQueued(bool shadowPass);
