@@ -56,6 +56,7 @@ namespace Grapple
 		RendererStatistics Statistics;
 
 		std::vector<RenderableObject> Queue;
+		std::vector<uint32_t> CulledObjectIndices;
 
 		Ref<VertexBuffer> InstanceBuffer = nullptr;
 		std::vector<InstanceData> InstanceDataBuffer;
@@ -253,6 +254,68 @@ namespace Grapple
 			RenderCommand::Clear();
 		}
 		viewport.RenderTarget->Bind();
+
+		// Generate camera frustum planes
+		
+		std::array<glm::vec4, 8> frustumCorners =
+		{
+			// Near
+			glm::vec4(-1.0f, -1.0f, 0.0f, 1.0f),
+			glm::vec4(1.0f, -1.0f, 0.0f, 1.0f),
+			glm::vec4(-1.0f,  1.0f, 0.0f, 1.0f),
+			glm::vec4(1.0f,  1.0f, 0.0f, 1.0f),
+
+			// Far
+			glm::vec4(-1.0f, -1.0f, 1.0f, 1.0f),
+			glm::vec4(1.0f, -1.0f, 1.0f, 1.0f),
+			glm::vec4(-1.0f,  1.0f, 1.0f, 1.0f),
+			glm::vec4(1.0f,  1.0f, 1.0f, 1.0f),
+		};
+
+		for (size_t i = 0; i < frustumCorners.size(); i++)
+		{
+			frustumCorners[i] = viewport.FrameData.Camera.InverseViewProjection * frustumCorners[i];
+			frustumCorners[i] /= frustumCorners[i].w;
+		}
+
+		// Generate camera frustum planes
+		{
+			FrustumPlanes& frustumPlanes = viewport.FrameData.CameraFrustumPlanes;
+
+			// Near
+			frustumPlanes.Planes[FrustumPlanes::NearPlaneIndex] = Math::Plane::TroughPoint(frustumCorners[0], s_RendererData.CurrentViewport->FrameData.Camera.ViewDirection);
+
+			// Far
+			frustumPlanes.Planes[FrustumPlanes::FarPlaneIndex] = Math::Plane::TroughPoint(frustumCorners[4], -s_RendererData.CurrentViewport->FrameData.Camera.ViewDirection);
+
+			// Left (Trough bottom left corner)
+			frustumPlanes.Planes[2] = Math::Plane::TroughPoint(frustumCorners[0], glm::normalize(glm::cross(
+				// Bottom Left Near -> Bottom Left Far
+				(glm::vec3)(frustumCorners[4] - frustumCorners[0]),
+				// Bottom Left Near -> Top Left Near
+				(glm::vec3)(frustumCorners[2] - frustumCorners[0]))));
+
+			// Right (Trough top right corner)
+			frustumPlanes.Planes[3] = Math::Plane::TroughPoint(frustumCorners[1], glm::cross(
+				// Top Right Near -> Top Right Far
+				(glm::vec3)(frustumCorners[7] - frustumCorners[3]),
+				// Top Right Near -> Bottom Right Near
+				(glm::vec3)(frustumCorners[1] - frustumCorners[3])));
+
+			// Top (Trough top right corner)
+			frustumPlanes.Planes[4] = Math::Plane::TroughPoint(frustumCorners[3], glm::cross(
+				// Top Right Near -> Top Left Near
+				(glm::vec3)(frustumCorners[2] - frustumCorners[3]),
+				// Top Right Near -> Top Right Far
+				(glm::vec3)(frustumCorners[7] - frustumCorners[3])));
+
+			// Bottom (Trough bottom left corner)
+			frustumPlanes.Planes[5] = Math::Plane::TroughPoint(frustumCorners[0], glm::cross(
+				// Bottom left near => Bottom right near
+				(glm::vec3)(frustumCorners[1] - frustumCorners[0]),
+				// Bottom left near -> Bottom left far
+				(glm::vec3)(frustumCorners[4] - frustumCorners[0])));
+		}
 	}
 
 	static void ApplyMaterialFeatures(ShaderFeatures features)
@@ -263,8 +326,11 @@ namespace Grapple
 		RenderCommand::SetDepthWriteEnabled(features.DepthWrite);
 	}
 
-	static bool CompareRenderableObjects(const RenderableObject& a, const RenderableObject& b)
+	static bool CompareRenderableObjects(uint32_t aIndex, uint32_t bIndex)
 	{
+		const RenderableObject& a = s_RendererData.Queue[aIndex];
+		const RenderableObject& b = s_RendererData.Queue[bIndex];
+
 		if ((uint64_t)a.Material->Handle < (uint64_t)b.Material->Handle)
 			return true;
 
@@ -277,9 +343,53 @@ namespace Grapple
 		return false;
 	}
 
+	static void PerformFrustumCulling()
+	{
+		std::array<glm::vec3, 8> aabbCorners;
+		Math::AABB objectAABB;
+
+		const FrustumPlanes& planes = s_RendererData.CurrentViewport->FrameData.CameraFrustumPlanes;
+		for (size_t i = 0; i < s_RendererData.Queue.size(); i++)
+		{
+			const RenderableObject& object = s_RendererData.Queue[i];
+			const Math::AABB& meshBounds = object.Mesh->GetSubMesh().Bounds;
+
+			meshBounds.GetCorners(aabbCorners.data());
+
+			for (size_t i = 0; i < 8; i++)
+			{
+				aabbCorners[i] = (glm::vec3)(object.Transform * glm::vec4(aabbCorners[i], 1.0f));
+			}
+
+			bool intersectsFrustum = false;
+
+			objectAABB.Min = aabbCorners[0];
+			objectAABB.Max = aabbCorners[0];
+
+			for (size_t i = 1; i < 8; i++)
+			{
+				objectAABB.Min = glm::min(objectAABB.Min, aabbCorners[i]);
+				objectAABB.Max = glm::max(objectAABB.Max, aabbCorners[i]);
+			}
+
+			bool intersects = true;
+			for (size_t i = 0; i < planes.PlanesCount; i++)
+			{
+				intersects &= objectAABB.IntersectsOrInFrontOfPlane(planes.Planes[i]);
+			}
+
+			if (intersects)
+			{
+				s_RendererData.CulledObjectIndices.push_back((uint32_t)i);
+			}
+		}
+	}
+
 	void Renderer::Flush()
 	{
-		std::sort(s_RendererData.Queue.begin(), s_RendererData.Queue.end(), CompareRenderableObjects);
+		PerformFrustumCulling();
+
+		std::sort(s_RendererData.CulledObjectIndices.begin(), s_RendererData.CulledObjectIndices.end(), CompareRenderableObjects);
 
 		// Bind white texture for each cascade
 		for (size_t i = 0; i < 4; i++)
@@ -324,6 +434,7 @@ namespace Grapple
 		s_RendererData.CurrentViewport->RenderTarget->SetWriteMask(previousMask);
 
 		s_RendererData.InstanceDataBuffer.clear();
+		s_RendererData.CulledObjectIndices.clear();
 		s_RendererData.Queue.clear();
 	}
 
@@ -331,8 +442,10 @@ namespace Grapple
 	{
 		Ref<Material> currentMaterial = nullptr;
 
-		for (const RenderableObject& object : s_RendererData.Queue)
+		for (uint32_t objectIndex : s_RendererData.CulledObjectIndices)
 		{
+			const RenderableObject& object = s_RendererData.Queue[objectIndex];
+
 			if (shadowPass && HAS_BIT(object.Flags, MeshRenderFlags::DontCastShadows))
 				continue;
 

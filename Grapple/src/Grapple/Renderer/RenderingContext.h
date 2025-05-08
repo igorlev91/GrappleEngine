@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Grapple/Math/Math.h"
+
 #include "Grapple/Renderer/FrameBuffer.h"
 #include "Grapple/Renderer/RenderTargetsPool.h"
 

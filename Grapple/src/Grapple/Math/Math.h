@@ -10,9 +10,26 @@ namespace Grapple::Math
 
 	struct Plane
 	{
-		inline static Plane TroughPoint(glm::vec3 point, glm::vec3 planeNormmal)
+		inline float SignedDistance(const glm::vec3& point) const
 		{
-			return { planeNormmal, -glm::dot(point, planeNormmal)};
+			return glm::dot(point, Normal) + Offset;
+		}
+
+		inline float Distance(const glm::vec3& point) const
+		{
+			return glm::abs(glm::dot(point, Normal) + Offset);
+		}
+
+		inline bool IntersectsSegment(const glm::vec3& segmentStart, const glm::vec3& segmentEnd) const
+		{
+			float startValue = SignedDistance(segmentStart);
+			float endValue = SignedDistance(segmentEnd);
+			return glm::sign(startValue) != glm::sign(endValue);
+		}
+
+		inline static Plane TroughPoint(glm::vec3 point, glm::vec3 planeNormal)
+		{
+			return { planeNormal, -glm::dot(point, planeNormal)};
 		}
 
 		glm::vec3 Normal;
@@ -58,6 +75,25 @@ namespace Grapple::Math
 
 		inline glm::vec3 GetCenter() const { return (Max + Min) / 2.0f; }
 		inline glm::vec3 GetSize() const { return Max - Min; }
+
+		// From https://gdbooks.gitbooks.io/3dcollisions/content/Chapter2/static_aabb_plane.html
+		inline bool IntersectsPlane(const Plane& plane) const
+		{
+			glm::vec3 center = GetCenter();
+			glm::vec3 extents = Max - center;
+
+			float projectedDistance = glm::dot(glm::abs(plane.Normal), extents);
+			return plane.Distance(center) <= projectedDistance;
+		}
+
+		inline bool IntersectsOrInFrontOfPlane(const Plane& plane) const
+		{
+			glm::vec3 center = GetCenter();
+			glm::vec3 extents = Max - center;
+
+			float projectedDistance = glm::dot(glm::abs(plane.Normal), extents);
+			return -projectedDistance <= plane.SignedDistance(center);
+		}
 
 		glm::vec3 Min;
 		glm::vec3 Max;

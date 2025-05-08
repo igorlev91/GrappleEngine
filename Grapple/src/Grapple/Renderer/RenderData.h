@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Grapple/Math/Math.h"
 #include "Grapple/Renderer/UniformBuffer.h"
 
 #include "GrappleCore/Core.h"
@@ -9,6 +10,26 @@
 
 namespace Grapple
 {
+	struct FrustumPlanes
+	{
+		static constexpr size_t PlanesCount = 6;
+		static constexpr size_t NearPlaneIndex = 0;
+		static constexpr size_t FarPlaneIndex = 1;
+
+		inline bool ContainsPoint(const glm::vec3& point) const
+		{
+			for (size_t i = 0; i < 6; i++)
+			{
+				if (Planes[i].SignedDistance(point) < 0.0f)
+					return false;
+			}
+
+			return true;
+		}
+
+		Math::Plane Planes[PlanesCount];
+	};
+
 	struct CameraData
 	{
 		CameraData()
@@ -65,6 +86,7 @@ namespace Grapple
 	struct RenderData
 	{
 		CameraData Camera;
+		FrustumPlanes CameraFrustumPlanes;
 		LightData Light;
 		CameraData LightView[4];
 		bool IsEditorCamera = false;
