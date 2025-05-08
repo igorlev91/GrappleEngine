@@ -145,7 +145,7 @@ namespace Grapple
 
 
 	Grapple_IMPL_COMPONENT(DirectionalLight,
-		Grapple_PROPERTY(DirectionalLight, Color),
+		Grapple_COLOR_PROPERTY(DirectionalLight, Color),
 		Grapple_PROPERTY(DirectionalLight, Intensity)
 	);
 	DirectionalLight::DirectionalLight()

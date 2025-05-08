@@ -108,12 +108,14 @@ namespace Grapple
 
 				{
 					Ref<Shader> shader = AssetManager::GetAsset<Shader>(defaultShader.value());
+					if (shader != nullptr && shader->IsLoaded())
+					{
+						colorProperty = shader->GetPropertyIndex("u_InstanceData.Color");
+						roughnessProperty = shader->GetPropertyIndex("u_InstanceData.Roughness");
+						textureProperty = shader->GetPropertyIndex("u_Texture");
 
-					colorProperty = shader->GetPropertyIndex("u_InstanceData.Color");
-					roughnessProperty = shader->GetPropertyIndex("u_InstanceData.Roughness");
-					textureProperty = shader->GetPropertyIndex("u_Texture");
-
-					Grapple_CORE_ASSERT(colorProperty && roughnessProperty && textureProperty);
+						Grapple_CORE_ASSERT(colorProperty && roughnessProperty && textureProperty);
+					}
 				}
 
 				for (uint32_t i = 0; i < scene->mNumMaterials; i++)
@@ -128,8 +130,11 @@ namespace Grapple
 					material->Get(AI_MATKEY_ROUGHNESS_FACTOR, roughness);
 
 					Ref<Material> materialAsset = CreateRef<Material>(defaultShader.value());
-					materialAsset->WritePropertyValue(*colorProperty, glm::vec4(color.r, color.g, color.b, color.a));
-					materialAsset->WritePropertyValue(*roughnessProperty, 0.0f);
+
+					if (colorProperty)
+						materialAsset->WritePropertyValue(*colorProperty, glm::vec4(color.r, color.g, color.b, color.a));
+					if (roughnessProperty)
+						materialAsset->WritePropertyValue(*roughnessProperty, roughness);
 
 					auto it = nameToHandle.find(name);
 					if (it != nameToHandle.end())

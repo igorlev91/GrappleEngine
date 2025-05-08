@@ -9,6 +9,8 @@
 
 #include "Grapple/Project/Project.h"
 
+#include <random>
+
 namespace Grapple
 {
 	struct InstanceData
@@ -66,6 +68,8 @@ namespace Grapple
 
 		ShadowSettings ShadowMappingSettings;
 		Ref<UniformBuffer> ShadowDataBuffer = nullptr;
+
+		Ref<Texture3D> RandomAngles = nullptr;
 	};
 	
 	RendererData s_RendererData;
@@ -86,8 +90,8 @@ namespace Grapple
 		s_RendererData.ShadowDataBuffer = UniformBuffer::Create(sizeof(ShadowData), 2);
 
 		s_RendererData.ShadowMappingSettings.Resolution = 2048;
-		s_RendererData.ShadowMappingSettings.Bias = 0.001f;
-		s_RendererData.ShadowMappingSettings.LightSize = 0.1f;
+		s_RendererData.ShadowMappingSettings.Bias = 0.015f;
+		s_RendererData.ShadowMappingSettings.LightSize = 0.05f;
 
 		s_RendererData.ShadowMappingSettings.Cascades = s_RendererData.ShadowMappingSettings.MaxCascades;
 		s_RendererData.ShadowMappingSettings.CascadeSplits[0] = 15.0f;
@@ -129,6 +133,36 @@ namespace Grapple
 		});
 
 		Project::OnProjectOpen.Bind(ReloadShaders);
+
+		// Random angles
+
+		{
+			constexpr size_t anglesTextureSize = 16;
+			float* angles = new float[anglesTextureSize * anglesTextureSize * anglesTextureSize];
+
+			std::random_device device;
+			std::mt19937_64 engine(device());
+			std::uniform_real_distribution<float> uniformDistribution(0.0f, glm::pi<float>() * 2.0f);
+
+			for (size_t z = 0; z < anglesTextureSize; z++)
+			{
+				for (size_t y = 0; y < anglesTextureSize; y++)
+				{
+					for (size_t x = 0; x < anglesTextureSize; x++)
+					{
+						angles[z * anglesTextureSize * anglesTextureSize + y * anglesTextureSize + x] = uniformDistribution(engine);
+					}
+				}
+			}
+
+			Texture3DSpecifications specifications;
+			specifications.Filtering = TextureFiltering::Linear;
+			specifications.Format = TextureFormat::RF32;
+			specifications.Size = glm::uvec3((uint32_t)anglesTextureSize);
+			s_RendererData.RandomAngles = Texture3D::Create(specifications, (const void*)angles, specifications.Size);
+
+			delete[] angles;
+		}
 	}
 
 	void Renderer::Shutdown()
@@ -247,10 +281,13 @@ namespace Grapple
 	{
 		std::sort(s_RendererData.Queue.begin(), s_RendererData.Queue.end(), CompareRenderableObjects);
 
+		// Bind white texture for each cascade
 		for (size_t i = 0; i < 4; i++)
 		{
 			s_RendererData.WhiteTexture->Bind(2 + (uint32_t)i);
 		}
+
+		s_RendererData.RandomAngles->Bind(6);
 
 		RenderCommand::SetDepthTestEnabled(true);
 		RenderCommand::SetCullingMode(CullingMode::Front);
