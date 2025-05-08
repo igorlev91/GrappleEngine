@@ -120,6 +120,7 @@ namespace Grapple
 
 	Grapple_IMPL_COMPONENT(TextComponent,
 		Grapple_PROPERTY(TextComponent, Text),
+		Grapple_COLOR_PROPERTY(TextComponent, Color),
 		Grapple_PROPERTY(TextComponent, Font),
 	);
 	TextComponent::TextComponent()
