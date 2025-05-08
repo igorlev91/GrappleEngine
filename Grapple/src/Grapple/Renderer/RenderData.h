@@ -88,6 +88,7 @@ namespace Grapple
 		CameraData Camera;
 		FrustumPlanes CameraFrustumPlanes;
 		LightData Light;
+		Math::Basis LightBasis;
 		CameraData LightView[4];
 		bool IsEditorCamera = false;
 	};
