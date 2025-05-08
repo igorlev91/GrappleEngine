@@ -189,7 +189,6 @@ namespace Grapple
 
 	struct ShadowMappingParams
 	{
-		glm::vec3 ViewPosition;
 		glm::vec3 CameraFrustumCenter;
 		float BoundingSphereRadius;
 	};
@@ -245,9 +244,34 @@ namespace Grapple
 		for (size_t i = 0; i < frustumCorners.size(); i++)
 			boundingSphereRadius = glm::max(boundingSphereRadius, glm::distance(frustumCenter, (glm::vec3)frustumCorners[i]));
 
-		params.ViewPosition = frustumCenter - lightDirection * boundingSphereRadius;
 		params.CameraFrustumCenter = frustumCenter;
 		params.BoundingSphereRadius = boundingSphereRadius;
+	}
+
+	static void CalculateShadowProjectionFrustum(Math::Plane* outPlanes, const ShadowMappingParams& params, glm::vec3 lightDirection, const Math::Basis& lightBasis)
+	{
+		// Near and far planes aren't calculated here
+		// because they are computed based on AABBs of scene objects
+
+		// Left
+		outPlanes[0] = Math::Plane::TroughPoint(
+			params.CameraFrustumCenter - lightBasis.Right * params.BoundingSphereRadius,
+			lightBasis.Right);
+
+		 // Right
+		outPlanes[1] = Math::Plane::TroughPoint(
+			params.CameraFrustumCenter + lightBasis.Right * params.BoundingSphereRadius,
+			-lightBasis.Right);
+
+		// Top
+		outPlanes[2] = Math::Plane::TroughPoint(
+			params.CameraFrustumCenter + lightBasis.Up * params.BoundingSphereRadius,
+			-lightBasis.Up);
+
+		// Bottom
+		outPlanes[3] = Math::Plane::TroughPoint(
+			params.CameraFrustumCenter - lightBasis.Up * params.BoundingSphereRadius,
+			lightBasis.Up);
 	}
 
 	static void CalculateShadowProjections()
@@ -260,34 +284,27 @@ namespace Grapple
 		{
 			glm::vec3 lightDirection = viewport->FrameData.Light.Direction;
 
+			// 1. Calculate a fit frustum around camera's furstum
+
 			ShadowMappingParams params;
 			CalculateShadowFrustums(params, lightDirection,
 				*viewport, currentNearPlane,
 				shadowSettings.CascadeSplits[i]);
 
-#if 0
 			const Math::Basis& lightBasis = viewport->FrameData.LightBasis;
 
+			// 2. Calculate projection frustum planes (except near and far)
+
+			Math::Plane planes[4];
+			CalculateShadowProjectionFrustum(planes, params, lightDirection, lightBasis);
+
+			// 3. Extend near and far planes
+
 			Math::Plane nearPlane = Math::Plane::TroughPoint(params.CameraFrustumCenter, -lightDirection);
+			Math::Plane farPlane = Math::Plane::TroughPoint(params.CameraFrustumCenter, lightDirection);
 
-			float planeDistance = 0;
-			
-			// Cascade frustum planes
-			Math::Plane left = Math::Plane::TroughPoint(
-				params.CameraFrustumCenter - lightBasis.Right * params.BoundingSphereRadius,
-				lightBasis.Right);
-
-			Math::Plane right = Math::Plane::TroughPoint(
-				params.CameraFrustumCenter + lightBasis.Right * params.BoundingSphereRadius,
-				-lightBasis.Right);
-
-			Math::Plane top = Math::Plane::TroughPoint(
-				params.CameraFrustumCenter + lightBasis.Up * params.BoundingSphereRadius,
-				-lightBasis.Up);
-
-			Math::Plane bottom = Math::Plane::TroughPoint(
-				params.CameraFrustumCenter - lightBasis.Up * params.BoundingSphereRadius,
-				lightBasis.Up);
+			float nearPlaneDistance = 0;
+			float farPlaneDistance = 0;
 
 			for (size_t i = 0; i < s_RendererData.Queue.size(); i++)
 			{
@@ -295,10 +312,15 @@ namespace Grapple
 
 				Math::AABB objectAABB = object.Mesh->GetSubMesh().Bounds.Transformed(object.Transform);
 
-				bool intersects = objectAABB.IntersectsOrInFrontOfPlane(left)
-					&& objectAABB.IntersectsOrInFrontOfPlane(right)
-					&& objectAABB.IntersectsOrInFrontOfPlane(top)
-					&& objectAABB.IntersectsOrInFrontOfPlane(bottom);
+				bool intersects = true;
+				for (size_t i = 0; i < 4; i++)
+				{
+					if (!objectAABB.IntersectsOrInFrontOfPlane(planes[i]))
+					{
+						intersects = false;
+						break;
+					}
+				}
 
 				if (!intersects)
 					continue;
@@ -307,13 +329,16 @@ namespace Grapple
 				glm::vec3 extents = objectAABB.Max - center;
 
 				float projectedDistance = glm::dot(glm::abs(nearPlane.Normal), extents);
-				planeDistance = glm::max(planeDistance, nearPlane.Distance(center) + projectedDistance);
+				nearPlaneDistance = glm::max(nearPlaneDistance, nearPlane.Distance(center) + projectedDistance);
+				farPlaneDistance = glm::max(farPlaneDistance, farPlane.Distance(center) + projectedDistance);
 			}
 
-			float distance = glm::max(params.BoundingSphereRadius, planeDistance);
-#endif
+			float distance = glm::max(params.BoundingSphereRadius, nearPlaneDistance);
 
-			glm::mat4 view = glm::lookAt(params.ViewPosition, params.CameraFrustumCenter, glm::vec3(0.0f, 1.0f, 0.0f));
+			nearPlaneDistance = -glm::max(params.BoundingSphereRadius, nearPlaneDistance);
+			farPlaneDistance = glm::max(params.BoundingSphereRadius, farPlaneDistance);
+
+			glm::mat4 view = glm::lookAt(params.CameraFrustumCenter + lightDirection * nearPlaneDistance, params.CameraFrustumCenter, glm::vec3(0.0f, 1.0f, 0.0f));
 
 			CameraData& lightView = viewport->FrameData.LightView[i];
 			lightView.View = view;
@@ -323,7 +348,7 @@ namespace Grapple
 				-params.BoundingSphereRadius,
 				params.BoundingSphereRadius,
 				viewport->FrameData.Light.Near,
-				params.BoundingSphereRadius * 2.0f);
+				farPlaneDistance - nearPlaneDistance);
 
 			lightView.CalculateViewProjection();
 			currentNearPlane = shadowSettings.CascadeSplits[i];
@@ -353,8 +378,6 @@ namespace Grapple
 	void Renderer::BeginScene(Viewport& viewport)
 	{
 		s_RendererData.CurrentViewport = &viewport;
-
-		CalculateShadowMappingParams();
 
 		s_RendererData.LightBuffer->SetData(&viewport.FrameData.Light, sizeof(viewport.FrameData.Light), 0);
 		s_RendererData.CameraBuffer->SetData(&viewport.FrameData.Camera, sizeof(CameraData), 0);
@@ -437,28 +460,28 @@ namespace Grapple
 			frustumPlanes.Planes[FrustumPlanes::FarPlaneIndex] = Math::Plane::TroughPoint(frustumCorners[4], -s_RendererData.CurrentViewport->FrameData.Camera.ViewDirection);
 
 			// Left (Trough bottom left corner)
-			frustumPlanes.Planes[2] = Math::Plane::TroughPoint(frustumCorners[0], glm::normalize(glm::cross(
+			frustumPlanes.Planes[FrustumPlanes::LeftPlaneIndex] = Math::Plane::TroughPoint(frustumCorners[0], glm::normalize(glm::cross(
 				// Bottom Left Near -> Bottom Left Far
 				(glm::vec3)(frustumCorners[4] - frustumCorners[0]),
 				// Bottom Left Near -> Top Left Near
 				(glm::vec3)(frustumCorners[2] - frustumCorners[0]))));
 
 			// Right (Trough top right corner)
-			frustumPlanes.Planes[3] = Math::Plane::TroughPoint(frustumCorners[1], glm::cross(
+			frustumPlanes.Planes[FrustumPlanes::RightPlaneIndex] = Math::Plane::TroughPoint(frustumCorners[1], glm::cross(
 				// Top Right Near -> Top Right Far
 				(glm::vec3)(frustumCorners[7] - frustumCorners[3]),
 				// Top Right Near -> Bottom Right Near
 				(glm::vec3)(frustumCorners[1] - frustumCorners[3])));
 
 			// Top (Trough top right corner)
-			frustumPlanes.Planes[4] = Math::Plane::TroughPoint(frustumCorners[3], glm::cross(
+			frustumPlanes.Planes[FrustumPlanes::TopPlaneIndex] = Math::Plane::TroughPoint(frustumCorners[3], glm::cross(
 				// Top Right Near -> Top Left Near
 				(glm::vec3)(frustumCorners[2] - frustumCorners[3]),
 				// Top Right Near -> Top Right Far
 				(glm::vec3)(frustumCorners[7] - frustumCorners[3])));
 
 			// Bottom (Trough bottom left corner)
-			frustumPlanes.Planes[5] = Math::Plane::TroughPoint(frustumCorners[0], glm::cross(
+			frustumPlanes.Planes[FrustumPlanes::BottomPlaneIndex] = Math::Plane::TroughPoint(frustumCorners[0], glm::cross(
 				// Bottom left near => Bottom right near
 				(glm::vec3)(frustumCorners[1] - frustumCorners[0]),
 				// Bottom left near -> Bottom left far
@@ -517,6 +540,7 @@ namespace Grapple
 	void Renderer::Flush()
 	{
 		CalculateShadowProjections();
+		CalculateShadowMappingParams();
 
 		for (size_t i = 0; i < s_RendererData.Queue.size(); i++)
 		{
