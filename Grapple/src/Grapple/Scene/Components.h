@@ -121,6 +121,8 @@ namespace Grapple
 		MeshRenderFlags Flags;
 	};
 
+
+
 	struct Grapple_API DirectionalLight
 	{
 		Grapple_COMPONENT;
@@ -130,5 +132,16 @@ namespace Grapple
 
 		glm::vec3 Color;
 		float Intensity;
+	};
+
+	struct Grapple_API Environment
+	{
+		Grapple_COMPONENT;
+
+		Environment();
+		Environment(glm::vec3 color, float intensity);
+
+		glm::vec3 EnvironmentColor;
+		float EnvironmentColorIntensity;
 	};
 }

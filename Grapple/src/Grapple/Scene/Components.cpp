@@ -153,4 +153,16 @@ namespace Grapple
 
 	DirectionalLight::DirectionalLight(const glm::vec3& color, float intensity)
 		: Color(color), Intensity(intensity) {}
+
+
+
+	Grapple_IMPL_COMPONENT(Environment,
+		Grapple_COLOR_PROPERTY(Environment, EnvironmentColor),
+		Grapple_PROPERTY(Environment, EnvironmentColorIntensity)
+	);
+	Environment::Environment()
+		: EnvironmentColor(0.0f), EnvironmentColorIntensity(0.0f) {}
+
+	Environment::Environment(glm::vec3 color, float intensity)
+		: EnvironmentColor(color), EnvironmentColorIntensity(intensity) {}
 }

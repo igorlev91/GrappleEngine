@@ -56,8 +56,10 @@ namespace Grapple
 
 		glm::vec3 Direction;
 		float Unused;
-
+		
 		glm::mat4 LightProjection;
+		glm::vec4 EnvironmentLight;
+
 		float Near;
 		float Far;
 	};
