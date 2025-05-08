@@ -30,15 +30,16 @@ namespace Grapple
 	struct ShadowSettings
 	{
 		ShadowSettings()
-			: MaxDistance(0.0f),
-			Resolution(0),
+			: Resolution(0),
 			LightSize(1.0f),
 			Bias(0.0f) {}
 
-		float MaxDistance;
+		const uint32_t MaxCascades = 4;
+
 		float LightSize;
 		float Bias;
 		uint32_t Resolution;
+		int32_t Cascades;
 
 		float CascadeSplits[4] = { 0.0f };
 	};

@@ -44,7 +44,7 @@ void main()
 	o_Vertex.Position = transformed.xyz;
 
 	o_Vertex.UV = i_UV;
-	o_Vertex.ViewSpacePosition = position.xyz;
+	o_Vertex.ViewSpacePosition = (u_Camera.View * transformed).xyz;
 	o_EntityIndex = i_EntityIndex;
 
     gl_Position = position;
@@ -72,11 +72,15 @@ layout(std140, binding = 1) uniform DirLight
 	float u_LightNear;
 };
 
+const int CASCADES_COUNT = 4;
+
 layout(std140, binding = 2) uniform ShadowData
 {
 	float u_Bias;
 	float u_LightFrustumSize;
 	float u_LightSize;
+
+	int u_MaxCascadeIndex;
 
 	vec4 u_CascadeSplits;
 
@@ -223,29 +227,68 @@ float CalculateShadow(sampler2D shadowMap, vec4 lightSpacePosition)
 	return 1.0f - PCF(shadowMap, uv, receieverDepth, filterRadius, rotation);
 }
 
+#define DEBUG_CASCADES 0
+
 void main()
 {
 	vec3 N = normalize(i_Vertex.Normal);
 	vec3 V = normalize(u_Camera.Position - i_Vertex.Position);
 	vec3 H = normalize(V + u_LightDirection);
 
+	vec4 color = u_InstanceData.Color * texture(u_Texture, i_Vertex.UV);
+
 	float shadow = 1.0f;
-	if (i_Vertex.ViewSpacePosition.z <= u_CascadeSplits.x)
+	float viewSpaceDistance = abs(i_Vertex.ViewSpacePosition.z);
+
+	int cascadeIndex = u_MaxCascadeIndex;
+	for (int i = 0; i < u_MaxCascadeIndex; i++)
+	{
+		if (viewSpaceDistance <= u_CascadeSplits[i])
+		{
+			cascadeIndex = i;
+			break;
+		}
+	}
+
+#if DEBUG_CASCADES
+	switch (cascadeIndex)
+	{
+	case 0:
+		color.xyz *= vec3(1.0f, 0.f, 0.0f);
+		break;
+	case 1:
+		color.xyz *= vec3(0.0f, 1.0f, 0.0f);
+		break;
+	case 2:
+		color.xyz *= vec3(0.0f, 0.0f, 1.0f);
+		break;
+	case 3:
+		color.xyz *= vec3(1.0f, 0.0f, 0.0f);
+		break;
+	}
+#else
+	switch (cascadeIndex)
+	{
+	case 0:
 		shadow = CalculateShadow(u_ShadowMap0, (u_CascadeProjection0 * vec4(i_Vertex.Position, 1.0f)));
-	else if (i_Vertex.ViewSpacePosition.z <= u_CascadeSplits.y)
+		break;
+	case 1:
 		shadow = CalculateShadow(u_ShadowMap1, (u_CascadeProjection1 * vec4(i_Vertex.Position, 1.0f)));
-	else if (i_Vertex.ViewSpacePosition.z <= u_CascadeSplits.z)
+		break;
+	case 2:
 		shadow = CalculateShadow(u_ShadowMap2, (u_CascadeProjection2 * vec4(i_Vertex.Position, 1.0f)));
-	else
+		break;
+	case 3:
 		shadow = CalculateShadow(u_ShadowMap3, (u_CascadeProjection3 * vec4(i_Vertex.Position, 1.0f)));
+		break;
+	}
+#endif
 
 	vec3 incomingLight = u_LightColor.rgb * u_LightColor.w;
 	float alpha = max(0.04, u_InstanceData.Roughness * u_InstanceData.Roughness);
 
 	vec3 kS = Fresnel_Shlick(baseReflectivity, V, H);
 	vec3 kD = vec3(1.0) - kS;
-
-	vec4 color = u_InstanceData.Color * texture(u_Texture, i_Vertex.UV);
 
 	vec3 diffuse = Diffuse_Lambertian(color.rgb);
 	vec3 specular = Specular_CookTorence(alpha, N, V, u_LightDirection);
