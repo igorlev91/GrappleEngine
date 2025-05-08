@@ -33,6 +33,8 @@
 
 #include "GrappleEditor/Scripting/BuildSystem/BuildSystem.h"
 
+#include "GrappleCore/Profiler/Profiler.h"
+
 #include <imgui.h>
 #include <imgui_internal.h>
 
@@ -137,6 +139,8 @@ namespace Grapple
 
     void EditorLayer::OnUpdate(float deltaTime)
     {
+        Profiler::BeginFrame();
+
         m_PreviousFrameTime = deltaTime;
 
         Renderer2D::ResetStats();
@@ -145,11 +149,22 @@ namespace Grapple
         Renderer::SetMainViewport(m_GameWindow->GetViewport());
         InputManager::SetMousePositionOffset(-m_GameWindow->GetViewport().GetPosition());
 
-        if (m_Mode == EditorMode::Play && !m_PlaymodePaused)
-            Scene::GetActive()->OnUpdateRuntime();
+        {
+            Grapple_PROFILE_SCOPE("Scene Runtime Update");
 
-        for (auto& viewport : m_ViewportWindows)
-            viewport->OnRenderViewport();
+            if (m_Mode == EditorMode::Play && !m_PlaymodePaused)
+                Scene::GetActive()->OnUpdateRuntime();
+        }
+
+        {
+            Grapple_PROFILE_SCOPE("Viewport Render");
+            for (auto& viewport : m_ViewportWindows)
+            {
+                viewport->OnRenderViewport();
+            }
+        }
+
+        Profiler::EndFrame();
     }
 
     void EditorLayer::OnEvent(Event& event)
@@ -321,6 +336,7 @@ namespace Grapple
         m_PropertiesWindow.OnImGuiRender();
         m_AssetManagerWindow.OnImGuiRender();
         m_QuickSearch.OnImGuiRender();
+        m_ProfilerWindow.OnImGuiRender();
 
         ECSInspector::GetInstance().OnImGuiRender();
 

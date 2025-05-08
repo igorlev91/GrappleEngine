@@ -12,6 +12,8 @@
 #include "GrappleEditor/UI/ProjectSettingsWindow.h"
 #include "GrappleEditor/UI/ECS/ECSInspector.h"
 
+#include "GrappleEditor/UI/Profiler/ProfilerWindow.h"
+
 #include <imgui_internal.h>
 
 namespace Grapple
@@ -109,6 +111,8 @@ namespace Grapple
 		{
 			if (ImGui::MenuItem("ECS Inspector"))
 				ECSInspector::Show();
+			if (ImGui::MenuItem("Profiler"))
+				ProfilerWindow::GetInstance().ShowWindow();
 
 			const auto& viewports = EditorLayer::GetInstance().GetViewportWindows();
 			for (const Ref<ViewportWindow>& viewportWindow : viewports)
