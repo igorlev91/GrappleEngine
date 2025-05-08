@@ -6,6 +6,7 @@
 #include "Grapple/Scene/Scene.h"
 
 #include "Grapple/Core/Application.h"
+#include "GrappleCore/Profiler/Profiler.h"
 
 #include <imgui.h>
 #include <imgui_internal.h>
@@ -25,6 +26,8 @@ namespace Grapple
 
 	void ViewportWindow::OnRenderViewport()
 	{
+		Grapple_PROFILE_FUNCTION();
+
 		if (!ShowWindow || !m_IsVisible)
 			return;
 

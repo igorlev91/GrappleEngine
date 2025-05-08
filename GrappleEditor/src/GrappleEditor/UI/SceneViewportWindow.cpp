@@ -80,6 +80,8 @@ namespace Grapple
 
 	void SceneViewportWindow::OnRenderViewport()
 	{
+		Grapple_PROFILE_FUNCTION();
+
 		if (Scene::GetActive() == nullptr || !ShowWindow || !m_IsVisible)
 			return;
 

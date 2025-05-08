@@ -1,5 +1,7 @@
 #include "Scene.h"
 
+#include "GrappleCore/Profiler/Profiler.h"
+
 #include "Grapple/Renderer/Renderer.h"
 #include "Grapple/Renderer2D/Renderer2D.h"
 #include "Grapple/Renderer/DebugRenderer.h"
@@ -73,6 +75,8 @@ namespace Grapple
 
 	void Scene::OnBeforeRender(Viewport& viewport)
 	{
+		Grapple_PROFILE_FUNCTION();
+
 		if (!viewport.FrameData.IsEditorCamera)
 		{
 			float aspectRation = viewport.GetAspectRatio();
@@ -168,6 +172,8 @@ namespace Grapple
 
 	void Scene::OnRender(const Viewport& viewport)
 	{
+		Grapple_PROFILE_FUNCTION();
+
 		Renderer2D::Begin();
 
 		m_World.GetSystemsManager().ExecuteGroup(m_2DRenderingGroup);

@@ -2,6 +2,7 @@
 
 #include "GrappleCore/Assert.h"
 #include "GrappleCore/Log.h"
+#include "GrappleCore/Profiler/Profiler.h"
 
 #include "Grapple/Serialization/Serialization.h"
 #include "Grapple/Project/Project.h"
@@ -360,6 +361,8 @@ namespace Grapple
 
     Ref<Asset> EditorAssetManager::LoadAsset(const AssetMetadata& metadata)
     {
+        Grapple_PROFILE_FUNCTION();
+
         auto importerIterator = m_AssetImporters.find(metadata.Type);
         if (importerIterator == m_AssetImporters.end())
         {
