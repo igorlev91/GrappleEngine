@@ -3,6 +3,7 @@
 #include <GrappleCore/Serialization/TypeSerializer.h>
 #include <GrappleCore/Serialization/SerializationStream.h>
 
+#include <GrappleECS/World.h>
 #include <GrappleECS/System/SystemInitializer.h>
 #include <GrappleECS/Entity/ComponentInitializer.h>
 
@@ -39,8 +40,8 @@ struct PrefabSpawnSystem : Grapple::System
 {
 	Grapple_SYSTEM;
 
-	virtual void OnConfig(Grapple::SystemConfig& config) override;
-	virtual void OnUpdate(Grapple::SystemExecutionContext& context) override;
+	virtual void OnConfig(Grapple::World& world, Grapple::SystemConfig& config) override;
+	virtual void OnUpdate(Grapple::World& world, Grapple::SystemExecutionContext& context) override;
 private:
 	Grapple::Query m_Query;
 };

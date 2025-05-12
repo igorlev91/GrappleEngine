@@ -1,5 +1,6 @@
 #pragma once
 
+#include "GrappleECS/World.h"
 #include "GrappleECS/System/System.h"
 #include "GrappleECS/System/SystemInitializer.h"
 
@@ -10,8 +11,8 @@ namespace Grapple
 	public:
 		Grapple_SYSTEM;
 
-		virtual void OnConfig(SystemConfig& config) override;
-		virtual void OnUpdate(SystemExecutionContext& context) override;
+		virtual void OnConfig(World& world, SystemConfig& config) override;
+		virtual void OnUpdate(World& world, SystemExecutionContext& context) override;
 	private:
 		Query m_Query;
 	};
