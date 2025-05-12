@@ -260,6 +260,8 @@ namespace Grapple
 
         glm::vec3 EnvironmentColor;
         float EnvironmentColorIntensity;
+
+        ShadowSettings ShadowSettings;
     };
 
     template<>
@@ -269,6 +271,8 @@ namespace Grapple
         {
             stream.Serialize("EnvironmentColor", SerializationValue(environment.EnvironmentColor, SerializationValueFlags::Color));
             stream.Serialize("EnvironmentColorIntensity", SerializationValue(environment.EnvironmentColorIntensity));
+
+            stream.Serialize("ShadowSettings", SerializationValue(environment.ShadowSettings));
         }
     };
 }

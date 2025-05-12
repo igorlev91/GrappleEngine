@@ -51,6 +51,7 @@ namespace Grapple
 			ViewProjection = Projection * View;
 			InverseView = glm::inverse(View);
 			InverseViewProjection = glm::inverse(ViewProjection);
+			InverseProjection = glm::inverse(Projection);
 		}
 
 		glm::vec3 Position;
