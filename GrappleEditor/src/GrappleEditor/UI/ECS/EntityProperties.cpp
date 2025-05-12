@@ -52,8 +52,6 @@ namespace Grapple
 				{
 					if (component == COMPONENT_ID(CameraComponent))
 						RenderCameraComponent(m_World.GetEntityComponent<CameraComponent>(entity));
-					else if (component == COMPONENT_ID(TransformComponent))
-						RenderTransformComponent(m_World.GetEntityComponent<TransformComponent>(entity));
 					else if (component == COMPONENT_ID(SpriteComponent))
 						RenderSpriteComponent(m_World.GetEntityComponent<SpriteComponent>(entity));
 					else if (component == COMPONENT_ID(MeshComponent))
