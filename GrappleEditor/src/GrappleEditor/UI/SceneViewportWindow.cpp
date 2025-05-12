@@ -213,16 +213,10 @@ namespace Grapple
 			return false;
 		});
 
-		if (!m_IsHovered)
+		if (m_IsHovered)
 		{
-			// Block the scroll event when the window is not hovered, to dsiallow camera zooming
-			dispatcher.Dispatch<MouseScrollEvent>([this](MouseScrollEvent& e) -> bool
-			{
-				return true;
-			});
+			m_Camera.ProcessEvents(event);
 		}
-
-		m_Camera.ProcessEvents(event);
 	}
 
 	void SceneViewportWindow::CreateFrameBuffer()
@@ -439,7 +433,7 @@ namespace Grapple
 			overlayName = "Default";
 			break;
 		case ViewportOverlay::Depth:
-			overlayName = "Default";
+			overlayName = "Depth";
 			break;
 		}
 
@@ -505,12 +499,10 @@ namespace Grapple
 			SceneViewSettings& settings = EditorLayer::GetInstance().GetSceneViewSettings();
 			if (ImGui::BeginCombo("", "Settings"))
 			{
-				if (ImGui::MenuItem("Show AABBs", nullptr, &settings.ShowAABBs))
-					settings.ShowAABBs = settings.ShowAABBs;
-				if (ImGui::MenuItem("Show Lights", nullptr, &settings.ShowLights))
-					settings.ShowLights = settings.ShowLights;
-				if (ImGui::MenuItem("Show Camera Frustums", nullptr, &settings.ShowCameraFrustum))
-					settings.ShowCameraFrustum = settings.ShowCameraFrustum;
+				ImGui::MenuItem("Show AABBs", nullptr, &settings.ShowAABBs);
+				ImGui::MenuItem("Show Lights", nullptr, &settings.ShowLights);
+				ImGui::MenuItem("Show Camera Frustums", nullptr, &settings.ShowCameraFrustum);
+				ImGui::MenuItem("Show Grid", nullptr, &settings.ShowGrid);
 
 				ImGui::EndCombo();
 			}
@@ -526,7 +518,7 @@ namespace Grapple
 
 	void SceneViewportWindow::RenderGrid()
 	{
-		if (!m_GridMaterial)
+		if (!m_GridMaterial || !EditorLayer::GetInstance().GetSceneViewSettings().ShowGrid)
 			return;
 
 		float scale = m_Camera.GetZoom() * 3.0f;

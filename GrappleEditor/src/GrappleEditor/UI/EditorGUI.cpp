@@ -141,13 +141,13 @@ namespace Grapple
 		return result;
 	}
 
-	bool EditorGUI::ObjectField(const SerializableObjectDescriptor& descriptor, void* data)
+	bool EditorGUI::ObjectField(const SerializableObjectDescriptor& descriptor, void* data, const World* currentWorld)
 	{
 		bool result = false;
 
 		Grapple_CORE_ASSERT(descriptor.Callback);
 
-		SerializablePropertyRenderer propertyRenderer;
+		SerializablePropertyRenderer propertyRenderer(currentWorld);
 		propertyRenderer.PropertyKey(descriptor.Name);
 		propertyRenderer.SerializeObject(descriptor, data);
 

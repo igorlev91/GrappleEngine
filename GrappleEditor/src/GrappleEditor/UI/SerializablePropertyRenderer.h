@@ -4,6 +4,9 @@
 
 #include "Grapple/AssetManager/Asset.h"
 
+#include "GrappleECS/World.h"
+#include "GrappleECS/Entity/Entity.h"
+
 #include <string_view>
 #include <vector>
 
@@ -12,7 +15,7 @@ namespace Grapple
     class SerializablePropertyRenderer : public SerializationStream
     {
     public:
-        SerializablePropertyRenderer();
+        SerializablePropertyRenderer(const World* currentWorld = nullptr);
 
         void PropertyKey(std::string_view key) override;
         DynamicArrayAction SerializeDynamicArraySize(size_t& size) override;
@@ -38,5 +41,7 @@ namespace Grapple
     private:
         PropertiesTreeState m_CurrentState;
         std::string_view m_CurrentPropertyName;
+
+        const World* m_CurrentWorld;
     };
 }
