@@ -76,8 +76,6 @@ namespace Grapple
 
 		ShadowSettings ShadowMappingSettings;
 		Ref<UniformBuffer> ShadowDataBuffer = nullptr;
-
-		Ref<Texture3D> RandomAngles = nullptr;
 	};
 	
 	RendererData s_RendererData;
@@ -147,36 +145,6 @@ namespace Grapple
 		});
 
 		Project::OnProjectOpen.Bind(ReloadShaders);
-
-		// Random angles
-
-		{
-			constexpr size_t anglesTextureSize = 16;
-			float* angles = new float[anglesTextureSize * anglesTextureSize * anglesTextureSize];
-
-			std::random_device device;
-			std::mt19937_64 engine(device());
-			std::uniform_real_distribution<float> uniformDistribution(0.0f, glm::pi<float>() * 2.0f);
-
-			for (size_t z = 0; z < anglesTextureSize; z++)
-			{
-				for (size_t y = 0; y < anglesTextureSize; y++)
-				{
-					for (size_t x = 0; x < anglesTextureSize; x++)
-					{
-						angles[z * anglesTextureSize * anglesTextureSize + y * anglesTextureSize + x] = uniformDistribution(engine);
-					}
-				}
-			}
-
-			Texture3DSpecifications specifications;
-			specifications.Filtering = TextureFiltering::Linear;
-			specifications.Format = TextureFormat::RF32;
-			specifications.Size = glm::uvec3((uint32_t)anglesTextureSize);
-			s_RendererData.RandomAngles = Texture3D::Create(specifications, (const void*)angles, specifications.Size);
-
-			delete[] angles;
-		}
 	}
 
 	void Renderer::Shutdown()
@@ -208,7 +176,11 @@ namespace Grapple
 		float BoundingSphereRadius;
 	};
 
-	static void CalculateShadowFrustums(ShadowMappingParams& params, glm::vec3 lightDirection, const Viewport& viewport, float nearPlaneDistance, float farPlaneDistance)
+	static void CalculateShadowFrustumParamsAroundCamera(ShadowMappingParams& params,
+		glm::vec3 lightDirection,
+		const Viewport& viewport,
+		float nearPlaneDistance,
+		float farPlaneDistance)
 	{
 		const CameraData& camera = viewport.FrameData.Camera;
 
@@ -294,21 +266,82 @@ namespace Grapple
 		Grapple_PROFILE_FUNCTION();
 
 		Viewport* viewport = s_RendererData.CurrentViewport;
-
+		glm::vec3 lightDirection = viewport->FrameData.Light.Direction;
+		const Math::Basis& lightBasis = viewport->FrameData.LightBasis;
 		const ShadowSettings& shadowSettings = Renderer::GetShadowSettings();
-		float currentNearPlane = viewport->FrameData.Light.Near;
-		for (size_t i = 0; i < 4; i++)
-		{
-			glm::vec3 lightDirection = viewport->FrameData.Light.Direction;
 
-			// 1. Calculate a fit frustum around camera's furstum
+		std::vector<uint32_t> perCascadeObjects[ShadowSettings::MaxCascades];
+
+		{
+			Grapple_PROFILE_SCOPE("DivideIntoGroups");
 
 			ShadowMappingParams params;
-			CalculateShadowFrustums(params, lightDirection,
-				*viewport, currentNearPlane,
-				shadowSettings.CascadeSplits[i]);
+			CalculateShadowFrustumParamsAroundCamera(params,
+				lightDirection,
+				*viewport,
+				viewport->FrameData.Light.Near,
+				shadowSettings.CascadeSplits[shadowSettings.Cascades - 1]);
 
-			const Math::Basis& lightBasis = viewport->FrameData.LightBasis;
+			Math::Plane cameraNearPlane = Math::Plane::TroughPoint(
+				s_RendererData.CurrentViewport->FrameData.Camera.Position,
+				s_RendererData.CurrentViewport->FrameData.Camera.ViewDirection);
+			
+			for (size_t objectIndex = 0; objectIndex < s_RendererData.Queue.size(); objectIndex++)
+			{
+				const RenderableObject& object = s_RendererData.Queue[objectIndex];
+				Math::AABB objectAABB = object.Mesh->GetSubMesh().Bounds.Transformed(object.Transform);
+
+				float distanceToPlane = cameraNearPlane.SignedDistance(objectAABB.GetCenter());
+				float projectedDistance = glm::dot(glm::abs(cameraNearPlane.Normal), objectAABB.GetExtents());
+
+				size_t firstCascadeIndex = 0;
+				size_t lastCascadeIndex = shadowSettings.Cascades - 1;
+
+				for (size_t cascade = 0; cascade < shadowSettings.Cascades; cascade++)
+				{
+					if (distanceToPlane - projectedDistance <= shadowSettings.CascadeSplits[cascade])
+					{
+						firstCascadeIndex = cascade;
+						break;
+					}
+				}
+
+				for (size_t i = 0; i < shadowSettings.Cascades; i++)
+				{
+					if (distanceToPlane + projectedDistance <= shadowSettings.CascadeSplits[i])
+					{
+						lastCascadeIndex = i;
+						break;
+					}
+				}
+
+				if (firstCascadeIndex <= lastCascadeIndex)
+				{
+					for (size_t cascadeIndex = firstCascadeIndex; cascadeIndex <= lastCascadeIndex; cascadeIndex++)
+						perCascadeObjects[cascadeIndex].push_back((uint32_t)objectIndex);
+				}
+			}
+		}
+
+		ShadowMappingParams perCascadeParams[ShadowSettings::MaxCascades];
+
+		{
+			// 1. Calculate a fit frustum around camera's furstum
+			float currentNearPlane = viewport->FrameData.Light.Near;
+			for (size_t i = 0; i < shadowSettings.Cascades; i++)
+			{
+				CalculateShadowFrustumParamsAroundCamera(perCascadeParams[i], lightDirection,
+					*viewport, currentNearPlane,
+					shadowSettings.CascadeSplits[i]);
+
+				currentNearPlane = shadowSettings.CascadeSplits[i];
+			}
+		}
+
+		float currentNearPlane = viewport->FrameData.Light.Near;
+		for (size_t i = 0; i < shadowSettings.Cascades; i++)
+		{
+			ShadowMappingParams params = perCascadeParams[i];
 
 			// 2. Calculate projection frustum planes (except near and far)
 
@@ -322,10 +355,10 @@ namespace Grapple
 
 			float nearPlaneDistance = 0;
 			float farPlaneDistance = 0;
-
-			for (size_t i = 0; i < s_RendererData.Queue.size(); i++)
+			
+			for (uint32_t objectIndex : perCascadeObjects[i])
 			{
-				const RenderableObject& object = s_RendererData.Queue[i];
+				const RenderableObject& object = s_RendererData.Queue[objectIndex];
 
 				Math::AABB objectAABB = object.Mesh->GetSubMesh().Bounds.Transformed(object.Transform);
 
@@ -399,8 +432,15 @@ namespace Grapple
 
 		s_RendererData.CurrentViewport = &viewport;
 
-		s_RendererData.LightBuffer->SetData(&viewport.FrameData.Light, sizeof(viewport.FrameData.Light), 0);
-		s_RendererData.CameraBuffer->SetData(&viewport.FrameData.Camera, sizeof(CameraData), 0);
+		{
+			Grapple_PROFILE_SCOPE("Renderer::UpdateLightUniformBuffer");
+			s_RendererData.LightBuffer->SetData(&viewport.FrameData.Light, sizeof(viewport.FrameData.Light), 0);
+		}
+
+		{
+			Grapple_PROFILE_SCOPE("Renderer::UpdateCameraUniformBuffer");
+			s_RendererData.CameraBuffer->SetData(&viewport.FrameData.Camera, sizeof(CameraData), 0);
+		}
 
 		uint32_t size = (uint32_t)s_RendererData.ShadowMappingSettings.Resolution;
 		if (s_RendererData.ShadowsRenderTarget[0] == nullptr)
@@ -431,30 +471,29 @@ namespace Grapple
 		viewport.RenderTarget->Bind();
 
 		// Generate camera frustum planes
-		
-		std::array<glm::vec4, 8> frustumCorners =
 		{
-			// Near
-			glm::vec4(-1.0f, -1.0f, 0.0f, 1.0f),
-			glm::vec4(1.0f, -1.0f, 0.0f, 1.0f),
-			glm::vec4(-1.0f,  1.0f, 0.0f, 1.0f),
-			glm::vec4(1.0f,  1.0f, 0.0f, 1.0f),
+			Grapple_PROFILE_SCOPE("Renderer::GenerateFrustumPlanes");
+			std::array<glm::vec4, 8> frustumCorners =
+			{
+				// Near
+				glm::vec4(-1.0f, -1.0f, 0.0f, 1.0f),
+				glm::vec4(1.0f, -1.0f, 0.0f, 1.0f),
+				glm::vec4(-1.0f,  1.0f, 0.0f, 1.0f),
+				glm::vec4(1.0f,  1.0f, 0.0f, 1.0f),
 
-			// Far
-			glm::vec4(-1.0f, -1.0f, 1.0f, 1.0f),
-			glm::vec4(1.0f, -1.0f, 1.0f, 1.0f),
-			glm::vec4(-1.0f,  1.0f, 1.0f, 1.0f),
-			glm::vec4(1.0f,  1.0f, 1.0f, 1.0f),
-		};
+				// Far
+				glm::vec4(-1.0f, -1.0f, 1.0f, 1.0f),
+				glm::vec4(1.0f, -1.0f, 1.0f, 1.0f),
+				glm::vec4(-1.0f,  1.0f, 1.0f, 1.0f),
+				glm::vec4(1.0f,  1.0f, 1.0f, 1.0f),
+			};
 
-		for (size_t i = 0; i < frustumCorners.size(); i++)
-		{
-			frustumCorners[i] = viewport.FrameData.Camera.InverseViewProjection * frustumCorners[i];
-			frustumCorners[i] /= frustumCorners[i].w;
-		}
+			for (size_t i = 0; i < frustumCorners.size(); i++)
+			{
+				frustumCorners[i] = viewport.FrameData.Camera.InverseViewProjection * frustumCorners[i];
+				frustumCorners[i] /= frustumCorners[i].w;
+			}
 
-		// Generate camera frustum planes
-		{
 			FrustumPlanes& frustumPlanes = viewport.FrameData.CameraFrustumPlanes;
 
 			// Near
@@ -506,16 +545,32 @@ namespace Grapple
 		const RenderableObject& a = s_RendererData.Queue[aIndex];
 		const RenderableObject& b = s_RendererData.Queue[bIndex];
 
+		glm::vec3 aPosition = glm::vec3(a.Transform[3]);
+		glm::vec3 bPosition = glm::vec3(b.Transform[3]);
+
+		float aDistance = glm::distance2(aPosition, s_RendererData.CurrentViewport->FrameData.Camera.Position);
+		float bDistance = glm::distance2(bPosition, s_RendererData.CurrentViewport->FrameData.Camera.Position);
+
+		return aDistance < bDistance;
+
+		// TODO: group objects based on material and mesh, then sort by distance
+
+#if 0
 		if ((uint64_t)a.Material->Handle < (uint64_t)b.Material->Handle)
 			return true;
 
 		if (a.Material->Handle == b.Material->Handle)
 		{
+			if (a.Mesh->Handle == b.Mesh->Handle)
+			{
+			}
+
 			if ((uint64_t)a.Mesh->Handle < (uint64_t)b.Mesh->Handle)
 				return true;
 		}
 
 		return false;
+#endif
 	}
 
 	static void PerformFrustumCulling()
@@ -549,9 +604,6 @@ namespace Grapple
 
 		s_RendererData.Statistics.ObjectsSubmitted += (uint32_t)s_RendererData.Queue.size();
 
-		CalculateShadowProjections();
-		CalculateShadowMappingParams();
-
 		ExecuteShadowPass();
 
 		// Geometry
@@ -581,7 +633,7 @@ namespace Grapple
 				s_RendererData.ShadowsRenderTarget[i]->BindAttachmentTexture(0, 2 + (uint32_t)i);
 			}
 
-			DrawQueued(false);
+			ExecuteGeomertyPass();
 			s_RendererData.CurrentViewport->RenderTarget->SetWriteMask(previousMask);
 
 			s_RendererData.InstanceDataBuffer.clear();
@@ -590,7 +642,7 @@ namespace Grapple
 		}
 	}
 
-	void Renderer::DrawQueued(bool shadowPass)
+	void Renderer::ExecuteGeomertyPass()
 	{
 		Grapple_PROFILE_FUNCTION();
 
@@ -599,9 +651,6 @@ namespace Grapple
 		for (uint32_t objectIndex : s_RendererData.CulledObjectIndices)
 		{
 			const RenderableObject& object = s_RendererData.Queue[objectIndex];
-
-			if (shadowPass && HAS_BIT(object.Flags, MeshRenderFlags::DontCastShadows))
-				continue;
 
 			if (object.Mesh->GetSubMesh().InstanceBuffer == nullptr)
 				object.Mesh->SetInstanceBuffer(s_RendererData.InstanceBuffer);
@@ -618,23 +667,19 @@ namespace Grapple
 
 				currentMaterial = object.Material;
 
-				if (!shadowPass)
-					ApplyMaterialFeatures(object.Material->GetShader()->GetFeatures());
+				ApplyMaterialFeatures(object.Material->GetShader()->GetFeatures());
 
 				currentMaterial->SetShaderProperties();
 
-				if (!shadowPass)
-				{
-					Ref<Shader> shader = object.Material->GetShader();
-					if (shader == nullptr)
-						continue;
+				Ref<Shader> shader = object.Material->GetShader();
+				if (shader == nullptr)
+					continue;
 
-					FrameBufferAttachmentsMask shaderOutputsMask = 0;
-					for (uint32_t output : shader->GetOutputs())
-						shaderOutputsMask |= (1 << output);
+				FrameBufferAttachmentsMask shaderOutputsMask = 0;
+				for (uint32_t output : shader->GetOutputs())
+					shaderOutputsMask |= (1 << output);
 
-					s_RendererData.CurrentViewport->RenderTarget->SetWriteMask(shaderOutputsMask);
-				}
+				s_RendererData.CurrentViewport->RenderTarget->SetWriteMask(shaderOutputsMask);
 			}
 
 			auto& instanceData = s_RendererData.InstanceDataBuffer.emplace_back();
@@ -652,6 +697,9 @@ namespace Grapple
 	void Renderer::ExecuteShadowPass()
 	{
 		Grapple_PROFILE_FUNCTION();
+
+		CalculateShadowProjections();
+		CalculateShadowMappingParams();
 
 		// Prepare objects for shadow pass
 
@@ -713,7 +761,10 @@ namespace Grapple
 		if (instancesCount == 0 || s_RendererData.CurrentInstancingMesh == nullptr)
 			return;
 
-		s_RendererData.InstanceBuffer->SetData(s_RendererData.InstanceDataBuffer.data(), sizeof(InstanceData) * instancesCount);
+		{
+			Grapple_PROFILE_SCOPE("Renderer::FlushInstance::SetInstancesData");
+			s_RendererData.InstanceBuffer->SetData(s_RendererData.InstanceDataBuffer.data(), sizeof(InstanceData) * instancesCount);
+		}
 
 		RenderCommand::DrawInstanced(s_RendererData.CurrentInstancingMesh->GetSubMesh().MeshVertexArray, instancesCount);
 		s_RendererData.Statistics.DrawCallsCount++;
@@ -764,7 +815,11 @@ namespace Grapple
 		FrameBufferAttachmentsMask previousMask = s_RendererData.CurrentViewport->RenderTarget->GetWriteMask();
 		s_RendererData.CurrentViewport->RenderTarget->SetWriteMask(shaderOutputsMask);
 
-		RenderCommand::DrawIndexed(mesh, indicesCount == SIZE_MAX ? mesh->GetIndexBuffer()->GetCount() : indicesCount);
+		{
+			Grapple_PROFILE_SCOPE("Renderer::DrawMesh::DrawIndexed");
+			RenderCommand::DrawIndexed(mesh, indicesCount == SIZE_MAX ? mesh->GetIndexBuffer()->GetCount() : indicesCount);
+		}
+
 		s_RendererData.Statistics.DrawCallsCount++;
 
 		s_RendererData.CurrentViewport->RenderTarget->SetWriteMask(previousMask);
