@@ -1,5 +1,8 @@
 #pragma once
 
+#include <GrappleCore/Serialization/TypeSerializer.h>
+#include <GrappleCore/Serialization/SerializationStream.h>
+
 #include <GrappleECS/System/SystemInitializer.h>
 #include <GrappleECS/Entity/ComponentInitializer.h>
 
@@ -18,6 +21,18 @@ struct PrefabSpawner
 
 	float TimeLeft;
 	float Period;
+};
+
+template<>
+struct Grapple::TypeSerializer<PrefabSpawner>
+{
+	void OnSerialize(PrefabSpawner& prefabSpawner, Grapple::SerializationStream& stream)
+	{
+		stream.Serialize("Enabled", Grapple::SerializationValue(prefabSpawner.Enabled));
+		stream.Serialize("PrefabHandle", Grapple::SerializationValue(prefabSpawner.PrefabHandle));
+		stream.Serialize("TimeLeft", Grapple::SerializationValue(prefabSpawner.TimeLeft));
+		stream.Serialize("Period", Grapple::SerializationValue(prefabSpawner.Period));
+	}
 };
 
 struct PrefabSpawnSystem : Grapple::System

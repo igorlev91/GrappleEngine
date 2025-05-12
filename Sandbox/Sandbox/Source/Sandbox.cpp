@@ -1,15 +1,11 @@
+#include "Sandbox.h"
+
 #include <GrappleECS/World.h>
 #include <GrappleECS/System/System.h>
-
-#include <GrappleECS/System/SystemInitializer.h>
-#include <GrappleECS/Entity/ComponentInitializer.h>
 
 #include <GrappleECS/Commands/CommandBuffer.h>
 
 #include <Grapple/Core/Time.h>
-#include <GrappleCore/Serialization/TypeInitializer.h>
-
-#include <Grapple/AssetManager/AssetManager.h>
 
 #include <Grapple/Scene/Components.h>
 #include <Grapple/Scene/Prefab.h>
@@ -21,40 +17,16 @@
 
 namespace Sandbox
 {
-	using namespace Grapple;
-	struct RotatingQuadData
-	{
-		Grapple_COMPONENT;
-		float RotationSpeed;
-		AssetHandle PrefabHandle;
-	};
 	Grapple_IMPL_COMPONENT(RotatingQuadData,
 		Grapple_PROPERTY(RotatingQuadData, RotationSpeed),
 		Grapple_PROPERTY(RotatingQuadData, PrefabHandle)
 	);
 
-	struct SomeComponent
-	{
-		Grapple_COMPONENT;
-
-		int a, b;
-
-		SomeComponent()
-			: a(100), b(-234) {}
-	};
 	Grapple_IMPL_COMPONENT(SomeComponent,
 		Grapple_PROPERTY(SomeComponent, a),
 		Grapple_PROPERTY(SomeComponent, b),
 	);
 
-	struct TestComponent
-	{
-		Grapple_COMPONENT;
-		int a;
-
-		TestComponent()
-			: a(1000) {}
-	};
 	Grapple_IMPL_COMPONENT(TestComponent, Grapple_PROPERTY(TestComponent, a));
 
 	class RotatingQuadSystem : public Grapple::System

@@ -37,6 +37,8 @@ namespace Grapple
         }
     };
 
+
+
     struct Grapple_API TransformComponent
     {
         Grapple_COMPONENT;
@@ -62,6 +64,8 @@ namespace Grapple
             stream.Serialize("Scale", SerializationValue(transform.Scale));
         }
     };
+
+
 
     struct Grapple_API CameraComponent
     {
@@ -99,6 +103,8 @@ namespace Grapple
         }
     };
 
+
+
     struct Grapple_API SpriteComponent
     {
         Grapple_COMPONENT;
@@ -117,13 +123,15 @@ namespace Grapple
     {
         void OnSerialize(SpriteComponent& sprite, SerializationStream& stream)
         {
-            stream.Serialize("Color", SerializationValue(sprite.Color));
+            stream.Serialize("Color", SerializationValue(sprite.Color, SerializationValueFlags::Color));
             stream.Serialize("TextureTiling", SerializationValue(sprite.TextureTiling));
             stream.Serialize("Texture", SerializationValue(sprite.Texture));
             
             // TODO: serialize flags
         }
     };
+
+
 
     struct Grapple_API SpriteLayer
     {
@@ -144,6 +152,8 @@ namespace Grapple
         }
     };
 
+
+
     struct Grapple_API MaterialComponent
     {
         Grapple_COMPONENT;
@@ -163,6 +173,8 @@ namespace Grapple
         }
     };
 
+
+
     struct Grapple_API TextComponent
     {
         Grapple_COMPONENT;
@@ -181,10 +193,12 @@ namespace Grapple
         void OnSerialize(TextComponent& text, SerializationStream& stream)
         {
             stream.Serialize("Text", SerializationValue(text.Text));
-            stream.Serialize("Color", SerializationValue(text.Color));
+            stream.Serialize("Color", SerializationValue(text.Color, SerializationValueFlags::Color));
             stream.Serialize("Font", SerializationValue(text.Font));
         }
     };
+
+
 
     struct Grapple_API MeshComponent
     {
@@ -228,10 +242,12 @@ namespace Grapple
     {
         void OnSerialize(DirectionalLight& light, SerializationStream& stream)
         {
-            stream.Serialize("Color", SerializationValue(light.Color));
+            stream.Serialize("Color", SerializationValue(light.Color, SerializationValueFlags::Color));
             stream.Serialize("Intensity", SerializationValue(light.Intensity));
         }
     };
+
+
 
     struct Grapple_API Environment
     {
@@ -249,7 +265,7 @@ namespace Grapple
     {
         void OnSerialize(Environment& environment, SerializationStream& stream)
         {
-            stream.Serialize("EnvironmentColor", SerializationValue(environment.EnvironmentColor));
+            stream.Serialize("EnvironmentColor", SerializationValue(environment.EnvironmentColor, SerializationValueFlags::Color));
             stream.Serialize("EnvironmentColorIntensity", SerializationValue(environment.EnvironmentColorIntensity));
         }
     };

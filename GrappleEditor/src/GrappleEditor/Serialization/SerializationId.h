@@ -1,6 +1,8 @@
 #pragma once
 
 #include "GrappleCore/UUID.h"
+#include "GrappleCore/Serialization/TypeSerializer.h"
+#include "GrappleCore/Serialization/SerializationStream.h"
 
 #include "GrappleECS/World.h"
 #include "GrappleECS/Entity/ComponentInitializer.h"
@@ -16,5 +18,14 @@ namespace Grapple
 			: Id(id) {}
 
 		UUID Id;
+	};
+
+	template<>
+	struct TypeSerializer<SerializationId>
+	{
+		void OnSerialize(SerializationId& id, SerializationStream& stream)
+		{
+			stream.Serialize("Id", SerializationValue(id.Id));
+		}
 	};
 }
