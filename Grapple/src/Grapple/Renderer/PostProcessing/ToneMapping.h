@@ -1,5 +1,8 @@
 #pragma once
 
+#include "GrappleCore/Serialization/TypeSerializer.h"
+#include "GrappleCore//Serialization/SerializationStream.h"
+
 #include "Grapple/Renderer/RenderPass.h"
 #include "Grapple/Renderer/Material.h"
 
@@ -17,5 +20,14 @@ namespace Grapple
 		bool Enabled;
 	private:
 		Ref<Material> m_Material;
+	};
+
+	template<>
+	struct TypeSerializer<ToneMapping>
+	{
+		void OnSerialize(ToneMapping& toneMapping, SerializationStream& stream)
+		{
+			stream.Serialize("Enabled", SerializationValue(toneMapping.Enabled));
+		}
 	};
 }

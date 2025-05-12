@@ -51,6 +51,24 @@ namespace Grapple
         }
     }
 
+    void SerializablePropertyRenderer::SerializeBool(SerializationValue<bool> value)
+    {
+        BeginPropertiesGridIfNeeded();
+
+        if (!value.IsArray)
+            EditorGUI::PropertyName(m_CurrentPropertyName.data());
+
+        for (size_t i = 0; i < value.Values.GetSize(); i++)
+        {
+            if (value.IsArray)
+                EditorGUI::PropertyIndex(i);
+
+            ImGui::PushID(&value.Values[i]);
+            ImGui::Checkbox("", &value.Values[i]);
+            ImGui::PopID();
+        }
+    }
+
     void SerializablePropertyRenderer::SerializeFloat(SerializationValue<float> value)
     {
         BeginPropertiesGridIfNeeded();
@@ -91,10 +109,16 @@ namespace Grapple
                 ImGui::DragFloat2("", &value.Values[i]);
                 break;
             case 3:
-                ImGui::DragFloat3("", &value.Values[i]);
+                if (HAS_BIT(value.Flags, SerializationValueFlags::Color))
+                    ImGui::ColorEdit3("", &value.Values[i], ImGuiColorEditFlags_Float);
+                else
+                    ImGui::DragFloat3("", &value.Values[i]);
                 break;
             case 4:
-                ImGui::DragFloat4("", &value.Values[i]);
+                if (HAS_BIT(value.Flags, SerializationValueFlags::Color))
+                    ImGui::ColorEdit4("", &value.Values[i], ImGuiColorEditFlags_Float);
+                else
+                    ImGui::DragFloat4("", &value.Values[i]);
                 break;
             }
 
