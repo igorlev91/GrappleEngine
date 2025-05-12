@@ -3,6 +3,7 @@
 #include "GrappleECS/Entity/Archetype.h"
 
 #include "GrappleCore/Serialization/TypeInitializer.h"
+#include "GrappleCore/Serialization/TypeSerializer.h"
 
 #include <stdint.h>
 #include <xhash>

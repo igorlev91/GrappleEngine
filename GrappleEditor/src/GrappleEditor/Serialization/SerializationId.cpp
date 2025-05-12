@@ -2,5 +2,5 @@
 
 namespace Grapple
 {
-	Grapple_IMPL_COMPONENT(SerializationId, Grapple_PROPERTY(SerializationId, Id));
+	Grapple_IMPL_COMPONENT(SerializationId);
 }

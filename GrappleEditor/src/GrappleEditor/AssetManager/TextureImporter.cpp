@@ -1,6 +1,5 @@
 #include "TextureImporter.h"
 
-#include "GrappleEditor/Serialization/Serialization.h"
 #include "GrappleEditor/AssetManager/EditorAssetManager.h"
 
 #include <fstream>

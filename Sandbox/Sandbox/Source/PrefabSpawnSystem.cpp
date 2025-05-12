@@ -10,12 +10,7 @@
 
 using namespace Grapple;
 
-Grapple_IMPL_COMPONENT(PrefabSpawner,
-	Grapple_PROPERTY(PrefabSpawner, Enabled),
-	Grapple_PROPERTY(PrefabSpawner, PrefabHandle),
-	Grapple_PROPERTY(PrefabSpawner, Period),
-	Grapple_PROPERTY(PrefabSpawner, TimeLeft),
-);
+Grapple_IMPL_COMPONENT(PrefabSpawner);
 
 void PrefabSpawnSystem::OnConfig(SystemConfig& config)
 {

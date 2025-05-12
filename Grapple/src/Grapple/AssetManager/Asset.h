@@ -4,6 +4,7 @@
 #include "GrappleCore/Assert.h"
 
 #include "GrappleCore/Serialization/TypeInitializer.h"
+#include "GrappleCore/Serialization/TypeSerializer.h"
 
 #include <filesystem>
 #include <string_view>

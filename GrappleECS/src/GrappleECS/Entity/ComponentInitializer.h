@@ -32,8 +32,8 @@ namespace Grapple
 	Grapple_TYPE                                      \
 	static Grapple::ComponentInitializer _Component;
 
-#define Grapple_IMPL_COMPONENT(typeName, ...)                               \
-	Grapple_IMPL_TYPE(typeName, __VA_ARGS__);                               \
+#define Grapple_IMPL_COMPONENT(typeName)                                \
+	Grapple_IMPL_TYPE(typeName);                                        \
 	Grapple::ComponentInitializer typeName::_Component(typeName::_Type);
 
 #define COMPONENT_ID(typeName) (typeName::_Component.GetId())

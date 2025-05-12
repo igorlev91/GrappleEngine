@@ -17,17 +17,9 @@
 
 namespace Sandbox
 {
-	Grapple_IMPL_COMPONENT(RotatingQuadData,
-		Grapple_PROPERTY(RotatingQuadData, RotationSpeed),
-		Grapple_PROPERTY(RotatingQuadData, PrefabHandle)
-	);
-
-	Grapple_IMPL_COMPONENT(SomeComponent,
-		Grapple_PROPERTY(SomeComponent, a),
-		Grapple_PROPERTY(SomeComponent, b),
-	);
-
-	Grapple_IMPL_COMPONENT(TestComponent, Grapple_PROPERTY(TestComponent, a));
+	Grapple_IMPL_COMPONENT(RotatingQuadData);
+	Grapple_IMPL_COMPONENT(SomeComponent);
+	Grapple_IMPL_COMPONENT(TestComponent);
 
 	class RotatingQuadSystem : public Grapple::System
 	{

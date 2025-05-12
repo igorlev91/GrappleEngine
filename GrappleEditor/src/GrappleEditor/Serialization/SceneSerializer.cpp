@@ -8,7 +8,6 @@
 
 #include "GrappleECS/Query/EntitiesIterator.h"
 
-#include "GrappleEditor/Serialization/Serialization.h"
 #include "GrappleEditor/Serialization/SerializationId.h"
 #include "GrappleEditor/Serialization/YAMLSerialization.h"
 
@@ -111,11 +110,6 @@ namespace Grapple
 					YAMLDeserializer deserializer(componentNode);
 					deserializer.PropertyKey("Data");
 					deserializer.SerializeObject(serializationDescriptor, (void*)componentData);
-				}
-				else
-				{
-					SerializableObject serializableComponent = SerializableObject(componentData, serializationDescriptor);
-					DeserializeObject(componentNode, serializableComponent);
 				}
 			}
 		}
