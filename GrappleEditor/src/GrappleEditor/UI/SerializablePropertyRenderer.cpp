@@ -197,16 +197,18 @@ namespace Grapple
 
     void SerializablePropertyRenderer::SerializeObject(const SerializableObjectDescriptor& descriptor, void* objectData)
     {
+        if (&descriptor == &Grapple_SERIALIZATION_DESCRIPTOR_OF(AssetHandle))
+        {
+            BeginPropertiesGridIfNeeded();
+            EditorGUI::PropertyName(m_CurrentPropertyName.data());
+            RenderAssetField(*reinterpret_cast<AssetHandle*>(objectData));
+            return;
+        }
+
         if (m_CurrentState.GridStarted)
         {
             EditorGUI::EndPropertyGrid();
             m_CurrentState.GridStarted = false;
-        }
-
-        if (&descriptor == &Grapple_SERIALIZATION_DESCRIPTOR_OF(AssetHandle))
-        {
-            RenderAssetField(*reinterpret_cast<AssetHandle*>(objectData));
-            return;
         }
 
         ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_FramePadding | ImGuiTreeNodeFlags_SpanFullWidth;
