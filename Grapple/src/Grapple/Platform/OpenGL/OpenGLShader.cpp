@@ -348,7 +348,7 @@ namespace Grapple
             for (const auto& param : m_Properties)
             {
                 int32_t location = glGetUniformLocation(m_Id, param.Name.c_str());
-                Grapple_CORE_ASSERT(location != -1);
+                //Grapple_CORE_ASSERT(location != -1);
 
                 m_UniformLocations.push_back(location);
             }

@@ -13,6 +13,7 @@ namespace Grapple
 		RGBA8,
 
 		RedInteger,
+		RF32,
 
 		Depth24Stencil8,
 

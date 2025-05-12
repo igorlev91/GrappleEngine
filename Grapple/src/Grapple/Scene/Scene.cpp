@@ -14,6 +14,8 @@
 
 #include "Grapple/Scripting/ScriptingEngine.h"
 
+#include "Grapple/Renderer/PostProcessing/SSAO.h"
+
 namespace Grapple
 {
 
@@ -24,6 +26,7 @@ namespace Grapple
 	{
 		m_PostProcessingManager.ToneMappingPass = CreateRef<ToneMapping>();
 		m_PostProcessingManager.VignettePass = CreateRef<Vignette>();
+		m_PostProcessingManager.SSAOPass = CreateRef<SSAO>();
 
 		m_World.MakeCurrent();
 		Initialize();
@@ -55,6 +58,7 @@ namespace Grapple
 
 		Renderer::AddRenderPass(m_PostProcessingManager.ToneMappingPass);
 		Renderer::AddRenderPass(m_PostProcessingManager.VignettePass);
+		Renderer::AddRenderPass(m_PostProcessingManager.SSAOPass);
 	}
 
 	void Scene::InitializeRuntime()

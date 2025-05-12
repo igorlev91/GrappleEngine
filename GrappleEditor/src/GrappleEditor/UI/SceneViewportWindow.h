@@ -17,6 +17,7 @@ namespace Grapple
 		enum class ViewportOverlay
 		{
 			Default,
+			Normal,
 			Depth,
 		};
 
