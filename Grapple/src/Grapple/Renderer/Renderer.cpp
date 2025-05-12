@@ -41,6 +41,8 @@ namespace Grapple
 		float CascadeSplits[4];
 
 		glm::mat4 LightProjection[4];
+
+		float Resolution;
 	};
 
 	struct RendererData
@@ -94,7 +96,7 @@ namespace Grapple
 
 		s_RendererData.ShadowMappingSettings.Resolution = 2048;
 		s_RendererData.ShadowMappingSettings.Bias = 0.015f;
-		s_RendererData.ShadowMappingSettings.LightSize = 0.05f;
+		s_RendererData.ShadowMappingSettings.LightSize = 0.009f;
 
 		s_RendererData.ShadowMappingSettings.Cascades = s_RendererData.ShadowMappingSettings.MaxCascades;
 		s_RendererData.ShadowMappingSettings.CascadeSplits[0] = 15.0f;
@@ -339,10 +341,8 @@ namespace Grapple
 				farPlaneDistance = glm::max(farPlaneDistance, farPlane.Distance(center) + projectedDistance);
 			}
 
-			float distance = nearPlaneDistance;
-
-			nearPlaneDistance = -glm::max(params.BoundingSphereRadius, nearPlaneDistance);
-			farPlaneDistance = glm::max(params.BoundingSphereRadius, farPlaneDistance);
+			nearPlaneDistance = -nearPlaneDistance;
+			farPlaneDistance = farPlaneDistance;
 
 			glm::mat4 view = glm::lookAt(params.CameraFrustumCenter + lightDirection * nearPlaneDistance, params.CameraFrustumCenter, glm::vec3(0.0f, 1.0f, 0.0f));
 
@@ -368,6 +368,7 @@ namespace Grapple
 		ShadowData shadowData;
 		shadowData.Bias = s_RendererData.ShadowMappingSettings.Bias;
 		shadowData.LightSize = s_RendererData.ShadowMappingSettings.LightSize;
+		shadowData.Resolution = (float)s_RendererData.ShadowMappingSettings.Resolution;
 
 		for (size_t i = 0; i < 4; i++)
 			shadowData.CascadeSplits[i] = s_RendererData.ShadowMappingSettings.CascadeSplits[i];
@@ -399,15 +400,7 @@ namespace Grapple
 			shadowMapSpecs.Height = s_RendererData.ShadowMappingSettings.Resolution;
 			shadowMapSpecs.Attachments = { { FrameBufferTextureFormat::Depth, TextureWrap::Clamp, TextureFiltering::Linear } };
 
-			for (size_t i = 0; i < 2; i++)
-			{
-				s_RendererData.ShadowsRenderTarget[i] = FrameBuffer::Create(shadowMapSpecs);
-			}
-
-			shadowMapSpecs.Width /= 2;
-			shadowMapSpecs.Height /= 2;
-
-			for (size_t i = 2; i < 4; i++)
+			for (size_t i = 0; i < 4; i++)
 			{
 				s_RendererData.ShadowsRenderTarget[i] = FrameBuffer::Create(shadowMapSpecs);
 			}
@@ -421,9 +414,6 @@ namespace Grapple
 				for (size_t i = 0; i < 4; i++)
 				{
 					uint32_t resolution = s_RendererData.ShadowMappingSettings.Resolution;
-					if (i >= 2)
-						resolution /= 2;
-
 					s_RendererData.ShadowsRenderTarget[i]->Resize(resolution, resolution);
 				}
 			}
