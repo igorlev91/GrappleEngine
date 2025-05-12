@@ -1,5 +1,7 @@
 #include "GrapplePlatform/Platform.h"
 
+#include "GrapplePlatform/Windows/WindowsPlatform.h"
+
 #include "GrappleCore/Assert.h"
 #include "GrappleCore/Assert.h"
 
@@ -19,7 +21,7 @@
 
 namespace Grapple
 {
-	static void LogError()
+	void LogError()
 	{
 		DWORD errorCode = GetLastError();
 		LPSTR messageBuffer = nullptr;

@@ -6,6 +6,8 @@
 
 #include "GrappleECS/ECSContext.h"
 
+#include "GrapplePlatform/FileWatcher.h"
+
 #include "GrappleEditor/UI/AssetEditor.h"
 
 #include "GrappleEditor/UI/SceneWindow.h"
@@ -114,6 +116,8 @@ namespace Grapple
 		EditorMode m_Mode;
 
 		ECSContext m_ECSContext;
+
+		Scope<FileWatcher> m_ProjectFilesWacher;
 	public:
 		GuizmoMode Guizmo;
 		EditorSelection Selection;

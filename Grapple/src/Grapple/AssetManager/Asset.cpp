@@ -1,4 +1,3 @@
-
 #include "Asset.h"
 
 namespace Grapple

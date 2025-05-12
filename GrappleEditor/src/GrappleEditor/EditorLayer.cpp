@@ -52,6 +52,7 @@ namespace Grapple
         m_PropertiesWindow(m_AssetManagerWindow),
         m_PlaymodePaused(false),
         m_Mode(EditorMode::Edit),
+        m_ProjectFilesWacher(nullptr),
         Guizmo(GuizmoMode::None)
     {
         s_Instance = this;
@@ -59,6 +60,7 @@ namespace Grapple
         Project::OnProjectOpen.Bind(Grapple_BIND_EVENT_CALLBACK(OnOpenProject));
         Project::OnUnloadActiveProject.Bind([this]()
         {
+            m_ProjectFilesWacher.reset();
             if (Scene::GetActive() == nullptr)
                 return;
 
@@ -329,6 +331,21 @@ namespace Grapple
 
         ImGui::End();
         ImGuiLayer::End();
+
+        if (m_ProjectFilesWacher)
+        {
+            m_ProjectFilesWacher->Update();
+            FileChangeEvent changes;
+            while (true)
+            {
+                auto result = m_ProjectFilesWacher->TryGetNextEvent(changes);
+
+                if (result != FileWatcher::Result::Ok)
+                    break;
+
+                Grapple_CORE_INFO("Change: {}", changes.FilePath.string());
+            }
+        }
     }
 
     void EditorLayer::UpdateWindowTitle()
@@ -351,6 +368,8 @@ namespace Grapple
 
         AssetHandle startScene = Project::GetActive()->StartScene;
         OpenScene(startScene);
+
+        m_ProjectFilesWacher.reset(FileWatcher::Create(Project::GetActive()->Location, EventsMask::FileName | EventsMask::DirectoryName | EventsMask::LastWrite));
     }
 
     void EditorLayer::SaveActiveScene()

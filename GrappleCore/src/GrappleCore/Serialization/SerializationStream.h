@@ -15,7 +15,8 @@ namespace Grapple
     enum class SerializationValueFlags
     {
         None = 0,
-        Color = 1
+        Color = 1,
+        HDRColor = 2,
     };
 
     Grapple_IMPL_ENUM_BITFIELD(SerializationValueFlags);
