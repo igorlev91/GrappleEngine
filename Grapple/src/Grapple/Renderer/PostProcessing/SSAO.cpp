@@ -5,6 +5,8 @@
 
 #include "Grapple/AssetManager/AssetManager.h"
 
+#include "GrappleCore/Profiler/Profiler.h"
+
 #include <random>
 
 namespace Grapple
@@ -63,6 +65,8 @@ namespace Grapple
 
 	void SSAO::OnRender(RenderingContext& context)
 	{
+		Grapple_PROFILE_FUNCTION();
+
 		if (!Enabled)
 			return;
 
@@ -102,6 +106,7 @@ namespace Grapple
 		aoTarget->Bind();
 
 		{
+			Grapple_PROFILE_SCOPE("SSAO::MainPass");
 			currentViewport.RenderTarget->BindAttachmentTexture(1, 0);
 			m_RandomVectors->Bind(2);
 
@@ -123,6 +128,7 @@ namespace Grapple
 		context.RenderTarget->Bind();
 
 		{
+			Grapple_PROFILE_SCOPE("SSAO::BlurAndCombinePass");
 			aoTarget->BindAttachmentTexture(0);
 			context.RenderTarget->BindAttachmentTexture(0, 1);
 

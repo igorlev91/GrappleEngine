@@ -6,6 +6,8 @@
 #include "Grapple/Renderer/RenderCommand.h"
 #include "Grapple/Renderer/ShaderLibrary.h"
 
+#include "GrappleCore/Profiler/Profiler.h"
+
 namespace Grapple
 {
 	Grapple_IMPL_TYPE(ToneMapping);
@@ -25,6 +27,8 @@ namespace Grapple
 
 	void ToneMapping::OnRender(RenderingContext& context)
 	{
+		Grapple_PROFILE_FUNCTION();
+
 		if (!Enabled)
 			return;
 
