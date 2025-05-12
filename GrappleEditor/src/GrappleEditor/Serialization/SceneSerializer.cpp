@@ -165,6 +165,19 @@ namespace Grapple
 
 			emitter << YAML::EndMap;
 		}
+		
+		{
+			Ref<SSAO> ssao = scene->GetPostProcessingManager().SSAOPass;
+			const auto* descriptor = &Grapple_SERIALIZATION_DESCRIPTOR_OF(SSAO);
+
+			emitter << YAML::Value << YAML::BeginMap;
+			emitter << YAML::Key << "Name" << YAML::Value << descriptor->Name;
+
+			YAMLSerializer serialzier(emitter);
+			serialzier.Serialize("Data", SerializationValue(*ssao));
+
+			emitter << YAML::EndMap;
+		}
 
 		emitter << YAML::EndMap; // PostProcessing
 
@@ -228,6 +241,10 @@ namespace Grapple
 				else if (name == Vignette::_Type.TypeName)
 				{
 					deserializer.Serialize("Data", SerializationValue(*scene->GetPostProcessingManager().VignettePass));
+				}
+				else if (name == SSAO::_Type.TypeName)
+				{
+					deserializer.Serialize("Data", SerializationValue(*scene->GetPostProcessingManager().SSAOPass));
 				}
 			}
 		}

@@ -74,6 +74,22 @@ namespace Grapple
 
 	OpenGLTexture::OpenGLTexture(uint32_t width, uint32_t height, const void* data, TextureFormat format, TextureFiltering filtering)
 	{
+		GLenum dataType = GL_UNSIGNED_BYTE;
+		switch (m_Specifications.Format)
+		{
+		case TextureFormat::RGB8:
+		case TextureFormat::RGBA8:
+		case TextureFormat::RG8:
+			dataType = GL_UNSIGNED_BYTE;
+			break;
+		case TextureFormat::RF32:
+			dataType = GL_FLOAT;
+			break;
+		case TextureFormat::RG16:
+			dataType = GL_UNSIGNED_SHORT;
+			break;
+		}
+
 		switch (format)
 		{
 		case TextureFormat::RGB8:
@@ -88,6 +104,14 @@ namespace Grapple
 			m_InternalTextureFormat = GL_R32F;
 			m_TextureDataType = GL_RED;
 			break;
+		case TextureFormat::RG8:
+			m_InternalTextureFormat = GL_RG8;
+			m_TextureDataType = GL_RG;
+			break;
+		case TextureFormat::RG16:
+			m_InternalTextureFormat = GL_RG16;
+			m_TextureDataType = GL_RG;
+			break;
 		}
 
 		m_Specifications.Width = width;
@@ -99,7 +123,7 @@ namespace Grapple
 
 		SetFiltering(m_Specifications.Filtering);
 
-		glTextureSubImage2D(m_Id, 0, 0, 0, m_Specifications.Width, m_Specifications.Height, m_TextureDataType, GL_UNSIGNED_BYTE, data);
+		glTextureSubImage2D(m_Id, 0, 0, 0, m_Specifications.Width, m_Specifications.Height, m_TextureDataType, dataType, data);
 	}
 	
 	OpenGLTexture::~OpenGLTexture()
@@ -114,7 +138,25 @@ namespace Grapple
 
 	void OpenGLTexture::SetData(const void* data, size_t size)
 	{
-		glTextureSubImage2D(m_Id, 0, 0, 0, m_Specifications.Width, m_Specifications.Height, m_TextureDataType, GL_UNSIGNED_BYTE, data);
+		GLenum dataType = GL_UNSIGNED_BYTE;
+		switch (m_Specifications.Format)
+		{
+		case TextureFormat::RGB8:
+		case TextureFormat::RGBA8:
+			dataType = GL_UNSIGNED_BYTE;
+			break;
+		case TextureFormat::RF32:
+			dataType = GL_FLOAT;
+			break;
+		case TextureFormat::RG8:
+			dataType = GL_UNSIGNED_BYTE;
+			break;
+		case TextureFormat::RG16:
+			dataType = GL_UNSIGNED_SHORT;
+			break;
+		}
+
+		glTextureSubImage2D(m_Id, 0, 0, 0, m_Specifications.Width, m_Specifications.Height, m_TextureDataType, dataType, data);
 	}
 
 	void* OpenGLTexture::GetRendererId() const
@@ -174,6 +216,12 @@ namespace Grapple
 			break;
 		case TextureFormat::RF32:
 			dataType = GL_FLOAT;
+			break;
+		case TextureFormat::RG8:
+			dataType = GL_UNSIGNED_BYTE;
+			break;
+		case TextureFormat::RG16:
+			dataType = GL_UNSIGNED_SHORT;
 			break;
 		}
 

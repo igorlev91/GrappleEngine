@@ -22,6 +22,9 @@ namespace Grapple
 		RGB8,
 		RGBA8,
 
+		RG8,
+		RG16,
+
 		RF32,
 	};
 
