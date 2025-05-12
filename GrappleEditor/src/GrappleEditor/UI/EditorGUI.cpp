@@ -1,10 +1,13 @@
 #include "EditorGUI.h"
 
+#include "GrappleCore/Serialization/SerializationStream.h"
+
 #include "Grapple/AssetManager/AssetManager.h"
 #include "Grapple/Scene/Scene.h"
 
 #include "GrappleEditor/AssetManager/EditorAssetManager.h"
 #include "GrappleEditor/UI/QuickSearch/QuickSearch.h"
+#include "GrappleEditor/UI/SerializablePropertyRenderer.h"
 
 #include <spdlog/spdlog.h>
 
@@ -142,15 +145,12 @@ namespace Grapple
 	{
 		bool result = false;
 
-		if (EditorGUI::BeginPropertyGrid())
-		{
-			size_t propertiesCount = object.Descriptor.Properties.size();
-			for (size_t index = 0; index < propertiesCount; index++)
-				result |= PropertyField(object.PropertyAt(index));
+		SerializablePropertyRenderer propertyRenderer;
 
-			EditorGUI::EndPropertyGrid();
-		}
+		propertyRenderer.PropertyKey(object.Descriptor.Name);
+		propertyRenderer.SerializeObject(object.Descriptor, object.GetBuffer());
 
+		// TODO: get the result from properties renderer
 		return result;
 	}
 
@@ -248,11 +248,7 @@ namespace Grapple
 	bool EditorGUI::TextProperty(const char* name, std::string& text)
 	{
 		PropertyName(name);
-
-		ImGui::PushID(&text);
- 		bool result = ImGui::InputTextMultiline("", text.data(), text.size(), ImVec2(0.0f, 0.0f), ImGuiInputTextFlags_CallbackResize, InputTextCallback, (void*)&text);
-		ImGui::PopID();
-		return result;
+		return TextField(name, text);
 	}
 
 	bool EditorGUI::TextField(const char* name, std::string& text)
@@ -266,6 +262,14 @@ namespace Grapple
 		ImGui::SetCursorPosY(y);
 
 		return TextField((uint64_t)name, text);
+	}
+
+	bool EditorGUI::TextField(std::string& text)
+	{
+		ImGui::PushID(&text);
+ 		bool result = ImGui::InputTextMultiline("", text.data(), text.size(), ImVec2(0.0f, 0.0f), ImGuiInputTextFlags_CallbackResize, InputTextCallback, (void*)&text);
+		ImGui::PopID();
+		return result;
 	}
 
 	bool EditorGUI::TextField(UUID id, std::string& text)

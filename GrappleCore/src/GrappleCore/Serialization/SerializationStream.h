@@ -28,8 +28,7 @@ namespace Grapple
     };
 
     class SerializableObjectDescriptor;
-
-    class SerializationStreamBase
+    class SerializationStream
     {
     public:
         virtual void PropertyKey(std::string_view key) = 0;
@@ -42,66 +41,41 @@ namespace Grapple
         virtual void SerializeFloatVector(SerializationValue<float> value, uint32_t componentsCount) = 0;
         virtual void SerializeIntVector(SerializationValue<int32_t> value, uint32_t componentsCount) = 0;
 
-        virtual void BeginArray() = 0;
-        virtual void EndArray() = 0;
-
-        virtual void BeginObject(const SerializableObjectDescriptor* descriptor) = 0;
-        virtual void EndObject() = 0;
-    };
-
-    class SerializationStream
-    {
-    public:
-        SerializationStream(SerializationStreamBase& stream)
-            : m_Stream(stream) {}
+        virtual void SerializeString(SerializationValue<std::string> value) = 0;
+        virtual void SerializeObject(const SerializableObjectDescriptor& descriptor, void* objectData) {}
 
         template<typename T>
         inline void Serialize(SerializationValue<T> value)
         {
-            TypeSerializer<T> serializer;
             const SerializableObjectDescriptor* descriptor = SerializationDescriptorOf<T>().Descriptor();
+
+            Grapple_CORE_ASSERT(descriptor);
             if (value.IsArray)
             {
-                m_Stream.BeginArray();
                 for (size_t i = 0; i < value.Values.GetSize(); i++)
                 {
-                    m_Stream.BeginObject(descriptor);
-                    serializer.OnSerialize(value.Values[i], *this);
-                    m_Stream.EndObject();
+                    SerializeObject(*descriptor, &value.Values[i]);
                 }
-                m_Stream.EndArray();
             }
             else
             {
-                if (descriptor)
-                    m_Stream.BeginObject(descriptor);
-
-                serializer.OnSerialize(value.Values[0], *this);
-
-                if (descriptor)
-                    m_Stream.EndObject();
+                SerializeObject(*descriptor, &value.Values[0]);
             }
         }
 
         template<typename T>
         inline void Serialize(std::string_view key, SerializationValue<T> value)
         {
-            m_Stream.PropertyKey(key);
+            PropertyKey(key);
             Serialize(value);
         }
-
-        inline SerializationStreamBase& GetInternalStream() { return m_Stream; }
-    private:
-        SerializationStreamBase& m_Stream;
     };
 
 #define IMPL_SERIALIZATION_WRAPPER(typeName, functionName)                                    \
     template<> 																				  \
     inline void SerializationStream::Serialize<typeName>(SerializationValue<typeName> value)  \
     {                                                                                         \
-        if (value.IsArray) m_Stream.BeginArray();                                             \
-        m_Stream.functionName(value);                                                         \
-        if (value.IsArray) m_Stream.EndArray();                                               \
+        functionName(value);                                                                  \
     }
 
     IMPL_SERIALIZATION_WRAPPER(int32_t, SerializeInt32);
@@ -109,18 +83,22 @@ namespace Grapple
     IMPL_SERIALIZATION_WRAPPER(float, SerializeFloat);
 
     template<>
+    inline void SerializationStream::Serialize<std::string>(SerializationValue<std::string> value)
+    {
+        SerializeString(value);
+    }
+
+    template<>
     inline void SerializationStream::Serialize<glm::ivec2>(SerializationValue<glm::ivec2> value)
     {
         if (value.IsArray)
         {
-            m_Stream.BeginArray();
             int32_t* vectors = glm::value_ptr(value.Values[0]);
-            m_Stream.SerializeIntVector(SerializationValue(vectors, value.Values.GetSize() * 2), 2);
-            m_Stream.EndArray();
+            SerializeIntVector(SerializationValue(vectors, value.Values.GetSize() * 2), 2);
         }
         else
         {
-            m_Stream.SerializeIntVector(SerializationValue(*glm::value_ptr(value.Values[0])), 2);
+            SerializeIntVector(SerializationValue(*glm::value_ptr(value.Values[0])), 2);
         }
     }
 
@@ -129,14 +107,12 @@ namespace Grapple
     {
         if (value.IsArray)
         {
-            m_Stream.BeginArray();
             int32_t* vectors = glm::value_ptr(value.Values[0]);
-            m_Stream.SerializeIntVector(SerializationValue(vectors, value.Values.GetSize() * 3), 3);
-            m_Stream.EndArray();
+            SerializeIntVector(SerializationValue(vectors, value.Values.GetSize() * 3), 3);
         }
         else
         {
-            m_Stream.SerializeIntVector(SerializationValue(*glm::value_ptr(value.Values[0])), 3);
+            SerializeIntVector(SerializationValue(*glm::value_ptr(value.Values[0])), 3);
         }
     }
 
@@ -145,14 +121,12 @@ namespace Grapple
     {
         if (value.IsArray)
         {
-            m_Stream.BeginArray();
             float* vectors = glm::value_ptr(value.Values[0]);
-            m_Stream.SerializeFloatVector(SerializationValue(vectors, value.Values.GetSize() * 2), 2);
-            m_Stream.EndArray();
+            SerializeFloatVector(SerializationValue(vectors, value.Values.GetSize() * 2), 2);
         }
         else
         {
-            m_Stream.SerializeFloatVector(SerializationValue(*glm::value_ptr(value.Values[0])), 2);
+            SerializeFloatVector(SerializationValue(*glm::value_ptr(value.Values[0])), 2);
         }
     }
 
@@ -161,32 +135,38 @@ namespace Grapple
     {
         if (value.IsArray)
         {
-            m_Stream.BeginArray();
             float* vectors = glm::value_ptr(value.Values[0]);
-            m_Stream.SerializeFloatVector(SerializationValue(vectors, value.Values.GetSize() * 3), 3);
-            m_Stream.EndArray();
+            SerializeFloatVector(SerializationValue(vectors, value.Values.GetSize() * 3), 3);
         }
         else
         {
-            m_Stream.SerializeFloatVector(SerializationValue(*glm::value_ptr(value.Values[0])), 3);
+            SerializeFloatVector(SerializationValue(*glm::value_ptr(value.Values[0])), 3);
         }
     }
 
     template<typename T>
-    struct SerializationDescriptorOf<std::vector<T>>
+    struct TypeSerializer<std::vector<T>>
     {
-        const SerializableObjectDescriptor* Descriptor()
+        static void OnSerialize(std::vector<T>& vector, SerializationStream& stream)
         {
-            return nullptr;
+            stream.Serialize(SerializationValue(vector.data(), vector.size()));
         }
     };
 
     template<typename T>
-    struct TypeSerializer<std::vector<T>>
+    struct SerializationDescriptorOf<std::vector<T>>
     {
-        void OnSerialize(std::vector<T>& vector, SerializationStream& stream)
+        static const SerializableObjectDescriptor* Descriptor()
         {
-            stream.Serialize(SerializationValue(vector.data(), vector.size()));
+            static SerializableObjectDescriptor s_Descriptor(
+                typeid(std::vector<T>).name(),
+                sizeof(std::vector<T>), {},
+                [](void* vector, SerializationStream& stream)
+                {
+                    TypeSerializer<std::vector<T>>::OnSerialize(*(std::vector<T>*)vector, stream);
+                });
+
+            return &s_Descriptor;
         }
     };
 }

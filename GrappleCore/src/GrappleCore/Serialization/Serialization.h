@@ -168,6 +168,8 @@ namespace Grapple
             return SerializableObject((uint8_t*)&value, Grapple_SERIALIZATION_DESCRIPTOR_OF(T));
         }
 
+        inline void* GetBuffer() { return m_Buffer; }
+
         inline SerializableProperty PropertyAt(size_t index)
         {
             Grapple_CORE_ASSERT(index < Descriptor.Properties.size());

@@ -1,5 +1,8 @@
 #pragma once
 
+#include "GrappleCore/Serialization/TypeSerializer.h"
+#include "GrappleCore/Serialization/SerializationStream.h"
+
 #include "Grapple.h"
 #include "Grapple/Renderer2D/Renderer2D.h"
 #include "Grapple/Renderer/Renderer.h"
@@ -39,6 +42,17 @@ namespace Grapple
 		glm::vec3 Rotation;
 		glm::vec3 Scale;
 	};
+
+    template<>
+    struct TypeSerializer<TransformComponent>
+    {
+        void OnSerialize(TransformComponent& transform, SerializationStream& stream)
+        {
+            stream.Serialize("Position", SerializationValue(transform.Position));
+            stream.Serialize("Rotation", SerializationValue(transform.Rotation));
+            stream.Serialize("Scale", SerializationValue(transform.Scale));
+        }
+    };
 
 	struct Grapple_API CameraComponent
 	{
@@ -85,6 +99,15 @@ namespace Grapple
 		SpriteLayer(int32_t layer);
 
 		int32_t Layer;
+	};
+
+	template<>
+	struct TypeSerializer<SpriteLayer>
+	{
+		void OnSerialize(SpriteLayer& value, SerializationStream& stream)
+		{
+			stream.Serialize("Layer", SerializationValue(value.Layer));
+		}
 	};
 
 	struct Grapple_API MaterialComponent

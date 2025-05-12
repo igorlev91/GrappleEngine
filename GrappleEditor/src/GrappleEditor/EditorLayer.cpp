@@ -23,6 +23,7 @@
 #include "GrapplePlatform/Events.h"
 
 #include "GrappleEditor/Serialization/SceneSerializer.h"
+#include "GrappleEditor/Serialization/YAMLSerialization.h"
 #include "GrappleEditor/AssetManager/EditorAssetManager.h"
 #include "GrappleEditor/AssetManager/EditorShaderCache.h"
 
@@ -51,6 +52,8 @@ namespace Grapple
         float FloatValue;
         glm::vec2 Vector;
 
+        std::string Text;
+
         std::vector<int32_t> Ints;
         std::vector<glm::vec3> Vectors;
         std::vector<glm::ivec3> IntVectors;
@@ -75,6 +78,7 @@ namespace Grapple
             stream.Serialize("Ints", SerializationValue(value.Ints));
             stream.Serialize("Vectors", SerializationValue(value.Vectors));
             stream.Serialize("IntVectors", SerializationValue(value.IntVectors));
+            stream.Serialize("Text", SerializationValue(value.Text));
         }
     };
 
@@ -91,114 +95,6 @@ namespace Grapple
     };
 
     Grapple_SERIALIZABLE_IMPL(Outer);
-
-    template<>
-    struct TypeSerializer<TransformComponent>
-    {
-        void OnSerialize(TransformComponent& transform, SerializationStream& stream)
-        {
-            stream.Serialize("Position", SerializationValue(transform.Position));
-            stream.Serialize("Rotation", SerializationValue(transform.Rotation));
-            stream.Serialize("Scale", SerializationValue(transform.Scale));
-        }
-    };
-
-    class TestSerializationStream : public SerializationStreamBase
-    {
-        void SerializeInt32(SerializationValue<int32_t> value) override
-        {
-            Grapple_CORE_INFO("{}", value.IsArray);
-
-            for (size_t i = 0; i < value.Values.GetSize(); i++)
-            {
-                Grapple_CORE_INFO("\t{} = {}", i, value.Values[i]);
-            }
-        }
-
-        void SerializeUInt32(SerializationValue<uint32_t> value) override
-        {
-            Grapple_CORE_INFO("{}", value.IsArray);
-
-            for (size_t i = 0; i < value.Values.GetSize(); i++)
-            {
-                Grapple_CORE_INFO("\t{} = {}", i, value.Values[i]);
-            }
-        }
-
-        void SerializeFloat(SerializationValue<float> value) override
-        {
-            Grapple_CORE_INFO("{} {}", value.IsArray, value.Values[0]);
-        }
-
-        void BeginArray() override
-        {
-            Grapple_CORE_INFO("Begin Array");
-        }
-
-        void EndArray() override
-        {
-            Grapple_CORE_INFO("End Array");
-        }
-
-        void PropertyKey(std::string_view key) override
-        {
-            Grapple_CORE_INFO("Property {}", key);
-        }
-
-        void BeginObject(const SerializableObjectDescriptor* descriptor) override
-        {
-            Grapple_CORE_INFO("Begin Object");
-        }
-
-        void EndObject() override
-        {
-            Grapple_CORE_INFO("End Object");
-        }
-
-        void SerializeFloatVector(SerializationValue<float> value, uint32_t componentsCount) override
-        {
-            char componentNames[] = "xyzw";
-
-            Grapple_CORE_ASSERT(componentsCount <= 4);
-            Grapple_CORE_INFO("Vector{}", componentsCount);
-
-            for (size_t j = 0; j < value.Values.GetSize(); j += (size_t)componentsCount)
-            {
-                if (value.IsArray)
-                    Grapple_CORE_INFO("\t{} = ", j / (size_t)componentsCount);
-
-                for (uint32_t i = 0; i < componentsCount; i++)
-                {
-                    if (value.IsArray)
-                        Grapple_CORE_INFO("\t\t{} = {}", componentNames[i], value.Values[(size_t)i + j]);
-                    else
-                        Grapple_CORE_INFO("\t{} = {}", componentNames[i], value.Values[(size_t)i + j]);
-                }
-            }
-        }
-
-        void SerializeIntVector(SerializationValue<int32_t> value, uint32_t componentsCount) override
-        {
-            char componentNames[] = "xyzw";
-
-            Grapple_CORE_ASSERT(componentsCount <= 4);
-            Grapple_CORE_INFO("Vector{}", componentsCount);
-
-            for (size_t j = 0; j < value.Values.GetSize(); j += (size_t)componentsCount)
-            {
-                if (value.IsArray)
-                    Grapple_CORE_INFO("\t{} = ", j / (size_t)componentsCount);
-
-                for (uint32_t i = 0; i < componentsCount; i++)
-                {
-                    if (value.IsArray)
-                        Grapple_CORE_INFO("\t\t{} = {}", componentNames[i], value.Values[(size_t)i + j]);
-                    else
-                        Grapple_CORE_INFO("\t{} = {}", componentNames[i], value.Values[(size_t)i + j]);
-                }
-            }
-        }
-    };
 
     EditorLayer* EditorLayer::s_Instance = nullptr;
 
@@ -230,29 +126,8 @@ namespace Grapple
         s_Instance = nullptr;
     }
 
-    static Scope<SerializablePropertyRenderer> s_PropertiesRenderer;
-
     void EditorLayer::OnAttach()
     {
-        s_PropertiesRenderer = CreateScope<SerializablePropertyRenderer>();
-
-        Scope<TestSerializationStream> serializationStream = CreateScope<TestSerializationStream>();
-        SerializationStream stream(*serializationStream);
-
-        CustomType t = { 10, 0.54545f };
-        t.Ints = { 10, 11, 12, 13 };
-        t.Vectors = { glm::vec3(1.0f), glm::vec3(2.0f), glm::vec3(-10.0f) };
-        //stream.Serialize("Object", SerializationValue(t));
-
-        TransformComponent transform;
-        transform.Position = glm::vec3(8, 92, 1);
-        transform.Rotation = glm::vec3(-993, 12, 1);
-        transform.Scale = glm::vec3(10, 10, 20);
-
-        //stream.Serialize("Transform", SerializationValue(transform));
-
-
-
         ShaderCacheManager::SetInstance(CreateScope<EditorShaderCache>());
 
         m_PropertiesWindow.OnAttach();
@@ -392,18 +267,25 @@ namespace Grapple
         {
             ImGui::Begin("Test");
 
-            SerializationStream stream(*s_PropertiesRenderer);
+            SerializablePropertyRenderer stream;
 
-            Outer o;
-            o.a = 88;
-            CustomType& t = o.t;
+            static Outer o;
+            static CustomType& t = o.t;
+            static bool init = false;
 
-            t.IntValue = 10;
-            t.FloatValue = 0.54545f;
-            t.Ints = { 10, 11, 12, 13 };
-            t.Vector = glm::vec2(1000, -99);
-            t.Vectors = { glm::vec3(1.0f), glm::vec3(2.0f), glm::vec3(-10.0f) };
-            t.IntVectors = { glm::ivec3(1), glm::ivec3(2), glm::ivec3(-993294) };
+            if (!init)
+            {
+                o.a = 88;
+
+                t.IntValue = 10;
+                t.FloatValue = 0.54545f;
+                t.Ints = { 10, 11, 12, 13 };
+                t.Vector = glm::vec2(1000, -99);
+                t.Vectors = { glm::vec3(1.0f), glm::vec3(2.0f), glm::vec3(-10.0f) };
+                t.IntVectors = { glm::ivec3(1), glm::ivec3(2), glm::ivec3(-993294) };
+
+                init = true;
+            }
 
             TransformComponent transform;
             transform.Position = glm::vec3(8, 92, 1);
@@ -412,6 +294,31 @@ namespace Grapple
 
             stream.Serialize("Outer", SerializationValue(o));
             stream.Serialize("Transform", SerializationValue(transform));
+
+            if (ImGui::Button("To YAML"))
+            {
+                YAML::Emitter emitter;
+                emitter << YAML::BeginMap;
+                YAMLSerializer stream(emitter);
+
+                stream.Serialize("Outer", SerializationValue(o));
+                stream.Serialize("Transform", SerializationValue(transform));
+                emitter << YAML::EndMap;
+
+                Grapple_CORE_INFO(emitter.c_str());
+            }
+
+            static char s_Buffer[2048] = { 0 };
+            ImGui::InputTextMultiline("YAML", s_Buffer, 2048, ImVec2(600, 400));
+
+            if (ImGui::Button("From YAML"))
+            {
+                YAML::Node root = YAML::Load(s_Buffer);
+                YAMLDeserializer stream(root);
+
+                stream.Serialize("Outer", SerializationValue(o));
+                stream.Serialize("Transform", SerializationValue(transform));
+            }
 
             ImGui::End();
         }
@@ -500,7 +407,7 @@ namespace Grapple
 
             if (ImGui::TreeNodeEx("Post Processing", ImGuiTreeNodeFlags_FramePadding | ImGuiTreeNodeFlags_SpanAvailWidth))
             {
-                auto postProcessing = Scene::GetActive()->GetPostProcessingManager();
+                auto& postProcessing = Scene::GetActive()->GetPostProcessingManager();
 
                 if (ImGui::TreeNodeEx("Tone Mapping", ImGuiTreeNodeFlags_FramePadding | ImGuiTreeNodeFlags_SpanAvailWidth))
                 {

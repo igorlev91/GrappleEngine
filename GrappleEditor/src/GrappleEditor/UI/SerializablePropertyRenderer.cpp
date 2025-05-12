@@ -5,6 +5,11 @@
 
 namespace Grapple
 {
+    SerializablePropertyRenderer::SerializablePropertyRenderer()
+        : m_CurrentState({ false })
+    {
+    }
+
     void SerializablePropertyRenderer::PropertyKey(std::string_view key)
     {
         m_CurrentPropertyName = key;
@@ -12,9 +17,6 @@ namespace Grapple
 
     void SerializablePropertyRenderer::SerializeInt32(SerializationValue<int32_t> value)
     {
-        if (!CurrentTreeNodeState().Expanded)
-            return;
-
         BeginPropertiesGridIfNeeded();
 
         if (!value.IsArray)
@@ -33,29 +35,42 @@ namespace Grapple
 
     void SerializablePropertyRenderer::SerializeUInt32(SerializationValue<uint32_t> value)
     {
-        if (!CurrentTreeNodeState().Expanded)
-            return;
-
         BeginPropertiesGridIfNeeded();
 
-        EditorGUI::UIntPropertyField(m_CurrentPropertyName.data(), value.Values[0]);
+        if (!value.IsArray)
+            EditorGUI::PropertyName(m_CurrentPropertyName.data());
+
+        for (size_t i = 0; i < value.Values.GetSize(); i++)
+        {
+            if (value.IsArray)
+                EditorGUI::PropertyIndex(i);
+
+            ImGui::PushID(&value.Values[i]);
+            ImGui::DragScalar("", ImGuiDataType_U32, &value.Values[i]);
+            ImGui::PopID();
+        }
     }
 
     void SerializablePropertyRenderer::SerializeFloat(SerializationValue<float> value)
     {
-        if (!CurrentTreeNodeState().Expanded)
-            return;
-
         BeginPropertiesGridIfNeeded();
+        
+        if (!value.IsArray)
+            EditorGUI::PropertyName(m_CurrentPropertyName.data());
 
-        EditorGUI::FloatPropertyField(m_CurrentPropertyName.data(), value.Values[0]);
+        for (size_t i = 0; i < value.Values.GetSize(); i++)
+        {
+            if (value.IsArray)
+                EditorGUI::PropertyIndex(i);
+
+            ImGui::PushID(&value.Values[i]);
+            ImGui::DragFloat("", &value.Values[i]);
+            ImGui::PopID();
+        }
     }
 
     void SerializablePropertyRenderer::SerializeFloatVector(SerializationValue<float> value, uint32_t componentsCount)
     {
-        if (!CurrentTreeNodeState().Expanded)
-            return;
-
         BeginPropertiesGridIfNeeded();
 
         if (!value.IsArray)
@@ -89,9 +104,6 @@ namespace Grapple
 
     void SerializablePropertyRenderer::SerializeIntVector(SerializationValue<int32_t> value, uint32_t componentsCount)
     {
-        if (!CurrentTreeNodeState().Expanded)
-            return;
-
         BeginPropertiesGridIfNeeded();
 
         if (!value.IsArray)
@@ -123,71 +135,54 @@ namespace Grapple
         }
     }
 
-    void SerializablePropertyRenderer::BeginArray()
+    void SerializablePropertyRenderer::SerializeString(SerializationValue<std::string> value)
     {
-        BeginTreeNode();
-    }
+        BeginPropertiesGridIfNeeded();
 
-    void SerializablePropertyRenderer::EndArray()
-    {
-        EndTreeNode();
-    }
+        if (!value.IsArray)
+            EditorGUI::PropertyName(m_CurrentPropertyName.data());
 
-    void SerializablePropertyRenderer::BeginObject(const SerializableObjectDescriptor* descriptor)
-    {
-        BeginTreeNode();
-    }
-
-    void SerializablePropertyRenderer::EndObject()
-    {
-        EndTreeNode();
-    }
-
-    void SerializablePropertyRenderer::BeginTreeNode()
-    {
-        if (m_TreeNodeStates.size() > 0)
+        for (size_t i = 0; i < value.Values.GetSize(); i++)
         {
-            PropertiesTreeState& currentState = CurrentTreeNodeState();
-            if (currentState.GridStarted)
-            {
-                EditorGUI::EndPropertyGrid();
-                currentState.GridStarted = false;
-            }
+            if (value.IsArray)
+                EditorGUI::PropertyIndex(i);
+            
+            EditorGUI::TextField(value.Values[i]);
+        }
+    }
+
+    void SerializablePropertyRenderer::SerializeObject(const SerializableObjectDescriptor& descriptor, void* objectData)
+    {
+        if (m_CurrentState.GridStarted)
+        {
+            EditorGUI::EndPropertyGrid();
+            m_CurrentState.GridStarted = false;
         }
 
         ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_FramePadding | ImGuiTreeNodeFlags_SpanFullWidth;
-        bool expanded = false;
-        if (m_TreeNodeStates.size() == 0 || CurrentTreeNodeState().Expanded)
+        bool expanded = ImGui::TreeNodeEx(m_CurrentPropertyName.data(), flags);
+
+        if (expanded)
         {
-            expanded = ImGui::TreeNodeEx(m_CurrentPropertyName.data(), flags);
-        }
+            PropertiesTreeState previousState = m_CurrentState;
+            m_CurrentState.GridStarted = false;
 
-        auto& state = m_TreeNodeStates.emplace_back();
-        state.Expanded = expanded;
-        state.GridStarted = false;
-    }
+            descriptor.Callback(objectData, *this);
 
-    void SerializablePropertyRenderer::EndTreeNode()
-    {
-        PropertiesTreeState& state = CurrentTreeNodeState();
+            if (m_CurrentState.GridStarted)
+                EditorGUI::EndPropertyGrid();
 
-        if (state.GridStarted)
-            EditorGUI::EndPropertyGrid();
-
-        if (state.Expanded)
             ImGui::TreePop();
-
-        m_TreeNodeStates.pop_back();
+            m_CurrentState = previousState;
+        }
     }
 
     void SerializablePropertyRenderer::BeginPropertiesGridIfNeeded()
     {
-        PropertiesTreeState& state = CurrentTreeNodeState();
-        
-        if (!state.GridStarted)
+        if (!m_CurrentState.GridStarted)
         {
             EditorGUI::BeginPropertyGrid();
-            state.GridStarted = true;
+            m_CurrentState.GridStarted = true;
         }
     }
 }

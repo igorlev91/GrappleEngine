@@ -60,7 +60,6 @@ namespace Grapple
 	void SceneSerializer::SerializeEntity(YAML::Emitter& emitter, World& world, Entity entity)
 	{
 		emitter << YAML::BeginMap;
-
 		emitter << YAML::Key << "Components" << YAML::BeginSeq; // Components
 
 		for (ComponentId component : world.GetEntityComponents(entity))
@@ -70,7 +69,7 @@ namespace Grapple
 		emitter << YAML::EndMap;
 	}
 
-	Entity SceneSerializer::DeserializeEntity(YAML::Node node, World& world)
+	Entity SceneSerializer::DeserializeEntity(const YAML::Node& node, World& world)
 	{
 		Entity entity;
 		
