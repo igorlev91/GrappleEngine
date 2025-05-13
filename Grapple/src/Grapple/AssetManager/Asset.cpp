@@ -49,6 +49,8 @@ namespace Grapple
 			return "Font";
 		case AssetType::Mesh:
 			return "Mesh";
+		case AssetType::MaterialsTable:
+			return "MaterialsTable";
 		}
 
 		Grapple_CORE_ASSERT(false, "Unhandled asset type");
@@ -71,6 +73,8 @@ namespace Grapple
 			return AssetType::Font;
 		else if (string == "Mesh")
 			return AssetType::Mesh;
+		else if (string == "MaterialsTable")
+			return AssetType::MaterialsTable;
 
 		Grapple_CORE_ASSERT(false, "Unknown asset type string");
 		return AssetType::None;

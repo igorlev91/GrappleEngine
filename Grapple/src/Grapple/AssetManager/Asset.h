@@ -43,6 +43,7 @@ namespace Grapple
 		Material,
 		Font,
 		Mesh,
+		MaterialsTable,
 	};
 
 	enum class AssetSource

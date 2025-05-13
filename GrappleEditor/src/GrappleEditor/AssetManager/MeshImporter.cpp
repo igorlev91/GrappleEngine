@@ -2,6 +2,7 @@
 
 #include "Grapple/AssetManager/AssetManager.h"
 #include "Grapple/Renderer/Material.h"
+#include "Grapple/Renderer/MaterialsTable.h"
 #include "Grapple/Renderer/ShaderLibrary.h"
 
 #include "GrappleEditor/AssetManager/EditorAssetManager.h"
@@ -13,13 +14,14 @@
 
 namespace Grapple
 {
-    static Ref<Mesh> ProcessMeshNode(aiNode* node, const aiScene* scene)
+    static Ref<Mesh> ProcessMeshNode(aiNode* node, const aiScene* scene, std::vector<uint32_t>& usedMaterials)
     {
         Ref<Mesh> mesh = nullptr;
 
         for (uint32_t i = 0; i < node->mNumMeshes; i++)
         {
             aiMesh* nodeMesh = scene->mMeshes[node->mMeshes[i]];
+            usedMaterials.push_back(nodeMesh->mMaterialIndex);
 
             std::vector<glm::vec3> vertices;
             std::vector<glm::vec3> normals;
@@ -69,7 +71,7 @@ namespace Grapple
             }
 
             if (!mesh)
-				mesh = CreateRef<Mesh>();
+                mesh = CreateRef<Mesh>();
 
             Span<glm::vec3> normalsSpan = Span<glm::vec3>::FromVector(normals);
             Span<glm::vec2> uvsSpan = Span<glm::vec2>::FromVector(uvs);
@@ -86,7 +88,7 @@ namespace Grapple
 
         for (uint32_t i = 0; i < node->mNumChildren; i++)
         {
-            Ref<Mesh> mesh = ProcessMeshNode(node->mChildren[i], scene);
+            Ref<Mesh> mesh = ProcessMeshNode(node->mChildren[i], scene, usedMaterials);
             if (mesh != nullptr)
                 return mesh;
         }
@@ -94,17 +96,23 @@ namespace Grapple
         return nullptr;
     }
 
-    static void ImportMaterials(const AssetMetadata& metadata, const aiScene* scene)
+    static void ImportMaterials(const AssetMetadata& metadata, const aiScene* scene, const std::vector<uint32_t>& usedMaterials)
     {
         Ref<EditorAssetManager> assetManager = As<EditorAssetManager>(AssetManager::GetInstance());
         std::optional<AssetHandle> defaultShader = ShaderLibrary::FindShader("Mesh");
 
         std::unordered_map<std::string, AssetHandle> nameToHandle;
+        AssetHandle materialsTableHandle;
 
         for (AssetHandle subAsset : metadata.SubAssets)
         {
             if (const auto* subAssetMetadata = AssetManager::GetAssetMetadata(subAsset))
-                nameToHandle[subAssetMetadata->Name] = subAsset;
+            {
+                if (subAssetMetadata->Type == AssetType::Material)
+                    nameToHandle[subAssetMetadata->Name] = subAsset;
+                else
+                    materialsTableHandle = subAsset;
+            }
         }
 
         if (!defaultShader)
@@ -125,11 +133,22 @@ namespace Grapple
             textureProperty = shader->GetPropertyIndex("u_Texture");
         }
 
-        for (uint32_t i = 0; i < scene->mNumMaterials; i++)
+        Ref<MaterialsTable> materialsTable = CreateRef<MaterialsTable>();
+        if (AssetManager::IsAssetHandleValid(materialsTableHandle))
+            assetManager->SetLoadedAsset(materialsTableHandle, materialsTable);
+        else
+            assetManager->ImportMemoryOnlyAsset("DefaultMaterialsTable", materialsTable, metadata.Handle);
+
+        materialsTable->Materials.reserve(usedMaterials.size());
+
+        for (uint32_t i : usedMaterials)
         {
             auto& material = scene->mMaterials[i];
 
             std::string name = material->GetName().C_Str();
+            if (name.empty())
+                name = fmt::format("Material {}", i);
+
             aiString texturePath;
             aiTextureMapping mapping;
             uint32_t uvIndex;
@@ -165,9 +184,16 @@ namespace Grapple
 
             auto it = nameToHandle.find(name);
             if (it != nameToHandle.end())
+            {
                 assetManager->SetLoadedAsset(it->second, materialAsset);
+				materialsTable->Materials.push_back(it->second);
+            }
             else
-                assetManager->ImportMemoryOnlyAsset(name, materialAsset, metadata.Handle);
+            {
+                AssetHandle handle = assetManager->ImportMemoryOnlyAsset(name, materialAsset, metadata.Handle);
+				materialsTable->Materials.push_back(handle);
+            }
+
         }
     }
 
@@ -186,8 +212,11 @@ namespace Grapple
             return nullptr;
         }
 
-        ImportMaterials(metadata, scene);
+        std::vector<uint32_t> usedMaterials;
 
-        return ProcessMeshNode(scene->mRootNode, scene);
+        Ref<Mesh> mesh = ProcessMeshNode(scene->mRootNode, scene, usedMaterials);
+        ImportMaterials(metadata, scene, usedMaterials);
+
+        return mesh;
     }
 }

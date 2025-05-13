@@ -4,6 +4,7 @@
 #include "Grapple/Scripting/ScriptingEngine.h"
 
 #include "Grapple/Renderer/Material.h"
+#include "Grapple/Renderer/MaterialsTable.h"
 
 #include "GrappleEditor/UI/EditorGUI.h"
 #include "GrappleEditor/UI/ECS/EntityProperties.h"
@@ -88,6 +89,24 @@ namespace Grapple
 		case AssetType::Material:
 			RenderMaterialEditor(handle);
 			break;
+		case AssetType::MaterialsTable:
+		{
+			Ref<MaterialsTable> table = AssetManager::GetAsset<MaterialsTable>(handle);
+			Grapple_CORE_ASSERT(table);
+
+			if (EditorGUI::BeginPropertyGrid())
+			{
+				for (size_t i = 0; i < table->Materials.size(); i++)
+				{
+					EditorGUI::PropertyIndex(i);
+					EditorGUI::AssetField(table->Materials[i]);
+				}
+
+				EditorGUI::EndPropertyGrid();
+			}
+
+			break;
+		}
 		}
 	}
 
