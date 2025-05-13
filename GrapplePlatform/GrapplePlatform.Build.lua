@@ -22,6 +22,7 @@ project "GrapplePlatform"
 		INCLUDE_DIRS.GLFW,
 		INCLUDE_DIRS.glm,
 		INCLUDE_DIRS.spdlog,
+		INCLUDE_DIRS.tracy,
 	}
 
 	links
@@ -48,7 +49,7 @@ project "GrapplePlatform"
 		symbols "on"
 
 	filter "configurations:Release"
-		defines "Grapple_RELEASE"
+		defines { "Grapple_RELEASE", "TRACY_ENABLE", "TRACY_IMPORTS" }
 		runtime "Release"
 		optimize "on"
 

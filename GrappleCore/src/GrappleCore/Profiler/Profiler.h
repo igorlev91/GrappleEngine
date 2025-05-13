@@ -6,6 +6,15 @@
 #include <stdint.h>
 #include <chrono>
 
+#ifdef Grapple_RELEASE
+    #define Grapple_PROFILING_ENABLED
+#endif
+
+#define Grapple_PROFILER_TRACY
+// #define Grapple_PROFILER_NATIVE
+
+#include <Tracy.hpp>
+
 namespace Grapple
 {
     struct ProfilerScopeTimer;
@@ -88,9 +97,28 @@ namespace Grapple
         Profiler::Record* m_Record;
     };
 
-#define Grapple_PROFILE_TIMER_NAME2(line) ___profileTimer___##line
-#define Grapple_PROFILE_TIMER_NAME(line) Grapple_PROFILE_TIMER_NAME2(line)
-#define Grapple_PROFILE_SCOPE(name) Grapple::ProfilerScopeTimer Grapple_PROFILE_TIMER_NAME(__LINE__) = Grapple::ProfilerScopeTimer(name)
+#ifdef Grapple_PROFILING_ENABLED
+    #ifdef Grapple_PROFILER_TRACY
+        #define Grapple_PROFILE_BEGIN_FRAME(name) FrameMarkStart(name)
+        #define Grapple_PROFILE_END_FRAME(name) FrameMarkEnd(name)
 
-#define Grapple_PROFILE_FUNCTION() Grapple_PROFILE_SCOPE(__FUNCSIG__)
+        #define Grapple_PROFILE_SCOPE(name) ZoneScopedN(name)
+        #define Grapple_PROFILE_FUNCTION() Grapple_PROFILE_SCOPE(__FUNCSIG__)
+    #elif defined(Grapple_PROFILER_NATIVE)
+        #define Grapple_PROFILE_BEGIN_FRAME(name) Grapple::Profiler::BeginFrame()
+        #define Grapple_PROFILE_END_FRAME(name) Grapple::Profiler::EndFrame()
+
+        #define Grapple_PROFILE_TIMER_NAME2(line) ___profileTimer___##line
+        #define Grapple_PROFILE_TIMER_NAME(line) Grapple_PROFILE_TIMER_NAME2(line)
+
+        #define Grapple_PROFILE_SCOPE(name) Grapple::ProfilerScopeTimer Grapple_PROFILE_TIMER_NAME(__LINE__) = Grapple::ProfilerScopeTimer(name)
+        #define Grapple_PROFILE_FUNCTION() Grapple_PROFILE_SCOPE(__FUNCSIG__)
+    #endif
+#else
+    #define Grapple_PROFILE_BEGIN_FRAME(name)
+    #define Grapple_PROFILE_END_FRAME(name)
+    #define Grapple_PROFILE_SCOPE(name)
+    #define Grapple_PROFILE_FUNCTION()
+#endif
+
 }

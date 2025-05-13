@@ -41,6 +41,7 @@ project "GrappleEditor"
 		INCLUDE_DIRS.yaml_cpp,
 
 		INCLUDE_DIRS.vulkan_sdk,
+		INCLUDE_DIRS.tracy,
     }
 
 	links
@@ -87,7 +88,7 @@ project "GrappleEditor"
 		}
 
 	filter "configurations:Release"
-		defines "Grapple_RELEASE"
+		defines { "Grapple_RELEASE", "TRACY_ENABLE", "TRACY_IMPORTS" }
 		runtime "Release"
 		optimize "on"
 

@@ -26,6 +26,8 @@ INCLUDE_DIRS = {
 	msdf_atlas_gen = "%{wks.location}/Grapple/vendor/msdf/msdf-atlas-gen/msdf-atlas-gen",
 
 	assimp = assimp_path .. "/include/",
+
+	tracy = "%{wks.location}/Grapple/vendor/Tracy/tracy",
 }
 
 LIBRARIES = {

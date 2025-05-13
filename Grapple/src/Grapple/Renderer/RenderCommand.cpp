@@ -1,5 +1,7 @@
 #include "RenderCommand.h"
 
+#include "GrappleCore/Profiler/Profiler.h"
+
 namespace Grapple
 {
 	Scope<RendererAPI> s_API = RendererAPI::Create();
@@ -31,26 +33,31 @@ namespace Grapple
 
 	void RenderCommand::DrawIndexed(const Ref<const VertexArray>& mesh)
 	{
+		Grapple_PROFILE_FUNCTION();
 		s_API->DrawIndexed(mesh);
 	}
 
 	void RenderCommand::DrawIndexed(const Ref<const VertexArray>& mesh, size_t indicesCount)
 	{
+		Grapple_PROFILE_FUNCTION();
 		s_API->DrawIndexed(mesh, indicesCount);
 	}
 
 	void RenderCommand::DrawInstanced(const Ref<const VertexArray>& mesh, size_t instancesCount)
 	{
+		Grapple_PROFILE_FUNCTION();
 		s_API->DrawInstanced(mesh, instancesCount);
 	}
 
 	void RenderCommand::DrawInstanced(const Ref<const VertexArray>& mesh, size_t instancesCount, size_t baseVertexIndex, size_t startIndex, size_t indicesCount)
 	{
+		Grapple_PROFILE_FUNCTION();
 		s_API->DrawInstanced(mesh, instancesCount, baseVertexIndex, startIndex, indicesCount);
 	}
 
 	void RenderCommand::DrawLines(const Ref<const VertexArray>& lines, size_t verticesCount)
-	{
+	{	
+		Grapple_PROFILE_FUNCTION();
 		s_API->DrawLines(lines, verticesCount);
 	}
 

@@ -1,14 +1,14 @@
 local build_tool = require("BuildTool")
 
-project "Grapple"
+project "Flare"
 	language "C++"
 	cppdialect "C++17"
 	staticruntime "off"
 
-	build_tool.define_module("Grapple")
-	build_tool.add_module_ref("GrapplePlatform")
-	build_tool.add_module_ref("GrappleCore")
-	build_tool.add_module_ref("GrappleECS")
+	build_tool.define_module("Flare")
+	build_tool.add_module_ref("FlarePlatform")
+	build_tool.add_module_ref("FlareCore")
+	build_tool.add_module_ref("FlareECS")
 
     files
     {
@@ -22,9 +22,9 @@ project "Grapple"
     includedirs
 	{
 		"src/",
-		"%{wks.location}/GrappleCore/src/",
-		"%{wks.location}/GrapplePlatform/src/",
-		"%{wks.location}/GrappleECS/src/",
+		"%{wks.location}/FlareCore/src/",
+		"%{wks.location}/FlarePlatform/src/",
+		"%{wks.location}/FlareECS/src/",
 
 		INCLUDE_DIRS.msdf_gen,
 		INCLUDE_DIRS.msdf_atlas_gen,
@@ -40,6 +40,7 @@ project "Grapple"
 
 		INCLUDE_DIRS.vulkan_sdk,
 		INCLUDE_DIRS.assimp,
+		INCLUDE_DIRS.tracy,
 	}
 
 	links
@@ -47,9 +48,9 @@ project "Grapple"
 		"GLAD",
 		"GLFW",
 		"ImGUI",
-		"GrappleECS",
-		"GrappleCore",
-		"GrapplePlatform",
+		"FlareECS",
+		"FlareCore",
+		"FlarePlatform",
 		"yaml-cpp",
 
 		"msdfgen",
@@ -69,17 +70,17 @@ project "Grapple"
 		links { "dwmapi.lib" }
 
 	filter "configurations:Debug"
-		defines "Grapple_DEBUG"
+		defines "FLARE_DEBUG"
 		runtime "Debug"
 		symbols "on"
 
 	filter "configurations:Release"
-		defines "Grapple_RELEASE"
+		defines { "FLARE_RELEASE", "TRACY_ENABLE", "TRACY_IMPORTS" }
 		runtime "Release"
 		optimize "on"
 
 	filter "configurations:Dist"
-		defines "Grapple_DIST"
+		defines "FLARE_DIST"
 		runtime "Release"
 		optimize "on"
 

@@ -87,6 +87,7 @@ namespace Grapple
 		while (m_Running)
 		{
 			Profiler::BeginFrame();
+			Grapple_PROFILE_BEGIN_FRAME("Main");
 
 			{
 				Grapple_PROFILE_SCOPE("Application::Update");
@@ -119,6 +120,7 @@ namespace Grapple
 				m_PreviousFrameTime = currentTime;
 			}
 
+			Grapple_PROFILE_END_FRAME("Main");
 			Profiler::EndFrame();
 		}
 

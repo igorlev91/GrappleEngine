@@ -9,10 +9,13 @@ namespace Grapple
 	{
 		TextureImportSettings()
 			: WrapMode(TextureWrap::Repeat),
-			Filtering(TextureFiltering::Linear) {}
+			Filtering(TextureFiltering::Linear),
+			GenerateMipMaps(false) {}
 
 		TextureWrap WrapMode;
 		TextureFiltering Filtering;
+
+		bool GenerateMipMaps;
 	};
 
 	class TextureImporter

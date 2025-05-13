@@ -2,6 +2,8 @@
 
 #include <stdint.h>
 
+#include "GrappleCore/Profiler/Profiler.h"
+
 #include "GrapplePlatform/Events.h"
 
 namespace Grapple
@@ -47,12 +49,14 @@ namespace Grapple
 
 	void InputManager::Update()
 	{
+		Grapple_PROFILE_FUNCTION();
 		std::memset(s_InputData->MouseButtonState, (int32_t)InputState::None, sizeof(s_InputData->MouseButtonState));
 		std::memset(s_InputData->KeyState, (int32_t)InputState::None, sizeof(s_InputData->KeyState));
 	}
 
 	void InputManager::ProcessEvent(Event& event)
 	{
+		Grapple_PROFILE_FUNCTION();
 		EventDispatcher dispatcher(event);
 
 		dispatcher.Dispatch<KeyPressedEvent>([](KeyPressedEvent& e) -> bool

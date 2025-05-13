@@ -41,6 +41,8 @@ namespace Grapple
 		TextureFormat Format;
 		TextureFiltering Filtering;
 		TextureWrap Wrap;
+
+		bool GenerateMipMaps = false;
 	};
 
 	Grapple_API const char* TextureWrapToString(TextureWrap wrap);

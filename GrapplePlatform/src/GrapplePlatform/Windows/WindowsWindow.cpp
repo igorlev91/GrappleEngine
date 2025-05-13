@@ -4,6 +4,8 @@
 #include "GrappleCore/KeyCode.h"
 #include "GrappleCore/MouseCode.h"
 
+#include "GrappleCore/Profiler/Profiler.h"
+
 #include <optional>
 
 #include <windows.h>
@@ -511,6 +513,7 @@ namespace Grapple
 
 	void WindowsWindow::OnUpdate()
 	{
+		Grapple_PROFILE_FUNCTION();
 		glfwPollEvents();
 	}
 
