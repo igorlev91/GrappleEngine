@@ -141,5 +141,6 @@ namespace Grapple
 		static void ExecuteGeomertyPass();
 		static void ExecuteShadowPass();
 		static void FlushInstances();
+		static void FlushShadowPassInstances();
 	};
 }
