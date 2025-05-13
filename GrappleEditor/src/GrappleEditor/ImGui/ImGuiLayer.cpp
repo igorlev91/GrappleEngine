@@ -1,6 +1,7 @@
 #include "ImGuiLayer.h"
 
 #include "Grapple/Core/Application.h"
+#include "GrappleCore/Profiler/Profiler.h"
 #include "GrapplePlatform/Window.h"
 
 #include <imgui_internal.h>
@@ -86,6 +87,8 @@ namespace Grapple
 
 	void ImGuiLayer::End()
 	{
+		Grapple_PROFILE_FUNCTION();
+
 		ImGuiIO& io = ImGui::GetIO();
 		Application& application = Application::GetInstance();
 

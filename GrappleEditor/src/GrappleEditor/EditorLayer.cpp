@@ -145,8 +145,7 @@ namespace Grapple
 
     void EditorLayer::OnUpdate(float deltaTime)
     {
-        Profiler::BeginFrame();
-
+        Grapple_PROFILE_FUNCTION();
         m_PreviousFrameTime = deltaTime;
 
         Renderer2D::ResetStats();
@@ -169,12 +168,11 @@ namespace Grapple
                 viewport->OnRenderViewport();
             }
         }
-
-        Profiler::EndFrame();
     }
 
     void EditorLayer::OnEvent(Event& event)
     {
+        Grapple_PROFILE_FUNCTION();
         for (Ref<ViewportWindow>& window : m_ViewportWindows)
             window->OnEvent(event);
         
@@ -183,6 +181,7 @@ namespace Grapple
 
     void EditorLayer::OnImGUIRender()
     {
+        Grapple_PROFILE_FUNCTION();
         ImGuiLayer::Begin();
 
         static bool fullscreen = true;
@@ -280,21 +279,27 @@ namespace Grapple
             ImGui::End();
         }
 
-        for (auto& viewport : m_ViewportWindows)
-            viewport->OnRenderImGui();
+        {
+            Grapple_PROFILE_SCOPE("ViewportWindows ImGui");
+            for (auto& viewport : m_ViewportWindows)
+                viewport->OnRenderImGui();
+        }
 
-        ProjectSettingsWindow::OnRenderImGui();
+        {
+            Grapple_PROFILE_SCOPE("EditorWindowsUpdate");
+            
+            ProjectSettingsWindow::OnRenderImGui();
+            m_SceneWindow.OnImGuiRender();
+            m_PropertiesWindow.OnImGuiRender();
+            m_AssetManagerWindow.OnImGuiRender();
+            m_QuickSearch.OnImGuiRender();
+            m_ProfilerWindow.OnImGuiRender();
 
-        m_SceneWindow.OnImGuiRender();
-        m_PropertiesWindow.OnImGuiRender();
-        m_AssetManagerWindow.OnImGuiRender();
-        m_QuickSearch.OnImGuiRender();
-        m_ProfilerWindow.OnImGuiRender();
+            ECSInspector::GetInstance().OnImGuiRender();
 
-        ECSInspector::GetInstance().OnImGuiRender();
-
-        for (auto& window : m_AssetEditorWindows)
-            window->OnUpdate();
+            for (auto& window : m_AssetEditorWindows)
+                window->OnUpdate();
+        }
 
         ImGui::End();
         ImGuiLayer::End();

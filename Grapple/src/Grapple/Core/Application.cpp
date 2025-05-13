@@ -2,6 +2,8 @@
 
 #include "Grapple/Core/Time.h"
 
+#include "GrappleCore/Profiler/Profiler.h"
+
 #include "Grapple/Renderer/Renderer.h"
 #include "Grapple/Renderer2D/Renderer2D.h"
 #include "Grapple/Renderer/DebugRenderer.h"
@@ -84,22 +86,40 @@ namespace Grapple
 
 		while (m_Running)
 		{
-			float currentTime = Platform::GetTime();
-			float deltaTime = currentTime - m_PreviousFrameTime;
+			Profiler::BeginFrame();
 
-			Time::UpdateDeltaTime();
+			{
+				Grapple_PROFILE_SCOPE("Application::Update");
 
-			InputManager::Update();
-			m_Window->OnUpdate();
+				float currentTime = Platform::GetTime();
+				float deltaTime = currentTime - m_PreviousFrameTime;
 
-			for (const Ref<Layer>& layer : m_LayersStack.GetLayers())
-				layer->OnUpdate(deltaTime);
+				Time::UpdateDeltaTime();
 
-			for (const Ref<Layer>& layer : m_LayersStack.GetLayers())
-				layer->OnImGUIRender();
+				InputManager::Update();
+				m_Window->OnUpdate();
 
-			m_GraphicsContext->SwapBuffers();
-			m_PreviousFrameTime = currentTime;
+				{
+					Grapple_PROFILE_SCOPE("Layers::OnUpdate");
+					for (const Ref<Layer>& layer : m_LayersStack.GetLayers())
+						layer->OnUpdate(deltaTime);
+				}
+
+				{
+					Grapple_PROFILE_SCOPE("Layers::OnImGui");
+					for (const Ref<Layer>& layer : m_LayersStack.GetLayers())
+						layer->OnImGUIRender();
+				}
+
+				{
+					Grapple_PROFILE_SCOPE("SwapBuffers");
+					m_GraphicsContext->SwapBuffers();
+				}
+
+				m_PreviousFrameTime = currentTime;
+			}
+
+			Profiler::EndFrame();
 		}
 
 		for (const Ref<Layer>& layer : m_LayersStack.GetLayers())

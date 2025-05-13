@@ -26,8 +26,11 @@ namespace Grapple
         s_Instance = nullptr;
     }
 
+    static double s_MillisecondToNanosecond = 1000000.0;
+
     void ProfilerWindow::OnImGuiRender()
     {
+        Grapple_PROFILE_FUNCTION();
         if (!m_ShowWindow)
             return;
 
@@ -182,10 +185,10 @@ namespace Grapple
 
         double duration = (double)(record.EndTime - record.StartTime);
 
-        double milliseconds = duration / 1000000.0;
+        double milliseconds = duration / s_MillisecondToNanosecond;
         double seconds = milliseconds / 1000.0;
 
-        float width = glm::abs(CalculatePositionFromTime(record.StartTime) - CalculatePositionFromTime(record.EndTime));
+        float width = CalculatePositionFromTime(record.EndTime) - CalculatePositionFromTime(record.StartTime);
         if (width < 1.0f)
             return;
 
@@ -213,9 +216,9 @@ namespace Grapple
         const char* text;
         const char* textEnd;
 
-        if (milliseconds < 0.001f)
+        if (milliseconds < 0.001)
             ImFormatStringToTempBuffer(&text, &textEnd, "%s %f ns", blockName, (float)duration);
-        else if (seconds < 0.01f)
+        else if (seconds < 0.01)
             ImFormatStringToTempBuffer(&text, &textEnd, "%s %f ms", blockName, (float)milliseconds);
         else
             ImFormatStringToTempBuffer(&text, &textEnd, "%s %f s", blockName, (float)seconds);
@@ -293,7 +296,7 @@ namespace Grapple
 
     float ProfilerWindow::CalculatePositionFromTime(uint64_t time)
     {
-        double start = (double)time / 1000000.0;
+        double start = (double)time / s_MillisecondToNanosecond;
         double position = (start) * (double)(m_WindowWidth * m_Zoom);
         return (float)position - m_ScrollOffset;
     }
@@ -302,7 +305,7 @@ namespace Grapple
     {
         position += m_ScrollOffset;
         double milliseconds = (double)(position) / (double)(m_WindowWidth * m_Zoom);
-        return (uint64_t)(milliseconds * 1000000.0);
+        return (uint64_t)(milliseconds * s_MillisecondToNanosecond);
     }
 
     void ProfilerWindow::RenderSubCallsList()
@@ -357,15 +360,12 @@ namespace Grapple
         ImGui::TableSetColumnIndex(1);
 
         double duration = (double)(record.EndTime - record.StartTime);
-
-        double milliseconds = duration / 1000000.0;
+        double milliseconds = duration / s_MillisecondToNanosecond;
         double seconds = milliseconds / 1000.0;
 
-        ImGui::SetCursorPosY(ImGui::GetCursorPosY() + style.FramePadding.y);
-
-        if (milliseconds < 0.001f)
+        if (milliseconds < 0.001)
             ImGui::Text("%f ns", duration);
-        else if (seconds < 0.01f)
+        else if (seconds < 0.01)
             ImGui::Text("%f ms", milliseconds);
         else
             ImGui::Text("%f s", seconds);
@@ -579,7 +579,7 @@ namespace Grapple
                 const Profiler::Record& record = buffer.Records[i];
 
                 double duration = (double)(record.EndTime - record.StartTime);
-                double milliseconds = duration / 1000000.0;
+                double milliseconds = duration / s_MillisecondToNanosecond;
 
                 auto it = records.find(record.Name);
                 if (it == records.end())
