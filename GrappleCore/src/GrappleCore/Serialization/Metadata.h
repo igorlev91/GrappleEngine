@@ -9,6 +9,6 @@
 #define Grapple_SERIALIZABLE_IMPL(typeName)                                              \
     Grapple::SerializableObjectDescriptor typeName::_SerializationDescriptor(            \
         typeid(typeName).name(), sizeof(typeName),                                     \
-        [](void* object, SerializationStream& stream) {                                \
+        [](void* object, Grapple::SerializationStream& stream) {                         \
             Grapple::TypeSerializer<typeName>().OnSerialize(*(typeName*)object, stream); \
         });
