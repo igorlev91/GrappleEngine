@@ -2,6 +2,7 @@
 
 #include "GrappleCore/Core.h"
 #include "Grapple/Renderer/RendererAPI.h"
+#include "Grapple/Renderer/Mesh.h"
 
 namespace Grapple
 {
@@ -18,6 +19,8 @@ namespace Grapple
 		static void DrawIndexed(const Ref<const VertexArray>& mesh, size_t indicesCount);
 		static void DrawInstanced(const Ref<const VertexArray>& mesh, size_t instancesCount);
 
+		static void DrawInstancesIndexed(const Ref<Mesh>& mesh, uint32_t subMeshIndex, size_t instancesCount);
+
 		static void DrawInstanced(const Ref<const VertexArray>& mesh,
 			size_t instancesCount,
 			size_t baseVertexIndex,
@@ -29,5 +32,6 @@ namespace Grapple
 		static void SetCullingMode(CullingMode mode);
 		static void SetDepthComparisonFunction(DepthComparisonFunction function);
 		static void SetDepthWriteEnabled(bool enabled);
+		static void SetBlendMode(BlendMode mode);
 	};
 }

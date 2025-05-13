@@ -16,12 +16,14 @@ namespace Grapple
 		virtual void SetCullingMode(CullingMode mode) override;
 		virtual void SetDepthComparisonFunction(DepthComparisonFunction function) override;
 		virtual void SetDepthWriteEnabled(bool enabled) override;
+		virtual void SetBlendMode(BlendMode mode) override;
 
 		virtual void SetLineWidth(float width) override;
 
 		virtual void DrawIndexed(const Ref<const VertexArray>& vertexArray) override;
 		virtual void DrawIndexed(const Ref<const VertexArray>& vertexArray, size_t indicesCount) override;
 		virtual void DrawInstanced(const Ref<const VertexArray>& mesh, size_t instancesCount) override;
+		virtual void DrawInstancesIndexed(const Ref<Mesh>& mesh, uint32_t subMeshIndex, size_t instancesCount) override;
 
 		virtual void DrawInstanced(const Ref<const VertexArray>& mesh,
 			size_t instancesCount,

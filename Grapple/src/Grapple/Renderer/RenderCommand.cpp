@@ -49,6 +49,12 @@ namespace Grapple
 		s_API->DrawInstanced(mesh, instancesCount);
 	}
 
+	void RenderCommand::DrawInstancesIndexed(const Ref<Mesh>& mesh, uint32_t subMeshIndex, size_t instancesCount)
+	{
+		Grapple_PROFILE_FUNCTION();
+		s_API->DrawInstancesIndexed(mesh, subMeshIndex, instancesCount);
+	}
+
 	void RenderCommand::DrawInstanced(const Ref<const VertexArray>& mesh, size_t instancesCount, size_t baseVertexIndex, size_t startIndex, size_t indicesCount)
 	{
 		Grapple_PROFILE_FUNCTION();
@@ -79,5 +85,10 @@ namespace Grapple
 	void RenderCommand::SetDepthWriteEnabled(bool enabled)
 	{
 		s_API->SetDepthWriteEnabled(enabled);
+	}
+
+	void RenderCommand::SetBlendMode(BlendMode mode)
+	{
+		s_API->SetBlendMode(mode);
 	}
 }
