@@ -47,16 +47,6 @@ namespace Grapple
 		InitializeLastSubMeshBuffers();
 	}
 
-	void Mesh::SetInstanceBuffer(const Ref<VertexBuffer>& instanceBuffer)
-	{
-		for (SubMesh& subMesh : m_SubMeshes)
-		{
-			subMesh.VertexArray->AddInstanceBuffer(instanceBuffer);
-		}
-
-		m_InstanceBuffer = instanceBuffer;
-	}
-
 	void Mesh::InitializeLastSubMeshBuffers()
 	{
 		Grapple_CORE_ASSERT(m_SubMeshes.size() > 0);
