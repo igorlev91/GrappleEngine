@@ -379,40 +379,51 @@ namespace Grapple
 
     void YAMLDeserializer::SerializeObject(const SerializableObjectDescriptor& descriptor, void* objectData)
     {
-        if (&descriptor == &Grapple_SERIALIZATION_DESCRIPTOR_OF(AssetHandle))
+        try
         {
-            if (YAML::Node handleNode = CurrentNode()[m_CurrentPropertyKey])
-                (*(AssetHandle*)objectData) = handleNode.as<AssetHandle>();
-
-            return;
-        }
-
-        if (&descriptor == &Grapple_SERIALIZATION_DESCRIPTOR_OF(Entity))
-        {
-            Entity& entityId = *(Entity*)objectData;
-            YAML::Node idNode = CurrentNode()[m_CurrentPropertyKey];
-
-            if (idNode && m_SerializationIdToECSId != nullptr)
+            if (&descriptor == &Grapple_SERIALIZATION_DESCRIPTOR_OF(AssetHandle))
             {
-                UUID serializationId = idNode.as<UUID>();
-                
-                auto it = m_SerializationIdToECSId->find(serializationId);
-                if (it != m_SerializationIdToECSId->end())
-                {
-                    entityId = it->second;
-                    return;
-                }
+                if (YAML::Node handleNode = CurrentNode()[m_CurrentPropertyKey])
+                    (*(AssetHandle*)objectData) = handleNode.as<AssetHandle>();
+
+                return;
             }
 
-            entityId = Entity();
-            return;
-        }
+            if (&descriptor == &Grapple_SERIALIZATION_DESCRIPTOR_OF(Entity))
+            {
+                Entity& entityId = *(Entity*)objectData;
+                YAML::Node idNode = CurrentNode()[m_CurrentPropertyKey];
 
-        if (YAML::Node objectNode = CurrentNode()[m_CurrentPropertyKey])
+                if (idNode && m_SerializationIdToECSId != nullptr)
+                {
+                    UUID serializationId = idNode.as<UUID>();
+
+                    auto it = m_SerializationIdToECSId->find(serializationId);
+                    if (it != m_SerializationIdToECSId->end())
+                    {
+                        entityId = it->second;
+                        return;
+                    }
+                }
+
+                entityId = Entity();
+                return;
+            }
+
+            if (YAML::Node objectNode = CurrentNode()[m_CurrentPropertyKey])
+            {
+                m_NodesStack.push_back(objectNode);
+                descriptor.Callback(objectData, *this);
+                m_NodesStack.pop_back();
+            }
+        }
+        catch (YAML::BadConversion& e)
         {
-            m_NodesStack.push_back(objectNode);
-            descriptor.Callback(objectData, *this);
-            m_NodesStack.pop_back();
+            Grapple_CORE_ERROR("Failed to deserialize object Line: {} Col: {} Erorr: {}", e.mark.line, e.mark.column, e.what());
+        }
+        catch (std::exception& e)
+        {
+            Grapple_CORE_ERROR("Failed to deserialize object: {}", e.what());
         }
     }
 }
