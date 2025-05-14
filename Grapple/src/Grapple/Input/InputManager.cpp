@@ -4,6 +4,8 @@
 
 #include "GrappleCore/Profiler/Profiler.h"
 
+#include "Grapple/Core/Application.h"
+
 #include "GrapplePlatform/Events.h"
 
 namespace Grapple
@@ -28,6 +30,8 @@ namespace Grapple
 
 		bool KeyHeld[(size_t)KeyCode::Menu + 1];
 		bool MouseButtonHeld[(size_t)MouseCode::ButtonLast + 1];
+
+		CursorMode CursorMode;
 	};
 
 	InputManagerData* s_InputData;
@@ -52,6 +56,7 @@ namespace Grapple
 		Grapple_PROFILE_FUNCTION();
 
 		s_InputData->MouseScroll = glm::vec2(0.0f);
+		s_InputData->PreviousMousePosition = s_InputData->MousePosition;
 
 		std::memset(s_InputData->MouseButtonState, (int32_t)InputState::None, sizeof(s_InputData->MouseButtonState));
 		std::memset(s_InputData->KeyState, (int32_t)InputState::None, sizeof(s_InputData->KeyState));
@@ -170,5 +175,16 @@ namespace Grapple
 	glm::ivec2 InputManager::GetMouseDelta()
 	{
 		return s_InputData->MousePosition - s_InputData->PreviousMousePosition;
+	}
+
+	void InputManager::SetCursorMode(CursorMode mode)
+	{
+		s_InputData->CursorMode = mode;
+		Application::GetInstance().GetWindow()->SetCursorMode(mode);
+	}
+
+	CursorMode InputManager::GetCursorMode()
+	{
+		return s_InputData->CursorMode;
 	}
 }

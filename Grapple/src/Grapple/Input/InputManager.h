@@ -5,6 +5,7 @@
 #include "GrappleCore/MouseCode.h"
 
 #include "GrapplePlatform/Event.h"
+#include "GrapplePlatform/Window.h"
 
 #include <glm/glm.hpp>
 
@@ -35,5 +36,7 @@ namespace Grapple
 		static glm::ivec2 GetRawMousePosition();
 
 		static glm::ivec2 GetMouseDelta();
+		static void SetCursorMode(CursorMode mode);
+		static CursorMode GetCursorMode();
 	};
 }
