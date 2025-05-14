@@ -137,6 +137,9 @@ namespace Grapple
 
 
 
+	Grapple_IMPL_COMPONENT(PointLight);
+
+
 	Grapple_IMPL_COMPONENT(Environment);
 	Environment::Environment()
 		: EnvironmentColor(0.0f), EnvironmentColorIntensity(0.0f) {}

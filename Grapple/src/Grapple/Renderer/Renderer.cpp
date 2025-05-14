@@ -97,6 +97,9 @@ namespace Grapple
 		Ref<ShaderStorageBuffer> InstancesShaderBuffer = nullptr;
 		std::vector<DrawIndirectCommandSubMeshData> IndirectDrawData;
 
+		std::vector<PointLightData> PointLights;
+		Ref<ShaderStorageBuffer> PointLightsShaderBuffer = nullptr;
+
 		Ref<GPUTimer> ShadowPassTimer = nullptr;
 		Ref<GPUTimer> GeometryPassTimer = nullptr;
 	};
@@ -124,6 +127,7 @@ namespace Grapple
 		s_RendererData.LightBuffer = UniformBuffer::Create(sizeof(LightData), 1);
 		s_RendererData.ShadowDataBuffer = UniformBuffer::Create(sizeof(ShadowData), 2);
 		s_RendererData.InstancesShaderBuffer = ShaderStorageBuffer::Create(3);
+		s_RendererData.PointLightsShaderBuffer = ShaderStorageBuffer::Create(4);
 
 		s_RendererData.ShadowPassTimer = GPUTimer::Create();
 		s_RendererData.GeometryPassTimer = GPUTimer::Create();
@@ -426,12 +430,18 @@ namespace Grapple
 
 		{
 			Grapple_PROFILE_SCOPE("UpdateLightUniformBuffer");
+			s_RendererData.CurrentViewport->FrameData.Light.PointLightsCount = (uint32_t)s_RendererData.PointLights.size();
 			s_RendererData.LightBuffer->SetData(&viewport.FrameData.Light, sizeof(viewport.FrameData.Light), 0);
 		}
 
 		{
 			Grapple_PROFILE_SCOPE("UpdateCameraUniformBuffer");
 			s_RendererData.CameraBuffer->SetData(&viewport.FrameData.Camera, sizeof(CameraData), 0);
+		}
+
+		{
+			Grapple_PROFILE_SCOPE("UploadPointLightsData");
+			s_RendererData.PointLightsShaderBuffer->SetData(MemorySpan::FromVector(s_RendererData.PointLights));
 		}
 
 		{
@@ -723,9 +733,15 @@ namespace Grapple
 			s_RendererData.CurrentInstancingMesh.Reset();
 
 			// Group objects with same meshes together
-			std::sort(perCascadeObjects[cascadeIndex].begin(), perCascadeObjects[cascadeIndex].end(), [](uint32_t a, uint32_t b) -> bool
+			std::sort(perCascadeObjects[cascadeIndex].begin(), perCascadeObjects[cascadeIndex].end(), [](uint32_t aIndex, uint32_t bIndex) -> bool
 			{
-				return (uint64_t)s_RendererData.Queue[a].Mesh->Handle < (uint64_t)s_RendererData.Queue[b].Mesh->Handle;
+				const auto& a = s_RendererData.Queue[aIndex];
+				const auto& b = s_RendererData.Queue[bIndex];
+
+				if (a.Mesh->Handle == b.Mesh->Handle)
+					return a.SubMeshIndex < b.SubMeshIndex;
+
+				return (uint64_t)a.Mesh->Handle < (uint64_t)b.Mesh->Handle;
 			});
 
 			s_RendererData.IndirectDrawData.clear();
@@ -828,6 +844,13 @@ namespace Grapple
 	{
 		s_RendererData.Statistics.ShadowPassTime += s_RendererData.ShadowPassTimer->GetElapsedTime().value_or(0.0f);
 		s_RendererData.Statistics.GeometryPassTime += s_RendererData.GeometryPassTimer->GetElapsedTime().value_or(0.0f);
+
+		s_RendererData.PointLights.clear();
+	}
+
+	void Renderer::SubmitPointLight(const PointLightData& light)
+	{
+		s_RendererData.PointLights.push_back(light);
 	}
 
 	void Renderer::DrawFullscreenQuad(const Ref<Material>& material)

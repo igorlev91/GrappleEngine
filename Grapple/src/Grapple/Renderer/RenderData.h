@@ -86,6 +86,7 @@ namespace Grapple
 		glm::vec4 EnvironmentLight;
 
 		float Near;
+		uint32_t PointLightsCount;
 	};
 
 	struct RenderData
