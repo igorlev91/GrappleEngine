@@ -4,18 +4,8 @@
 layout(location = 0) in vec3 i_Position;
 layout(location = 1) in vec3 i_Normal;
 
-#include "Camera.glsl"
-
-struct InstanceData
-{
-	mat4 Transform;
-	int EntityIndex;
-};
-
-layout(std140, binding = 3) buffer InstacesData
-{
-	InstanceData Data[];
-} u_InstancesData;
+#include "Packages/RendererAssets/Assets/Camera.glsl"
+#include "Packages/RendererAssets/Assets/Instancing.glsl"
 
 struct VertexData
 {
@@ -26,18 +16,17 @@ layout(location = 0) out VertexData o_Vertex;
 
 void main()
 {
-	mat4 normalTransform = transpose(inverse(u_InstancesData.Data[gl_InstanceIndex].Transform));
+	mat4 transform = GetInstanceTransform();
+	mat4 normalTransform = transpose(inverse(transform));
 	o_Vertex.Normal = (normalTransform * vec4(i_Normal, 1.0)).xyz;
 
-    gl_Position = u_Camera.ViewProjection * u_InstancesData.Data[gl_InstanceIndex].Transform * vec4(i_Position, 1.0);
+    gl_Position = u_Camera.ViewProjection * transform * vec4(i_Position, 1.0);
 }
 
 #end
 
 #begin pixel
 #version 450
-
-#include "Camera.glsl"
 
 struct VertexData
 {
