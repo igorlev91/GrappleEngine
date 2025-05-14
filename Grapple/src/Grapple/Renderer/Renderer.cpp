@@ -930,6 +930,18 @@ namespace Grapple
 		s_RendererData.RenderPasses.push_back(pass);
 	}
 
+	void Renderer::RemoveRenderPass(Ref<RenderPass> pass)
+	{
+		for (size_t i = 0; i < s_RendererData.RenderPasses.size(); i++)
+		{
+			if (s_RendererData.RenderPasses[i] == pass)
+			{
+				s_RendererData.RenderPasses.erase(s_RendererData.RenderPasses.begin() + i);
+				break;
+			}
+		}
+	}
+
 	void Renderer::ExecuteRenderPasses()
 	{
 		Grapple_CORE_ASSERT(s_RendererData.CurrentViewport);
