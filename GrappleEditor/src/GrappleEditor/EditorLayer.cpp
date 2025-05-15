@@ -2,7 +2,6 @@
 
 #include "GrappleCore/Profiler/Profiler.h"
 #include "GrappleCore/Serialization/SerializationStream.h"
-#include "GrappleCore/Serialization/Serializer.h"
 
 #include "Grapple.h"
 #include "Grapple/Core/Application.h"

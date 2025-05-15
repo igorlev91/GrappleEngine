@@ -1,5 +1,10 @@
 #include "SerializablePropertyRenderer.h"
 
+#include "Grapple/Renderer/Material.h"
+#include "Grapple/Renderer/Texture.h"
+
+#include "Grapple/AssetManager/AssetManager.h"
+
 #include "GrappleEditor/UI/EditorGUI.h"
 #include "GrappleEditor/ImGui/ImGuiLayer.h"
 
@@ -254,6 +259,10 @@ namespace Grapple
             ImGui::TreePop();
             m_CurrentState = previousState;
         }
+    }
+
+    void SerializablePropertyRenderer::SerializeReference(const SerializableObjectDescriptor& valueDescriptor, void* referenceData, void* valueData)
+    {
     }
 
     void SerializablePropertyRenderer::RenderAssetField(AssetHandle& handle)

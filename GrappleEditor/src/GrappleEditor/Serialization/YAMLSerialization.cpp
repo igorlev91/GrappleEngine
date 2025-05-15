@@ -207,6 +207,11 @@ namespace Grapple
         m_ObjectSerializationStarted = previousObjectSerializationState;
     }
 
+    void YAMLSerializer::SerializeReference(const SerializableObjectDescriptor& valueDescriptor, void* referenceData, void* valueData)
+    {
+        Grapple_CORE_WARN("YAMLSerializer: Reference serialization not supported");
+    }
+
     // YAML Deserializer
 
     YAMLDeserializer::YAMLDeserializer(const YAML::Node& root, std::unordered_map<UUID, Entity>* serializationIdToECSId)
@@ -425,5 +430,10 @@ namespace Grapple
         {
             Grapple_CORE_ERROR("Failed to deserialize object: {}", e.what());
         }
+    }
+
+    void YAMLDeserializer::SerializeReference(const SerializableObjectDescriptor& valueDescriptor, void* referenceData, void* valueData)
+    {
+        Grapple_CORE_WARN("YAMLDeserializer: Reference deserialization not supported");
     }
 }
