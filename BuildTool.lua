@@ -59,6 +59,7 @@ M.setup_project = function(name)
 		root .. "Grapple/vendor/glm",
 		root .. "Grapple/vendor/msdf/msdf-atlas-gen/msdf-atlas-gen",
 		root .. "Grapple/vendor/msdf/msdf-atlas-gen/msdfgen",
+		root .. "Grapple/vendor/Tracy/tracy/",
 	})
 
 	filter "configurations:not Dist"
@@ -76,10 +77,10 @@ M.setup_project = function(name)
 		symbols "on"
 
 	filter "configurations:Release"
-		defines "Grapple_RELEASE"
+		defines { "Grapple_RELEASE", "TRACY_ENABLE", "TRACY_IMPORTS" }
 		runtime "Release"
 		optimize "on"
-		
+
 	filter "configurations:Dist"
 		defines "Grapple_DIST"
 		runtime "Release"
