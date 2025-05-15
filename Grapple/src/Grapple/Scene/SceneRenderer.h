@@ -37,5 +37,6 @@ namespace Grapple
 		void OnUpdate(World& world, SystemExecutionContext& context) override;
 	private:
 		Query m_Query;
+		Query m_DecalsQuery;
 	};
 }

@@ -270,6 +270,8 @@ namespace Grapple
         {
             Ref<Asset>& asset = *(Ref<Asset>*)referenceData;
             AssetHandle handle = asset ? asset->Handle : NULL_ASSET_HANDLE;
+
+            BeginPropertiesGridIfNeeded();
             
             if (EditorGUI::AssetField(m_CurrentPropertyName.data(), handle, descriptor))
                 asset = AssetManager::GetRawAsset(handle);

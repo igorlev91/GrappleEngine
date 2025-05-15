@@ -128,6 +128,10 @@ namespace Grapple
 
 
 
+	Grapple_IMPL_COMPONENT(Decal);
+
+
+
 	Grapple_IMPL_COMPONENT(DirectionalLight);
 	DirectionalLight::DirectionalLight()
 		: Color(1.0f), Intensity(1.0f) {}
