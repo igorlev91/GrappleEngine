@@ -206,7 +206,7 @@ namespace Grapple
 		return 0;
 	}
 
-	void OpenGLRendererAPI::DrawInstancesIndexed(const Ref<Mesh>& mesh, uint32_t subMeshIndex, size_t instancesCount)
+	void OpenGLRendererAPI::DrawInstancesIndexed(const Ref<Mesh>& mesh, uint32_t subMeshIndex, uint32_t instancesCount, uint32_t baseInstance)
 	{
 		const SubMesh& subMesh = mesh->GetSubMeshes()[subMeshIndex];
 		mesh->GetVertexArray()->Bind();
@@ -216,16 +216,17 @@ namespace Grapple
 		GLenum indexType = 0;
 		GetIndexCountAndType(mesh->GetVertexArray()->GetIndexBuffer(), &indicesCount, &indexType);
 
-		glDrawElementsInstancedBaseVertex(
+		glDrawElementsInstancedBaseVertexBaseInstance(
 			ConvertTopologyType(mesh->GetTopologyType()),
 			subMesh.IndicesCount,
 			indexType,
 			(const void*)(subMesh.BaseIndex * indexSize),
 			instancesCount,
-			subMesh.BaseVertex);
+			subMesh.BaseVertex,
+			baseInstance);
 	}
 
-	void OpenGLRendererAPI::DrawInstancesIndexedIndirect(const Ref<Mesh>& mesh, const Span<DrawIndirectCommandSubMeshData>& subMeshesData)
+	void OpenGLRendererAPI::DrawInstancesIndexedIndirect(const Ref<Mesh>& mesh, const Span<DrawIndirectCommandSubMeshData>& subMeshesData, uint32_t baseInstance)
 	{
 		mesh->GetVertexArray()->Bind();
 		const auto& subMeshes = mesh->GetSubMeshes();
@@ -235,7 +236,6 @@ namespace Grapple
 
 		m_IndirectCommandDataStorage.clear();
 
-		uint32_t baseInstance = 0;
 		for (const DrawIndirectCommandSubMeshData& data : subMeshesData)
 		{
 			auto& commandData = m_IndirectCommandDataStorage.emplace_back();

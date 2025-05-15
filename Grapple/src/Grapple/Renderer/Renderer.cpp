@@ -622,7 +622,7 @@ namespace Grapple
 		// Geometry
 
 		{
-			Grapple_PROFILE_SCOPE("Renderer::GeometryPass");
+			Grapple_PROFILE_SCOPE("Renderer::PrepareGeometryPass");
 			s_RendererData.GeometryPassTimer->Start();
 
 			RenderCommand::SetViewport(0, 0, s_RendererData.CurrentViewport->GetSize().x, s_RendererData.CurrentViewport->GetSize().y);
@@ -639,26 +639,23 @@ namespace Grapple
 			s_RendererData.Statistics.ObjectsCulled += (uint32_t)(s_RendererData.Queue.size() - s_RendererData.CulledObjectIndices.size());
 
 			{
-				Grapple_PROFILE_SCOPE("REnderer::GeomeryPass::Sort");
+				Grapple_PROFILE_SCOPE("Sort");
 				std::sort(s_RendererData.CulledObjectIndices.begin(), s_RendererData.CulledObjectIndices.end(), CompareRenderableObjects);
 			}
-
-			FrameBufferAttachmentsMask previousMask = s_RendererData.CurrentViewport->RenderTarget->GetWriteMask();
-		
-			for (size_t i = 0; i < 4; i++)
-			{
-				s_RendererData.ShadowsRenderTarget[i]->BindAttachmentTexture(0, 2 + (uint32_t)i);
-			}
-
-			ExecuteGeomertyPass();
-			s_RendererData.CurrentViewport->RenderTarget->SetWriteMask(previousMask);
-
-			s_RendererData.InstanceDataBuffer.clear();
-			s_RendererData.CulledObjectIndices.clear();
-			s_RendererData.Queue.clear();
-
-			s_RendererData.GeometryPassTimer->Stop();
 		}
+
+		FrameBufferAttachmentsMask previousMask = s_RendererData.CurrentViewport->RenderTarget->GetWriteMask();
+		for (size_t i = 0; i < 4; i++)
+			s_RendererData.ShadowsRenderTarget[i]->BindAttachmentTexture(0, 2 + (uint32_t)i);
+
+		ExecuteGeomertyPass();
+		s_RendererData.CurrentViewport->RenderTarget->SetWriteMask(previousMask);
+
+		s_RendererData.InstanceDataBuffer.clear();
+		s_RendererData.CulledObjectIndices.clear();
+		s_RendererData.Queue.clear();
+
+		s_RendererData.GeometryPassTimer->Stop();
 	}
 
 	void Renderer::ExecuteGeomertyPass()
@@ -667,20 +664,39 @@ namespace Grapple
 
 		Ref<Material> currentMaterial = nullptr;
 
+		s_RendererData.InstanceDataBuffer.clear();
 		for (uint32_t objectIndex : s_RendererData.CulledObjectIndices)
 		{
+			auto& instanceData = s_RendererData.InstanceDataBuffer.emplace_back();
+			instanceData.Transform = s_RendererData.Queue[objectIndex].Transform;
+			instanceData.EntityIndex = s_RendererData.Queue[objectIndex].EntityIndex;
+		}
+
+		{
+			Grapple_PROFILE_SCOPE("SetIntancesData");
+			s_RendererData.InstancesShaderBuffer->SetData(MemorySpan::FromVector(s_RendererData.InstanceDataBuffer));
+		}
+
+		uint32_t baseInstance = 0;
+		for (uint32_t currentInstance = 0; currentInstance < (uint32_t)s_RendererData.CulledObjectIndices.size(); currentInstance++)
+		{
+			uint32_t objectIndex = s_RendererData.CulledObjectIndices[currentInstance];
 			const RenderableObject& object = s_RendererData.Queue[objectIndex];
+
 			if (s_RendererData.CurrentInstancingMesh.Mesh.get() != object.Mesh.get()
 				|| s_RendererData.CurrentInstancingMesh.SubMeshIndex != object.SubMeshIndex)
 			{
-				FlushInstances();
+				FlushInstances(currentInstance - baseInstance, baseInstance);
+				baseInstance = currentInstance;
+
 				s_RendererData.CurrentInstancingMesh.Mesh = object.Mesh;
 				s_RendererData.CurrentInstancingMesh.SubMeshIndex = object.SubMeshIndex;
 			}
 
 			if (object.Material.get() != currentMaterial.get())
 			{
-				FlushInstances();
+				FlushInstances(currentInstance - baseInstance, baseInstance);
+				baseInstance = currentInstance;
 
 				currentMaterial = object.Material;
 
@@ -698,16 +714,9 @@ namespace Grapple
 
 				s_RendererData.CurrentViewport->RenderTarget->SetWriteMask(shaderOutputsMask);
 			}
-
-			auto& instanceData = s_RendererData.InstanceDataBuffer.emplace_back();
-			instanceData.Transform = object.Transform;
-			instanceData.EntityIndex = object.EntityIndex;
-
-			if (s_RendererData.InstanceDataBuffer.size() == (size_t)s_RendererData.MaxInstances)
-				FlushInstances();
 		}
 
-		FlushInstances();
+		FlushInstances((uint32_t)s_RendererData.CulledObjectIndices.size() - baseInstance, baseInstance);
 		s_RendererData.CurrentInstancingMesh.Reset();
 	}
 
@@ -753,14 +762,33 @@ namespace Grapple
 				return (uint64_t)a.Mesh->Handle < (uint64_t)b.Mesh->Handle;
 			});
 
+			// Fill instances buffer
+			s_RendererData.InstanceDataBuffer.clear();
+			for (uint32_t i : perCascadeObjects[cascadeIndex])
+			{
+				auto& instanceData = s_RendererData.InstanceDataBuffer.emplace_back();
+				instanceData.Transform = s_RendererData.Queue[i].Transform;
+			}
+
+			{
+				Grapple_PROFILE_SCOPE("SetInstancesData");
+				s_RendererData.InstancesShaderBuffer->SetData(MemorySpan::FromVector(s_RendererData.InstanceDataBuffer));
+			}
+
 			s_RendererData.IndirectDrawData.clear();
 			s_RendererData.CurrentInstancingMesh.Reset();
+
+			uint32_t baseInstance = 0;
+			uint32_t currentInstance = 0;
 			for (uint32_t objectIndex : perCascadeObjects[cascadeIndex])
 			{
 				const auto& queued = s_RendererData.Queue[objectIndex];
 				if (queued.Mesh.get() != s_RendererData.CurrentInstancingMesh.Mesh.get())
 				{
-					FlushShadowPassInstances();
+					FlushShadowPassInstances(baseInstance);
+
+					baseInstance = currentInstance;
+
 					s_RendererData.CurrentInstancingMesh.Mesh = queued.Mesh;
 					auto& command = s_RendererData.IndirectDrawData.emplace_back();
 					command.InstancesCount = 1;
@@ -768,18 +796,11 @@ namespace Grapple
 				}
 				else
 				{
-					bool found = false;
-					for (size_t i = 0; i < s_RendererData.IndirectDrawData.size(); i++)
+					if (s_RendererData.IndirectDrawData.size() > 0 && s_RendererData.IndirectDrawData.back().SubMeshIndex == queued.SubMeshIndex)
 					{
-						if (s_RendererData.IndirectDrawData[i].SubMeshIndex == queued.SubMeshIndex)
-						{
-							s_RendererData.IndirectDrawData[i].InstancesCount++;
-							found = true;
-							break;
-						}
+						s_RendererData.IndirectDrawData.back().InstancesCount++;
 					}
-
-					if (!found)
+					else
 					{
 						auto& command = s_RendererData.IndirectDrawData.emplace_back();
 						command.InstancesCount = 1;
@@ -787,65 +808,55 @@ namespace Grapple
 					}
 				}
 
-				auto& instance = s_RendererData.InstanceDataBuffer.emplace_back();
-				instance.Transform = queued.Transform;
-
-				if (s_RendererData.InstanceDataBuffer.size() == (size_t)s_RendererData.MaxInstances)
-					FlushShadowPassInstances();
+				currentInstance++;
 			}
 
-			FlushShadowPassInstances();
+			FlushShadowPassInstances(baseInstance);
 		}
 
 		s_RendererData.CurrentInstancingMesh.Reset();
 		s_RendererData.ShadowPassTimer->Stop();
+		s_RendererData.InstanceDataBuffer.clear();
 	}
 
-	void Renderer::FlushInstances()
+	void Renderer::FlushInstances(uint32_t count, uint32_t baseInstance)
 	{
 		Grapple_PROFILE_FUNCTION();
 
-		size_t instancesCount = s_RendererData.InstanceDataBuffer.size();
-		if (instancesCount == 0 || s_RendererData.CurrentInstancingMesh.Mesh == nullptr)
+		if (count == 0 || s_RendererData.CurrentInstancingMesh.Mesh == nullptr)
 			return;
-
-		{
-			Grapple_PROFILE_SCOPE("Renderer::FlushInstance::SetInstancesData");
-			s_RendererData.InstancesShaderBuffer->SetData(MemorySpan::FromVector(s_RendererData.InstanceDataBuffer));
-		}
 
 		auto mesh = s_RendererData.CurrentInstancingMesh;
 
 		const SubMesh& subMesh = mesh.Mesh->GetSubMeshes()[mesh.SubMeshIndex];
-		RenderCommand::DrawInstancesIndexed(mesh.Mesh, mesh.SubMeshIndex, instancesCount);
+		RenderCommand::DrawInstancesIndexed(mesh.Mesh, mesh.SubMeshIndex, count, baseInstance);
 
 		s_RendererData.Statistics.DrawCallsCount++;
-		s_RendererData.Statistics.DrawCallsSavedByInstancing += (uint32_t)instancesCount - 1;
-
-		s_RendererData.InstanceDataBuffer.clear();
+		s_RendererData.Statistics.DrawCallsSavedByInstancing += count - 1;
 	}
 
-	void Renderer::FlushShadowPassInstances()
+	void Renderer::FlushShadowPassInstances(uint32_t baseInstance)
 	{
 		Grapple_PROFILE_FUNCTION();
 
-		size_t instancesCount = s_RendererData.InstanceDataBuffer.size();
-		if (instancesCount == 0 || s_RendererData.CurrentInstancingMesh.Mesh == nullptr)
+		if (s_RendererData.CurrentInstancingMesh.Mesh == nullptr)
 			return;
 
-		{
-			Grapple_PROFILE_SCOPE("Renderer::FlushShadowPassInstances::SetInstancesData");
-			s_RendererData.InstancesShaderBuffer->SetData(MemorySpan::FromVector(s_RendererData.InstanceDataBuffer));
-		}
+		uint32_t instancesCount = 0;
+		for (auto& command : s_RendererData.IndirectDrawData)
+			instancesCount += command.InstancesCount;
+
+		if (instancesCount == 0)
+			return;
 
 		RenderCommand::DrawInstancesIndexedIndirect(
 			s_RendererData.CurrentInstancingMesh.Mesh,
-			Span<DrawIndirectCommandSubMeshData>::FromVector(s_RendererData.IndirectDrawData));
+			Span<DrawIndirectCommandSubMeshData>::FromVector(s_RendererData.IndirectDrawData),
+			baseInstance);
 
 		s_RendererData.Statistics.DrawCallsCount++;
 		s_RendererData.Statistics.DrawCallsSavedByInstancing += (uint32_t)instancesCount - 1;
 
-		s_RendererData.InstanceDataBuffer.clear();
 		s_RendererData.IndirectDrawData.clear();
 	}
 

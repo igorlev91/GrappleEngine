@@ -1,6 +1,7 @@
 #include "OpenGLFrameBuffer.h"
 
 #include "GrappleCore/Assert.h"
+#include "GrappleCore/Profiler/Profiler.h"
 
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
@@ -68,6 +69,7 @@ namespace Grapple
 
     void OpenGLFrameBuffer::Resize(uint32_t width, uint32_t height)
     {
+        Grapple_PROFILE_FUNCTION();
         glDeleteFramebuffers(1, &m_Id);
         glDeleteTextures((int32_t)m_ColorAttachments.size(), m_ColorAttachments.data());
 
@@ -90,12 +92,16 @@ namespace Grapple
 
     void OpenGLFrameBuffer::ClearAttachment(uint32_t index, uint32_t value)
     {
+        Grapple_PROFILE_FUNCTION();
+
         Grapple_CORE_ASSERT(index < m_ColorAttachments.size());
         glClearTexImage(m_ColorAttachments[index], 0, FrameBufferTextureFormatToOpenGLFormat(m_Specifications.Attachments[index].Format), GL_INT, &value);
     }
 
     void OpenGLFrameBuffer::ReadPixel(uint32_t attachmentIndex, uint32_t x, uint32_t y, void* pixelOutput)
     {
+        Grapple_PROFILE_FUNCTION();
+
         Grapple_CORE_ASSERT(attachmentIndex < m_ColorAttachments.size());
         glReadBuffer(GL_COLOR_ATTACHMENT0 + attachmentIndex);
 
@@ -104,6 +110,8 @@ namespace Grapple
 
     void OpenGLFrameBuffer::Blit(const Ref<FrameBuffer>& source, uint32_t destinationAttachment, uint32_t sourceAttachment)
     {
+        Grapple_PROFILE_FUNCTION();
+
         Ref<OpenGLFrameBuffer> sourceFrameBuffer = As<OpenGLFrameBuffer>(source);
         Grapple_CORE_ASSERT(destinationAttachment < (uint32_t)m_ColorAttachments.size());
         Grapple_CORE_ASSERT(sourceAttachment < (uint32_t)sourceFrameBuffer->m_ColorAttachments.size());

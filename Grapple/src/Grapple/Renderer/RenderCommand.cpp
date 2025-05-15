@@ -49,16 +49,16 @@ namespace Grapple
 		s_API->DrawInstanced(mesh, instancesCount);
 	}
 
-	void RenderCommand::DrawInstancesIndexed(const Ref<Mesh>& mesh, uint32_t subMeshIndex, size_t instancesCount)
+	void RenderCommand::DrawInstancesIndexed(const Ref<Mesh>& mesh, uint32_t subMeshIndex, uint32_t instancesCount, uint32_t baseInstance)
 	{
 		Grapple_PROFILE_FUNCTION();
-		s_API->DrawInstancesIndexed(mesh, subMeshIndex, instancesCount);
+		s_API->DrawInstancesIndexed(mesh, subMeshIndex, instancesCount, baseInstance);
 	}
 
-	void RenderCommand::DrawInstancesIndexedIndirect(const Ref<Mesh>& mesh, const Span<DrawIndirectCommandSubMeshData>& subMeshesData)
+	void RenderCommand::DrawInstancesIndexedIndirect(const Ref<Mesh>& mesh, const Span<DrawIndirectCommandSubMeshData>& subMeshesData, uint32_t baseInstance)
 	{
 		Grapple_PROFILE_FUNCTION();
-		s_API->DrawInstancesIndexedIndirect(mesh, subMeshesData);
+		s_API->DrawInstancesIndexedIndirect(mesh, subMeshesData, baseInstance);
 	}
 
 	void RenderCommand::DrawInstanced(const Ref<const VertexArray>& mesh, size_t instancesCount, size_t baseVertexIndex, size_t startIndex, size_t indicesCount)
