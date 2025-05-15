@@ -26,6 +26,7 @@
 #include "GrappleEditor/SceneViewSettings.h"
 
 #include <vector>
+#include <set>
 
 namespace Grapple
 {
@@ -91,6 +92,8 @@ namespace Grapple
 		float m_PreviousFrameTime = 0.0f;
 
 		bool m_UpdateCursorModeNextFrame = false;
+
+		std::set<AssetHandle> m_AssetReloadQueue;
 
 		SceneViewSettings m_SceneViewSettings;
 
