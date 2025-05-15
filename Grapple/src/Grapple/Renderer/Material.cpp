@@ -5,6 +5,7 @@
 #include "Grapple/Renderer/Shader.h"
 #include "Grapple/Renderer/Texture.h"
 #include "Grapple/Renderer/RendererAPI.h"
+#include "Grapple/Renderer/Renderer.h"
 
 #include "Grapple/Platform/OpenGL/OpenGLShader.h"
 
@@ -13,6 +14,33 @@
 
 namespace Grapple
 {
+	void TexturePropertyValue::SetTexture(const Ref<Grapple::Texture>& texture)
+	{
+		ValueType = Type::Texture;
+		Texture = texture;
+		FrameBuffer = nullptr;
+		FrameBufferAttachmentIndex = UINT32_MAX;
+	}
+
+	void TexturePropertyValue::SetFrameBuffer(const Ref<Grapple::FrameBuffer>& frameBuffer, uint32_t attachment)
+	{
+		Grapple_CORE_ASSERT(frameBuffer);
+		Grapple_CORE_ASSERT(attachment < frameBuffer->GetAttachmentsCount());
+
+		ValueType = Type::FrameBufferAttachment;
+		Texture = nullptr;
+		FrameBuffer = frameBuffer;
+		FrameBufferAttachmentIndex = attachment;
+	}
+
+	void TexturePropertyValue::Clear()
+	{
+		ValueType = Type::Texture;
+		Texture = nullptr;
+		FrameBuffer = nullptr;
+		FrameBufferAttachmentIndex = UINT32_MAX;
+	}
+
 	Grapple_IMPL_ASSET(Material);
 	Grapple_IMPL_TYPE(Material);
 
@@ -47,9 +75,17 @@ namespace Grapple
 			return;
 
 		const ShaderProperties& properties = m_Shader->GetProperties();
+		size_t samplers = 0;
 
-		for (const auto& param : properties)
-			m_BufferSize += param.Offset;
+		for (const auto& prop : properties)
+		{
+			m_BufferSize += prop.Offset;
+
+			if (prop.Type == ShaderDataType::Sampler)
+				samplers++;
+		}
+
+		m_Textures.resize(samplers, TexturePropertyValue());
 
 		if (properties.size() > 0)
 			m_BufferSize += properties.back().Size;
@@ -76,6 +112,7 @@ namespace Grapple
 			m_BufferSize = 0;
 		}
 
+		m_Textures.clear();
 		m_Shader = shader;
 		Initialize();
 	}
@@ -117,9 +154,21 @@ namespace Grapple
 					break;
 				case ShaderDataType::Sampler:
 				{
-					Ref<Texture> texture = AssetManager::GetAsset<Texture>(*(AssetHandle*)paramData);
-					if (texture && properties[i].Location != UINT32_MAX)
-						texture->Bind(properties[i].Location);
+					const auto& textureValue = m_Textures[properties[i].SamplerIndex];
+
+					switch (textureValue.ValueType)
+					{
+					case TexturePropertyValue::Type::FrameBufferAttachment:
+						Grapple_CORE_ASSERT(textureValue.FrameBuffer);
+						textureValue.FrameBuffer->BindAttachmentTexture(textureValue.FrameBufferAttachmentIndex, properties[i].Location);
+						break;
+					case TexturePropertyValue::Type::Texture:
+						if (textureValue.Texture)
+							textureValue.Texture->Bind(properties[i].Location);
+;						break;
+					default:
+						Grapple_CORE_ASSERT(false);
+					}
 
 					break;
 				}
@@ -159,5 +208,38 @@ namespace Grapple
 				}
 			}
 		}
+	}
+
+	template<>
+	Grapple_API TexturePropertyValue& Material::GetPropertyValue(uint32_t index)
+	{
+		const ShaderProperties& properties = m_Shader->GetProperties();
+		Grapple_CORE_ASSERT((size_t)index < properties.size());
+		Grapple_CORE_ASSERT(properties[index].Type == ShaderDataType::Sampler);
+		Grapple_CORE_ASSERT(properties[index].SamplerIndex < (uint32_t)m_Textures.size());
+
+		return m_Textures[properties[index].SamplerIndex];
+	}
+
+	template<>
+	Grapple_API TexturePropertyValue Material::ReadPropertyValue(uint32_t index)
+	{
+		const ShaderProperties& properties = m_Shader->GetProperties();
+		Grapple_CORE_ASSERT((size_t)index < properties.size());
+		Grapple_CORE_ASSERT(properties[index].Type == ShaderDataType::Sampler);
+		Grapple_CORE_ASSERT(properties[index].SamplerIndex < (uint32_t)m_Textures.size());
+
+		return m_Textures[properties[index].SamplerIndex];
+	}
+
+	template<>
+	Grapple_API void Material::WritePropertyValue(uint32_t index, const TexturePropertyValue& value)
+	{
+		const ShaderProperties& properties = m_Shader->GetProperties();
+		Grapple_CORE_ASSERT((size_t)index < properties.size());
+		Grapple_CORE_ASSERT(properties[index].Type == ShaderDataType::Sampler);
+		Grapple_CORE_ASSERT(properties[index].SamplerIndex < (uint32_t)m_Textures.size());
+
+		m_Textures[properties[index].SamplerIndex] = value;
 	}
 }

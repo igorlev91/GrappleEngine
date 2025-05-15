@@ -4,6 +4,7 @@
 #include "Grapple/Renderer/Material.h"
 #include "Grapple/Renderer/MaterialsTable.h"
 #include "Grapple/Renderer/ShaderLibrary.h"
+#include "Grapple/Renderer/Renderer.h"
 
 #include "GrappleEditor/AssetManager/EditorAssetManager.h"
 
@@ -226,7 +227,14 @@ namespace Grapple
             if (roughnessProperty)
                 materialAsset->WritePropertyValue(*roughnessProperty, roughness);
             if (textureProperty)
-                materialAsset->WritePropertyValue(*textureProperty, baseColorTextureHandle);
+            {
+                auto& value = materialAsset->GetPropertyValue<TexturePropertyValue>(*textureProperty);
+
+                if (baseColorTextureHandle == NULL_ASSET_HANDLE)
+                    value.SetTexture(Renderer::GetWhiteTexture());
+                else
+                    value.SetTexture(AssetManager::GetAsset<Texture>(baseColorTextureHandle));
+            }
 
             auto it = nameToHandle.find(name);
             if (it != nameToHandle.end())
