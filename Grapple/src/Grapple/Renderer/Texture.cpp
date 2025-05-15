@@ -5,6 +5,9 @@
 
 namespace Grapple
 {
+	Grapple_IMPL_ASSET(Texture);
+	Grapple_SERIALIZABLE_IMPL(Texture);
+
 	Ref<Texture> Texture::Create(const std::filesystem::path& path, const TextureSpecifications& specifications)
 	{
 		switch (RendererAPI::GetAPI())

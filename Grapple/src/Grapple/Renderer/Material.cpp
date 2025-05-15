@@ -13,6 +13,12 @@
 
 namespace Grapple
 {
+	Grapple_IMPL_ASSET(Material);
+	Grapple_IMPL_TYPE(Material);
+
+	Material::Material()
+		: Asset(AssetType::Material), m_Shader(nullptr), m_Buffer(nullptr), m_BufferSize(0) {}
+
 	Material::Material(Ref<Shader> shader)
 		: Asset(AssetType::Material),
 		m_Shader(shader),

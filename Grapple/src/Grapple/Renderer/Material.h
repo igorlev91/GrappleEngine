@@ -1,5 +1,7 @@
 #pragma once
 
+#include "GrappleCore/Serialization/TypeInitializer.h"
+
 #include "Grapple/AssetManager/Asset.h"
 #include "Grapple/Renderer/Shader.h"
 #include "Grapple/Renderer/RendererAPI.h"
@@ -10,6 +12,10 @@ namespace Grapple
 	class Grapple_API Material : public Asset
 	{
 	public:
+		Grapple_ASSET;
+		Grapple_TYPE;
+
+		Material();
 		Material(Ref<Shader> shader);
 		Material(AssetHandle shaderHandle);
 		virtual ~Material();

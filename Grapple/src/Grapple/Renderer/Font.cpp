@@ -9,6 +9,9 @@ namespace Grapple
 {
     static Ref<Font> s_DefualtFont = nullptr;
 
+    Grapple_SERIALIZABLE_IMPL(Font);
+    Grapple_IMPL_ASSET(Font);
+
 	Font::Font(const std::filesystem::path& path)
         : Asset(AssetType::Font)
 	{

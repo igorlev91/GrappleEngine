@@ -119,7 +119,7 @@ namespace Grapple
 			if (EditorGUI::BeginPropertyGrid())
 			{
 				EditorGUI::ColorPropertyField("Color", sprite.Color);
-				EditorGUI::AssetField("Texture", sprite.Texture);
+				EditorGUI::AssetField("Texture", sprite.Texture, &Texture::_Asset);
 				EditorGUI::Vector2PropertyField("Tiling", sprite.TextureTiling);
 
 				EditorGUI::PropertyName("Flip");

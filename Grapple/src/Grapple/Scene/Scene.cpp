@@ -18,8 +18,10 @@
 
 namespace Grapple
 {
-
 	Ref<Scene> s_Active = nullptr;
+
+	Grapple_SERIALIZABLE_IMPL(Scene);
+	Grapple_IMPL_ASSET(Scene);
 
 	Scene::Scene(ECSContext& context)
 		: Asset(AssetType::Scene), m_World(context)

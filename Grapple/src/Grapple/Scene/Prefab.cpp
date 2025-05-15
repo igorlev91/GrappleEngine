@@ -6,6 +6,9 @@
 
 namespace Grapple
 {
+    Grapple_IMPL_ASSET(Prefab);
+    Grapple_SERIALIZABLE_IMPL(Prefab);
+
     Entity Prefab::CreateInstance(World& world)
     {
         return world.Entities.CreateEntity(m_Components.data(), m_Components.size(), true);

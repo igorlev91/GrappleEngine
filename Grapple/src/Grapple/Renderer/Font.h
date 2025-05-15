@@ -23,6 +23,9 @@ namespace Grapple
 	class Grapple_API Font : public Asset
 	{
 	public:
+		Grapple_SERIALIZABLE;
+		Grapple_ASSET;
+
 		Font(const std::filesystem::path& path);
 
 		Ref<Texture> GetAtlas() const { return m_FontAtlas; }

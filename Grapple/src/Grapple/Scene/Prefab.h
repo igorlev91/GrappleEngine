@@ -11,6 +11,9 @@ namespace Grapple
 	class Grapple_API Prefab : public Asset
 	{
 	public:
+		Grapple_ASSET;
+		Grapple_SERIALIZABLE;
+
 		Prefab(const uint8_t* prefabData, std::vector<std::pair<ComponentId, void*>>&& components)
 			: Asset(AssetType::Prefab), m_Data(prefabData), m_Components(std::move(components)) {}
 		

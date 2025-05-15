@@ -5,6 +5,9 @@
 
 namespace Grapple
 {
+	Grapple_IMPL_ASSET(Shader);
+	Grapple_SERIALIZABLE_IMPL(Shader);
+
 	Ref<Shader> Shader::Create()
 	{
 		switch (RendererAPI::GetAPI())

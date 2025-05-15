@@ -20,6 +20,9 @@ namespace Grapple
 	class Grapple_API Shader : public Asset
 	{
 	public:
+		Grapple_SERIALIZABLE;
+		Grapple_ASSET;
+
 		Shader()
 			: Asset(AssetType::Shader) {}
 

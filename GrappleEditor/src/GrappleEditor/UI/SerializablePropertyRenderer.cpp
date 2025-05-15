@@ -263,6 +263,17 @@ namespace Grapple
 
     void SerializablePropertyRenderer::SerializeReference(const SerializableObjectDescriptor& valueDescriptor, void* referenceData, void* valueData)
     {
+        Grapple_ASSERT(referenceData);
+
+        const AssetDescriptor* descriptor = AssetDescriptor::FindBySerializationDescriptor(valueDescriptor);
+        if (descriptor)
+        {
+            Ref<Asset>& asset = *(Ref<Asset>*)referenceData;
+            AssetHandle handle = asset ? asset->Handle : NULL_ASSET_HANDLE;
+            
+            if (EditorGUI::AssetField(m_CurrentPropertyName.data(), handle, descriptor))
+                asset = AssetManager::GetRawAsset(handle);
+        }
     }
 
     void SerializablePropertyRenderer::RenderAssetField(AssetHandle& handle)

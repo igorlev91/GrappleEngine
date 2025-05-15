@@ -6,6 +6,7 @@
 #include "Grapple/Math/Math.h"
 
 #include "GrappleCore/Collections/Span.h"
+#include "GrappleCore/Serialization/Metadata.h"
 
 namespace Grapple
 {
@@ -26,6 +27,9 @@ namespace Grapple
 	class Grapple_API Mesh : public Asset
 	{
 	public:
+		Grapple_SERIALIZABLE;
+		Grapple_ASSET;
+
 		Mesh(MeshTopology topologyType,
 			size_t vertexBufferSize,
 			IndexBuffer::IndexFormat indexFormat,

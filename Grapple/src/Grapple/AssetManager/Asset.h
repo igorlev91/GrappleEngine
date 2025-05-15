@@ -71,12 +71,38 @@ namespace Grapple
 		std::vector<AssetHandle> SubAssets;
 	};
 
+	class Grapple_API AssetDescriptor
+	{
+	public:
+		struct DescriptorsContainer
+		{
+			std::vector<AssetDescriptor*> Descriptors;
+			std::unordered_map<const SerializableObjectDescriptor*, AssetDescriptor*> SerializationDescritproToAsset;
+		};
+
+		AssetDescriptor(const SerializableObjectDescriptor& descriptor);
+
+		const SerializableObjectDescriptor& SerializationDescriptor;
+	public:
+		static DescriptorsContainer& GetDescriptors();
+		static const AssetDescriptor* FindBySerializationDescriptor(const SerializableObjectDescriptor& descriptor);
+	};
+
+#define Grapple_ASSET                                                      \
+	static Grapple::AssetDescriptor _Asset;                                \
+	virtual const Grapple::AssetDescriptor& GetDescriptor() const override;
+
+#define Grapple_IMPL_ASSET(assetType)                                                                      \
+	Grapple::AssetDescriptor assetType::_Asset(Grapple_SERIALIZATION_DESCRIPTOR_OF(assetType));              \
+	const Grapple::AssetDescriptor& assetType::GetDescriptor() const { return assetType::_Asset; }
+
 	class Grapple_API Asset
 	{
 	public:
 		Asset(AssetType type)
 			: m_Type(type) {}
 	public:
+		virtual const AssetDescriptor& GetDescriptor() const = 0;
 		inline AssetType GetType() const { return m_Type; }
 	private:
 		AssetType m_Type;

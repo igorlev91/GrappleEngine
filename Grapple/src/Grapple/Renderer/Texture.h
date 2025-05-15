@@ -1,6 +1,8 @@
 #pragma once
 
 #include "GrappleCore/Core.h"
+#include "GrappleCore/Serialization/TypeInitializer.h"
+#include "GrappleCore/Serialization/Metadata.h"
 
 #include "Grapple/AssetManager/Asset.h"
 
@@ -56,6 +58,9 @@ namespace Grapple
 	class Grapple_API Texture : public Asset
 	{
 	public:
+		Grapple_ASSET;
+		Grapple_SERIALIZABLE;
+
 		Texture()
 			: Asset(AssetType::Texture) {}
 

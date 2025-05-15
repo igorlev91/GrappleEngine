@@ -18,6 +18,9 @@ namespace Grapple
 	class Grapple_API Scene : public Asset
 	{
 	public:
+		Grapple_ASSET;
+		Grapple_SERIALIZABLE;
+
 		Scene(ECSContext& context);
 		~Scene();
 
