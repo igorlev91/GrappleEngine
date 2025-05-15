@@ -17,6 +17,8 @@
 
 namespace Grapple
 {
+#define FIXED_SHADOW_NEAR_AND_FAR 1
+
 	Grapple_IMPL_TYPE(ShadowSettings);
 
 	struct InstanceData
@@ -444,13 +446,15 @@ namespace Grapple
 			{
 				ShadowMappingParams params = perCascadeParams[cascadeIndex];
 
+				float nearPlaneDistance = 0;
+				float farPlaneDistance = 0;
+#if !FIXED_SHADOW_NEAR_AND_FAR
+
 				// 3. Extend near and far planes
 
 				Math::Plane nearPlane = Math::Plane::TroughPoint(params.CameraFrustumCenter, -lightDirection);
 				Math::Plane farPlane = Math::Plane::TroughPoint(params.CameraFrustumCenter, lightDirection);
 
-				float nearPlaneDistance = 0;
-				float farPlaneDistance = 0;
 
 				for (uint32_t objectIndex : perCascadeObjects[cascadeIndex])
 				{
@@ -464,9 +468,14 @@ namespace Grapple
 					nearPlaneDistance = glm::max(nearPlaneDistance, nearPlane.Distance(center) + projectedDistance);
 					farPlaneDistance = glm::max(farPlaneDistance, farPlane.Distance(center) + projectedDistance);
 				}
-
+				
 				nearPlaneDistance = -nearPlaneDistance;
 				farPlaneDistance = farPlaneDistance;
+#else
+				const float fixedPlaneDistance = 500.0f;
+				nearPlaneDistance = -fixedPlaneDistance;
+				farPlaneDistance = fixedPlaneDistance;
+#endif
 
 				glm::mat4 view = glm::lookAt(params.CameraFrustumCenter + lightDirection * nearPlaneDistance, params.CameraFrustumCenter, glm::vec3(0.0f, 1.0f, 0.0f));
 
