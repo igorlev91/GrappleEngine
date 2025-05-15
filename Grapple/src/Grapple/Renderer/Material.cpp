@@ -165,7 +165,7 @@ namespace Grapple
 					case TexturePropertyValue::Type::Texture:
 						if (textureValue.Texture)
 							textureValue.Texture->Bind(properties[i].Location);
-;						break;
+						break;
 					default:
 						Grapple_CORE_ASSERT(false);
 					}

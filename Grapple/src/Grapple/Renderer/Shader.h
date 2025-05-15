@@ -13,10 +13,6 @@
 
 namespace Grapple
 {
-	using ShaderProperties = std::vector<ShaderProperty>;
-	// Indices of frame buffer attachments to which the shader writes
-	using ShaderOutputs = std::vector<uint32_t>;
-
 	class Grapple_API Shader : public Asset
 	{
 	public:
