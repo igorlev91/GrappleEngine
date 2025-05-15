@@ -212,7 +212,7 @@ namespace Grapple
 							const TransformComponent* transform = world.TryGetEntityComponent<TransformComponent>(editorSelection.GetEntity());
 
 							if (transform)
-								m_Camera.SetPosition(transform->Position);
+								m_Camera.SetRotationOrigin(transform->Position);
 						}
 						break;
 					}

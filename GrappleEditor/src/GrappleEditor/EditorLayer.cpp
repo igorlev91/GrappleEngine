@@ -29,11 +29,11 @@
 
 #include "GrappleEditor/ImGui/ImGuiLayer.h"
 #include "GrappleEditor/UI/EditorGUI.h"
-#include "GrappleEditor/UI/SceneViewportWindow.h"
 #include "GrappleEditor/UI/EditorTitleBar.h"
 #include "GrappleEditor/UI/ProjectSettingsWindow.h"
 #include "GrappleEditor/UI/ECS/ECSInspector.h"
 #include "GrappleEditor/UI/PrefabEditor.h"
+#include "GrappleEditor/UI/SceneViewportWindow.h"
 #include "GrappleEditor/UI/SerializablePropertyRenderer.h"
 
 #include "GrappleEditor/Scripting/BuildSystem/BuildSystem.h"
@@ -160,7 +160,7 @@ namespace Grapple
                     m_UpdateCursorModeNextFrame = true;
             }
 
-            if (m_UpdateCursorModeNextFrame)
+            if (m_UpdateCursorModeNextFrame && !m_PlaymodePaused)
             {
                 Application::GetInstance().GetWindow()->SetCursorMode(InputManager::GetCursorMode());
                 m_UpdateCursorModeNextFrame = false;
@@ -424,7 +424,7 @@ namespace Grapple
     {
         Grapple_CORE_ASSERT(Scene::GetActive());
         if (AssetManager::IsAssetHandleValid(Scene::GetActive()->Handle))
-            SceneSerializer::Serialize(Scene::GetActive());
+            SceneSerializer::Serialize(Scene::GetActive(), m_Camera, m_SceneViewSettings);
         else
             SaveActiveSceneAs();
     }
@@ -441,7 +441,7 @@ namespace Grapple
             if (!path.has_extension())
                 path.replace_extension(".Grapple");
 
-            SceneSerializer::Serialize(Scene::GetActive(), path);
+            SceneSerializer::Serialize(Scene::GetActive(), path, m_Camera, m_SceneViewSettings);
             AssetHandle handle = As<EditorAssetManager>(AssetManager::GetInstance())->ImportAsset(path);
             OpenScene(handle);
         }
@@ -469,6 +469,7 @@ namespace Grapple
             Scene::SetActive(active);
 
             active->InitializeRuntime();
+            active->InitializePostProcessing();
 
             m_EditedSceneHandle = handle;
         }
@@ -531,7 +532,7 @@ namespace Grapple
 
         ScriptingEngine::LoadModules();
         Ref<Scene> playModeScene = CreateRef<Scene>(m_ECSContext);
-        SceneSerializer::Deserialize(playModeScene, activeScenePath);
+        SceneSerializer::Deserialize(playModeScene, activeScenePath, m_Camera, m_SceneViewSettings);
 
         Scene::SetActive(playModeScene);
         m_Mode = EditorMode::Play;
@@ -592,7 +593,7 @@ namespace Grapple
         ScriptingEngine::LoadModules();
         active = CreateRef<Scene>(m_ECSContext);
         active->Handle = activeSceneHandle;
-        SceneSerializer::Deserialize(active, activeScenePath);
+        SceneSerializer::Deserialize(active, activeScenePath, m_Camera, m_SceneViewSettings);
 
         active->InitializeRuntime();
         Scene::SetActive(active);
