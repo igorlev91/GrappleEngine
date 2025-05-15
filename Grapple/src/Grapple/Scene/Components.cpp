@@ -138,6 +138,7 @@ namespace Grapple
 
 
 	Grapple_IMPL_COMPONENT(PointLight);
+	Grapple_IMPL_COMPONENT(SpotLight);
 
 
 	Grapple_IMPL_COMPONENT(Environment);
