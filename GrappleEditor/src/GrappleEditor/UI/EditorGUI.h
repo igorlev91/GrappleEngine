@@ -11,6 +11,7 @@
 #include "GrappleECS/World.h"
 
 #include "GrappleEditor/ImGui/ImGuiLayer.h"
+#include "GrappleEditor/UI/EditorIcons.h"
 
 namespace Grapple
 {
@@ -19,8 +20,13 @@ namespace Grapple
 	class EditorGUI
 	{
 	public:
+		static void Initialize();
+
 		static bool BeginPropertyGrid();
 		static void EndPropertyGrid();
+
+		static void DrawIcon(glm::ivec2 iconPosition, float size = 0.0f);
+		static const EditorIcons& GetIcons();
 
 		static void MoveCursor(ImVec2 offset);
 

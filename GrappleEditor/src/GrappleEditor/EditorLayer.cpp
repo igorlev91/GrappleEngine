@@ -80,6 +80,7 @@ namespace Grapple
     void EditorLayer::OnAttach()
     {
         ShaderCacheManager::SetInstance(CreateScope<EditorShaderCache>());
+        EditorGUI::Initialize();
 
         m_PropertiesWindow.OnAttach();
         ImGuiLayer::OnAttach();
