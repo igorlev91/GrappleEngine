@@ -19,6 +19,7 @@ namespace Grapple
 		glm::uvec2 Size;
 		glm::ivec2 Position;
 		bool IsMinimized = false;
+		bool IsFocused = false;
 		bool IsMaximized = false;
 		bool CustomTitleBar = false;
 		bool VSyncEnabled = true;

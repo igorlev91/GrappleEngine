@@ -10,6 +10,7 @@ namespace Grapple
 	enum class EventType
 	{
 		WindowClose,
+		WindowFocus,
 		WindowResize,
 		WindowMove,
 
