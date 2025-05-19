@@ -147,10 +147,9 @@ namespace Grapple
 
                 std::vector<GLchar> infoLog(maxLength + 1);
                 glGetProgramInfoLog(m_Id, maxLength, &maxLength, &infoLog[0]);
-                glDeleteProgram(m_Id);
 
                 Grapple_CORE_ERROR("Failed to link shader: {}", infoLog.data());
-                return;
+                m_IsValid = false;
             }
         }
 
@@ -185,7 +184,8 @@ namespace Grapple
 
     void Grapple::OpenGLShader::Bind()
     {
-        glUseProgram(m_Id);
+        if (m_IsValid)
+			glUseProgram(m_Id);
     }
 
     const ShaderProperties& OpenGLShader::GetProperties() const
