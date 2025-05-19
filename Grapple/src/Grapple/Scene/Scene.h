@@ -1,25 +1,25 @@
 #pragma once
 
-#include "FlareCore/Core.h"
-#include "Flare/AssetManager/Asset.h"
+#include "GrappleCore/Core.h"
+#include "Grapple/AssetManager/Asset.h"
 
-#include "Flare/Renderer/RenderData.h"
-#include "Flare/Renderer/Viewport.h"
-#include "Flare/Renderer/Font.h"
-#include "Flare/Renderer/PostProcessing/PostProcessingManager.h"
+#include "Grapple/Renderer/RenderData.h"
+#include "Grapple/Renderer/Viewport.h"
+#include "Grapple/Renderer/Font.h"
+#include "Grapple/Renderer/PostProcessing/PostProcessingManager.h"
 
-#include "Flare/Scene/SceneRenderer.h"
+#include "Grapple/Scene/SceneRenderer.h"
 
-#include "FlareECS.h"
+#include "GrappleECS.h"
 
-namespace Flare
+namespace Grapple
 {
 	class SceneSerializer;
-	class FLARE_API Scene : public Asset
+	class Grapple_API Scene : public Asset
 	{
 	public:
-		FLARE_ASSET;
-		FLARE_SERIALIZABLE;
+		Grapple_ASSET;
+		Grapple_SERIALIZABLE;
 
 		Scene(ECSContext& context);
 		~Scene();

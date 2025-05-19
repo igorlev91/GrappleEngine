@@ -57,6 +57,7 @@ namespace Grapple
 			Grapple_CORE_ASSERT((size_t)index < properties.size());
 			Grapple_CORE_ASSERT(sizeof(T) == properties[index].Size);
 			Grapple_CORE_ASSERT(properties[index].Type != ShaderDataType::Sampler);
+			Grapple_CORE_ASSERT(properties[index].Offset + properties[index].Size <= m_BufferSize);
 			return *(T*)(m_Buffer + properties[index].Offset);
 		}
 
@@ -68,6 +69,7 @@ namespace Grapple
 			Grapple_CORE_ASSERT(sizeof(T) == properties[index].Size);
 
 			Grapple_CORE_ASSERT(properties[index].Type != ShaderDataType::Sampler);
+			Grapple_CORE_ASSERT(properties[index].Offset + properties[index].Size <= m_BufferSize);
 
 			T value;
 
@@ -81,6 +83,7 @@ namespace Grapple
 			const ShaderProperties& properties = m_Shader->GetProperties();
 			Grapple_CORE_ASSERT((size_t)index < properties.size());
 			Grapple_CORE_ASSERT(sizeof(T) == properties[index].Size);
+			Grapple_CORE_ASSERT(properties[index].Offset + properties[index].Size <= m_BufferSize);
 
 			Grapple_CORE_ASSERT(properties[index].Type != ShaderDataType::Sampler);
 			memcpy_s(m_Buffer + properties[index].Offset, sizeof(value), &value, properties[index].Size);
