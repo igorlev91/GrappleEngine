@@ -32,7 +32,7 @@ namespace Grapple
 	{
 		Grapple_PROFILE_FUNCTION();
 
-		if (!Enabled)
+		if (!Enabled || !Renderer::GetCurrentViewport().PostProcessingEnabled)
 			return;
 
 		Ref<FrameBuffer> output = context.RTPool.Get();

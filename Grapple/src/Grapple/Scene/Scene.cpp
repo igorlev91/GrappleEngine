@@ -10,6 +10,7 @@
 
 #include "Grapple/Math/Math.h"
 #include "Grapple/Scene/Components.h"
+#include "Grapple/Scene/Hierarchy.h"
 #include "Grapple/Input/InputManager.h"
 
 #include "Grapple/Scripting/ScriptingEngine.h"
@@ -47,6 +48,7 @@ namespace Grapple
 
 		m_2DRenderingGroup = systemsManager.CreateGroup("2D Rendering");
 		m_ScriptingUpdateGroup = systemsManager.CreateGroup("Scripting Update");
+		m_LateUpdateGroup = systemsManager.CreateGroup("Late Update");
 		m_OnRuntimeStartGroup = systemsManager.CreateGroup("On Runtime Start");
 		m_OnRuntimeEndGroup = systemsManager.CreateGroup("On Runtime End");
 
@@ -208,15 +210,30 @@ namespace Grapple
 		{
 			auto transforms = view.View<const TransformComponent>();
 			auto lights = view.View<const SpotLight>();
+			auto globalTransform = view.ViewOptional<const GlobalTransform>();
 
 			for (EntityViewElement entity : view)
 			{
 				if (lights[entity].OuterAngle - lights[entity].InnerAngle <= 0.0f)
 					continue;
 
+				glm::vec3 position = transforms[entity].Position;
+				glm::vec3 direction = glm::vec3(0.0f);
+
+				if (globalTransform.HasComponent())
+				{
+					position = globalTransform[entity].value()->Position;
+					direction = globalTransform[entity].value()->TransformDirection(glm::vec3(0.0f, 0.0f, -1.0f));
+				}
+				else
+				{
+					position = transforms[entity].Position;
+					direction = transforms[entity].TransformDirection(glm::vec3(0.0f, 0.0f, -1.0f));
+				}
+
 				Renderer::SubmitSpotLight(SpotLightData(
-					transforms[entity].Position,
-					transforms[entity].TransformDirection(glm::vec3(0.0f, 0.0f, -1.0f)),
+					position,
+					direction,					
 					lights[entity].InnerAngle,
 					lights[entity].OuterAngle,
 					glm::vec4(lights[entity].Color, lights[entity].Intensity)
@@ -243,6 +260,7 @@ namespace Grapple
 	{
 		m_World.GetSystemsManager().ExecuteGroup(m_OnFrameStart);
 		m_World.GetSystemsManager().ExecuteGroup(m_ScriptingUpdateGroup);
+		m_World.GetSystemsManager().ExecuteGroup(m_LateUpdateGroup);
 		m_World.GetSystemsManager().ExecuteGroup(m_OnFrameEnd);
 
 		// TODO: should probably move out of here, because OnUpdateRuntime is called
@@ -253,6 +271,7 @@ namespace Grapple
 
 	void Scene::OnUpdateEditor()
 	{
+		m_World.GetSystemsManager().ExecuteSystem<TransformPropagationSystem>();
 		m_World.Entities.ClearQueuedForDeletion();
 	}
 
