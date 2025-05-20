@@ -2,6 +2,7 @@
 
 #include "GrappleCore/Assert.h"
 #include "GrappleCore/Core.h"
+#include "GrappleCore/Collections/Span.h"
 
 #include "GrappleECS/Entity/Entity.h"
 #include "GrappleECS/Entity/Component.h"
@@ -115,6 +116,8 @@ namespace Grapple
 			ArchetypeId Archetype = INVALID_ARCHETYPE_ID;
 			uint8_t* Data = nullptr;
 		};
+
+		void MoveEntityData(uint8_t* source, uint8_t* destination, const ArchetypeRecord& entityArchetype, size_t firstComponentIndex, size_t componentsCount);
 
 		void CreateEntity(const ComponentSet& components, EntityCreationResult& result);
 		void InitializeEntity(const EntityCreationResult& entityResult, ComponentInitializationStrategy initStrategy);
