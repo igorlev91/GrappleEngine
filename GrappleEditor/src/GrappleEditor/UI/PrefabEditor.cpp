@@ -22,6 +22,7 @@ namespace Grapple
         settings.RotationSpeed = 1.0f;
 
         m_PreviewScene->Initialize();
+        m_ViewportWindow.GetViewport().PostProcessingEnabled = false;
     }
 
     void PrefabEditor::OnOpen(AssetHandle asset)
@@ -63,5 +64,10 @@ namespace Grapple
         ImGui::End();
 
         show = m_ViewportWindow.ShowWindow;
+    }
+
+    void PrefabEditor::OnEvent(Event& event)
+    {
+        m_ViewportWindow.OnEvent(event);
     }
 }

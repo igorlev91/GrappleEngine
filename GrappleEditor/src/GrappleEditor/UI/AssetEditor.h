@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Grapple/AssetManager/Asset.h"
+#include "GrapplePlatform/Event.h"
 
 namespace Grapple
 {
@@ -16,6 +17,8 @@ namespace Grapple
 		void Open(AssetHandle asset);
 		void Close();
 		void OnUpdate();
+
+		virtual void OnEvent(Event& event) = 0;
 	protected:
 		virtual void OnOpen(AssetHandle asset) = 0;
 		virtual void OnClose() = 0;
