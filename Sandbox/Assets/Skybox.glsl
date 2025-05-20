@@ -1,31 +1,33 @@
-Culling = Front
-
 Properties =
 {
-	u_Sky.AtmoshpereHeight = {}
 	u_Sky.PlanetRadius = {}
-	u_Sky.AtmoshpericDensity = {}
+	u_Sky.AtmosphereThickness = {}
 	u_Sky.RaySteps = {}
 	u_Sky.ViewRaySteps = {}
-	u_Sky.ScatteringStrength = {}
-	u_Sky.SunColor = {}
+
+	u_Sky.ObserverHeight = {}
+
+	u_Sky.MieHeight = {}
+	u_Sky.RayleighHeight = {}
+	u_Sky.RayleighCoefficient = {}
+	u_Sky.MieCoefficient = {}
+	u_Sky.MieAbsorbtion = {}
+	u_Sky.RayleighAbsobtion = {}
+	u_Sky.OzoneAbsorbtion = {}
+
+	u_Sky.GroundColor = { Type = Color }
 }
 
 #begin vertex
 #version 450
 
 #include "Packages/RendererAssets/Assets/Common/Camera.glsl"
-#include "Packages/RendererAssets/Assets/Common/Instancing.glsl"
 
-layout(location = 0) in vec3 i_Position;
-layout(location = 0) out vec3 o_Position;
+layout(location = 0) in vec2 i_Position;
 
 void main()
 {
-	mat4 transform = GetInstanceTransform();
-	vec4 transformed = transform * vec4(i_Position, 1.0f);
-	o_Position = transformed.xyz;
-	gl_Position = u_Camera.ViewProjection * transformed;
+	gl_Position = vec4(i_Position, 0.9999999f, 1.0f);
 }
 
 #end
@@ -39,16 +41,25 @@ void main()
 
 layout(std140, push_constant) uniform Sky
 {
-	float AtmoshpereHeight;
-	float AtmoshpericDensity;
 	float PlanetRadius;
-	float ScatteringStrength;
+	float AtmosphereThickness;
 	int RaySteps;
 	int ViewRaySteps;
-	vec3 SunColor;
-} u_Sky;
 
-layout(location = 0) in vec3 i_Position;
+	float ObserverHeight;
+
+	float MieHeight;
+	float RayleighHeight;
+
+	float MieCoefficient;
+	float MieAbsorbtion;
+	float RayleighAbsobtion;
+	vec3 OzoneAbsorbtion;
+	vec3 RayleighCoefficient;
+
+	vec3 GroundColor;
+
+} u_Sky;
 
 layout(location = 0) out vec4 o_Color;
 
@@ -64,27 +75,11 @@ float RayleighPhaseFunction(float cosTheta)
 	return 3.0f / (16.0f * pi) * (1 + cosTheta * cosTheta);
 }
 
-float CalculateOpticalDepth(vec3 rayOrigin, vec3 rayDirection, vec3 waveLength)
-{
-	float opticalDepth = 0.0f;
-	vec3 step = rayDirection / max(1, u_Sky.RaySteps - 1);
-	float stepLength = length(step);
-	vec3 pointOnRay = rayOrigin;
-	for (int i = 0; i < u_Sky.RaySteps; i++)
-	{
-		float height = length(pointOnRay);
-		opticalDepth += exp(-height / u_Sky.AtmoshpereHeight) * stepLength;
-		pointOnRay += step;
-	}
-
-	return opticalDepth;
-}
-
-float FindSpehereRayIntersection(vec3 rayOrigin, vec3 rayDirection)
+float FindSpehereRayIntersection(vec3 rayOrigin, vec3 rayDirection, float radius)
 {
 	vec3 d = rayOrigin;
 	float p1 = -dot(rayDirection, d);
-	float p2sqr = p1 * p1 - dot(d, d) + u_Sky.AtmoshpereHeight * u_Sky.AtmoshpereHeight;
+	float p2sqr = p1 * p1 - dot(d, d) + radius * radius;
 
 	if (p2sqr < 0)
 		return -1.0f;
@@ -104,46 +99,98 @@ vec3 CalculateViewDirection()
 	return normalize(projected.xyz - u_Camera.Position);
 }
 
+struct ScatteringCoefficients
+{
+	float Mie;
+	vec3 Rayleigh;
+	vec3 Extinction;
+};
+
+ScatteringCoefficients ComputeScatteringCoefficients(float height)
+{
+	float rayleighDensity = exp(-height / u_Sky.RayleighHeight);
+	float mieDensity = exp(-height / u_Sky.MieHeight);
+
+	ScatteringCoefficients coefficients;
+	coefficients.Mie = u_Sky.MieCoefficient * mieDensity;
+	coefficients.Rayleigh = u_Sky.RayleighCoefficient * rayleighDensity;
+
+	vec3 ozoneAbsorbtion = u_Sky.OzoneAbsorbtion * max(0.0f, 1.0f - abs(height - 25000) / 15000);
+	coefficients.Extinction = coefficients.Rayleigh + vec3(u_Sky.RayleighAbsobtion) + u_Sky.MieAbsorbtion + coefficients.Mie + ozoneAbsorbtion;
+
+	return coefficients;
+}
+
+vec3 ComputeSunTransmittance(vec3 rayOrigin)
+{
+	float atmosphereDistance = FindSpehereRayIntersection(rayOrigin, -u_LightDirection, u_Sky.PlanetRadius + u_Sky.AtmosphereThickness);
+	if (atmosphereDistance < 0.0f)
+		return vec3(0.0f);
+
+	vec3 opticalDepth = vec3(0.0f);
+	float stepLength = atmosphereDistance / max(1, u_Sky.RaySteps - 1);
+	vec3 rayStep = -u_LightDirection * stepLength;
+	vec3 rayPoint = rayOrigin;
+
+	for (int i = 0; i < u_Sky.RaySteps; i++)
+	{
+		float height = length(rayPoint) - u_Sky.PlanetRadius;
+
+		ScatteringCoefficients scatteringCoefficients = ComputeScatteringCoefficients(height);
+
+		opticalDepth += scatteringCoefficients.Extinction;
+	}
+
+	return exp(-opticalDepth / u_Sky.AtmosphereThickness * stepLength);
+}
+
 void main()
 {
 	vec3 viewDirection = CalculateViewDirection();
+	vec3 viewRayPoint = vec3(0.0f, u_Sky.PlanetRadius + u_Sky.ObserverHeight, 0.0f);
 
-	float distanceThroughAtmosphere = FindSpehereRayIntersection(
-		vec3(0.0f, u_Sky.PlanetRadius, 0.0f),
-		viewDirection);
- 
-	if (distanceThroughAtmosphere == -1.0f)
+	float groudDistance = FindSpehereRayIntersection(viewRayPoint, viewDirection, u_Sky.PlanetRadius);
+	if (groudDistance > 0.0f)
+	{
+		o_Color = vec4(u_Sky.GroundColor, 1.0f);
+		return;
+	}
+
+	float distanceThroughAtmosphere = FindSpehereRayIntersection(viewRayPoint,
+		viewDirection, u_Sky.PlanetRadius + u_Sky.AtmosphereThickness);
+
+	if (distanceThroughAtmosphere < 0.0f)
 		discard;
 
-	vec3 waveLength = u_Sky.SunColor * u_Sky.ScatteringStrength;
-	vec3 waveLengthPower4 = pow(waveLength, vec3(4.0f));
-	vec3 scatteringCoefficients = vec3(1.1111327521701591e-30);
-
 	vec3 viewRayStep = viewDirection * distanceThroughAtmosphere / max(1, u_Sky.ViewRaySteps - 1);
-	vec3 viewRayPoint = u_Camera.Position;
 	float viewRayStepLength = length(viewRayStep);
-	
-	vec3 finalColor = vec3(0.0f);
-	float viewOpticalDepth = 0.0f;
+	float scaledViewRayStepLength = viewRayStepLength / u_Sky.AtmosphereThickness;
+
+	float rayleighPhase = RayleighPhaseFunction(-dot(viewDirection, -u_LightDirection));
+	float miePhase = MiePhaseFunction(dot(viewDirection, -u_LightDirection), 0.84f);
+
+	vec3 luminance = vec3(0.0f);
+	vec3 transmittance = vec3(1.0f);
 	for (int i = 0; i < u_Sky.ViewRaySteps; i++)
 	{
-		float distanceToSun = FindSpehereRayIntersection(viewRayPoint, -u_LightDirection);
-		float opticalDepth = CalculateOpticalDepth(viewRayPoint, -u_LightDirection * distanceToSun, waveLength);
+		float height = length(viewRayPoint) - u_Sky.PlanetRadius;
 
-		float height = length(viewRayPoint);
-		float density = exp(-height / u_Sky.AtmoshpereHeight);
+		ScatteringCoefficients scatteringCoefficients = ComputeScatteringCoefficients(height);
+		vec3 sampleTransmittance = exp(-scatteringCoefficients.Extinction * scaledViewRayStepLength);
+		vec3 sunTransmittance = ComputeSunTransmittance(viewRayPoint);
 
-		finalColor += density * exp(vec3(-opticalDepth - viewOpticalDepth) * 4.0f * pi * scatteringCoefficients / waveLengthPower4);
+		vec3 rayleighInScatter = scatteringCoefficients.Rayleigh * rayleighPhase * sunTransmittance;
+		vec3 mieInScatter = scatteringCoefficients.Mie * miePhase * sunTransmittance;
+		vec3 inScatter = rayleighInScatter + mieInScatter;
 
-		viewOpticalDepth += density * viewRayStepLength;
+		vec3 scatteringIntegral = (inScatter - inScatter * sampleTransmittance) / scatteringCoefficients.Extinction;
+		luminance += scatteringIntegral * transmittance;
+		transmittance *= sampleTransmittance;
+
 		viewRayPoint += viewRayStep;
 	}
 
-	float phase = RayleighPhaseFunction(dot(viewDirection, -u_LightDirection));
-	o_Color = vec4(u_LightColor.w * finalColor * phase, 1.0f);
+	o_Color = vec4(u_LightColor.w * luminance * 10, 1.0f);
 }
 
-/*
-8 * pi^3 * (n^2 - 1)^2/3 / N
-*/
 #end

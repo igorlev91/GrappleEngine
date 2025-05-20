@@ -8,6 +8,9 @@ namespace Grapple
 
 	void AtmospherePass::OnRender(RenderingContext& context)
 	{
+		if (!AtmosphereMaterial)
+			return;
+
 		Renderer::DrawFullscreenQuad(AtmosphereMaterial);
 	}
 }
