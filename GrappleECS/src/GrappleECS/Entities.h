@@ -87,13 +87,13 @@ namespace Grapple
 
 		// Component operations
 
-		std::optional<void*> GetEntityComponent(Entity entity, ComponentId component);
-		std::optional<const void*> GetEntityComponent(Entity entity, ComponentId component) const;
+		void* GetEntityComponent(Entity entity, ComponentId component);
+		const void* GetEntityComponent(Entity entity, ComponentId component) const;
 
 		const std::vector<ComponentId>& GetEntityComponents(Entity entity);
 		bool HasComponent(Entity entity, ComponentId component) const;
 
-		std::optional<void*> GetSingletonComponent(ComponentId id) const;
+		void* GetSingletonComponent(ComponentId id) const;
 		std::optional<Entity> GetSingletonEntity(const Query& query) const;
 
 		// Archetypes
@@ -122,7 +122,6 @@ namespace Grapple
 		ArchetypeId CreateArchetype();
 
 		void RemoveEntityData(ArchetypeId archetype, size_t entityBufferIndex);
-		void ValidateEntityStorages();
 
 		std::unordered_map<Entity, size_t>::iterator FindEntity(Entity entity);
 		std::unordered_map<Entity, size_t>::const_iterator FindEntity(Entity entity) const;
@@ -134,7 +133,7 @@ namespace Grapple
 		Components& m_Components;
 
 		std::vector<EntityStorage> m_EntityStorages;
-		std::vector<DeletedEntitiesStorage> m_DeletedEntitiesStorages;
+		std::unordered_map<ArchetypeId, DeletedEntitiesStorage> m_DeletedEntitiesStorages;
 
 		std::vector<EntityRecord> m_EntityRecords;
 		std::unordered_map<Entity, size_t> m_EntityToRecord;

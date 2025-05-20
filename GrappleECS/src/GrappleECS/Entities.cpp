@@ -17,7 +17,6 @@ namespace Grapple
 		: m_Components(components), m_Queries(queries), m_Archetypes(archetypes)
 	{
 		EntityChunksPool::Initialize(16);
-		ValidateEntityStorages();
 	}
 
 	Entities::~Entities()
@@ -523,7 +522,7 @@ namespace Grapple
 		return GetEntityStorage(record.Archetype).GetEntitySize();
 	}
 
-	std::optional<void*> Entities::GetEntityComponent(Entity entity, ComponentId component)
+	void* Entities::GetEntityComponent(Entity entity, ComponentId component)
 	{
 		auto it = FindEntity(entity);
 		if (it == m_EntityToRecord.end())
@@ -541,11 +540,11 @@ namespace Grapple
 		return entityData + archetype.ComponentOffsets[componentIndex.value()];
 	}
 
-	std::optional<const void*> Entities::GetEntityComponent(Entity entity, ComponentId component) const
+	const void* Entities::GetEntityComponent(Entity entity, ComponentId component) const
 	{
 		auto it = FindEntity(entity);
 		if (it == m_EntityToRecord.end())
-			return {};
+			return nullptr;
 
 		const EntityRecord& entityRecord = m_EntityRecords[it->second];
 		const ArchetypeRecord& archetype = m_Archetypes.Records[entityRecord.Archetype];
@@ -553,13 +552,13 @@ namespace Grapple
 
 		std::optional<size_t> componentIndex = m_Archetypes.GetArchetypeComponentIndex(entityRecord.Archetype, component);
 		if (!componentIndex.has_value())
-			return {};
+			return nullptr;
 
 		const uint8_t* entityData = storage.GetEntityData(entityRecord.BufferIndex);
 		return entityData + archetype.ComponentOffsets[componentIndex.value()];
 	}
 
-	std::optional<void*> Entities::GetSingletonComponent(ComponentId id) const
+	void* Entities::GetSingletonComponent(ComponentId id) const
 	{
 		Grapple_CORE_ASSERT(m_Components.IsComponentIdValid(id));
 
@@ -567,7 +566,7 @@ namespace Grapple
 		if (it == m_Archetypes.ComponentToArchetype.end())
 		{
 			Grapple_CORE_ERROR("Failed to get singleton component: World doesn't contain any entities with component '{0}'", m_Components.GetComponentInfo(id).Name);
-			return {};
+			return nullptr;
 		}
 
 		const auto& archetypes = it->second;
@@ -587,7 +586,7 @@ namespace Grapple
 				else
 				{
 					Grapple_CORE_ERROR("Failed to get singleton component: World contains multiple entities with component '{0}'", m_Components.GetComponentInfo(id).Name);
-					return {};
+					return nullptr;
 				}
 			}
 		}
@@ -595,7 +594,7 @@ namespace Grapple
 		if (archetype == INVALID_ARCHETYPE_ID)
 		{
 			Grapple_CORE_ERROR("Failed to get singleton component: World doesn't contain any entities with component '{0}'", m_Components.GetComponentInfo(id).Name);
-			return {};
+			return nullptr;
 		}
 
 		const ArchetypeRecord& record = m_Archetypes[archetype];
@@ -604,7 +603,7 @@ namespace Grapple
 		if (storage.GetEntitiesCount() != 1)
 		{
 			Grapple_CORE_ERROR("Failed to get singleton component: World contains multiple entities with component '{0}'", m_Components.GetComponentInfo(id).Name);
-			return {};
+			return nullptr;
 		}
 
 		uint8_t* entityData = storage.GetEntityData(0);
@@ -777,7 +776,6 @@ namespace Grapple
 	EntityStorage& Entities::GetEntityStorage(ArchetypeId archetype)
 	{
 		Grapple_CORE_ASSERT(m_Archetypes.IsIdValid(archetype));
-		ValidateEntityStorages();
 		return m_EntityStorages[archetype];
 	}
 
@@ -790,21 +788,47 @@ namespace Grapple
 	DeletedEntitiesStorage& Entities::GetDeletedEntityStorage(ArchetypeId archetype)
 	{
 		Grapple_CORE_ASSERT(m_Archetypes.IsIdValid(archetype));
-		ValidateEntityStorages();
-		return m_DeletedEntitiesStorages[archetype];
+
+		auto it = m_DeletedEntitiesStorages.find(archetype);
+		if (it == m_DeletedEntitiesStorages.end())
+		{
+			DeletedEntitiesStorage& storage = m_DeletedEntitiesStorages.insert({ archetype, DeletedEntitiesStorage() }).first->second;
+
+			size_t entitySize = 0;
+			const auto& archetypeRecord = m_Archetypes[archetype];
+
+			Grapple_CORE_ASSERT(archetypeRecord.ComponentOffsets.size() > 0);
+			Grapple_CORE_ASSERT(archetypeRecord.Components.size() > 0);
+
+			entitySize = archetypeRecord.ComponentOffsets.back() + m_Components.GetComponentInfo(archetypeRecord.Components.back()).Size;
+
+			Grapple_CORE_ASSERT(entitySize > 0);
+
+			storage.DataStorage.SetEntitySize(entitySize);
+			return storage;
+		}
+
+		return it->second;
 	}
 
 	const DeletedEntitiesStorage& Entities::GetDeletedEntityStorage(ArchetypeId archetype) const
 	{
 		Grapple_CORE_ASSERT(m_Archetypes.IsIdValid(archetype));
-		return m_DeletedEntitiesStorages[archetype];
+		auto it = m_DeletedEntitiesStorages.find(archetype);
+		Grapple_CORE_ASSERT(it != m_DeletedEntitiesStorages.end());
+
+		return it->second;
 	}
 
 	void Entities::ClearQueuedForDeletion()
 	{
 		for (const ArchetypeRecord& archetype : m_Archetypes.Records)
 		{
-			DeletedEntitiesStorage& storage = m_DeletedEntitiesStorages[archetype.Id];
+			auto it = m_DeletedEntitiesStorages.find(archetype.Id);
+			if (it == m_DeletedEntitiesStorages.end())
+				continue;
+
+			DeletedEntitiesStorage& storage = it->second;
 			for (size_t entityIndex = 0; entityIndex < storage.DataStorage.EntitiesCount; entityIndex++)
 			{
 				uint8_t* entityData = storage.DataStorage.GetEntityData(entityIndex);
@@ -816,6 +840,8 @@ namespace Grapple
 
 			storage.Clear();
 		}
+
+		m_DeletedEntitiesStorages.clear();
 	}
 
 	void Entities::RemoveEntityData(ArchetypeId archetype, size_t entityBufferIndex)
@@ -827,42 +853,6 @@ namespace Grapple
 
 		storage.RemoveEntityData(entityBufferIndex);
 		lastEntityRecord.BufferIndex = entityBufferIndex;
-	}
-
-	void Entities::ValidateEntityStorages()
-	{
-		if (m_EntityStorages.size() < m_Archetypes.Records.size())
-		{
-			size_t oldSize = m_EntityStorages.size();
-			m_EntityStorages.resize(m_Archetypes.Records.size());
-			m_DeletedEntitiesStorages.resize(m_Archetypes.Records.size());
-
-			for (size_t i = oldSize; i < m_EntityStorages.size(); i++)
-			{
-				const ArchetypeRecord& record = m_Archetypes.Records[i];
-
-				size_t entitySize = record.ComponentOffsets.back() + m_Components.GetComponentInfo(record.Components.back()).Size;
-				m_EntityStorages[i].SetEntitySize(entitySize);
-				m_DeletedEntitiesStorages[i].DataStorage.SetEntitySize(entitySize);
-			}
-		}
-
-		if (m_DeletedEntitiesStorages.size() < m_Archetypes.Records.size())
-		{
-			size_t oldSize = m_DeletedEntitiesStorages.size();
-			m_DeletedEntitiesStorages.resize(m_Archetypes.Records.size());
-
-			for (size_t i = oldSize; i < m_DeletedEntitiesStorages.size(); i++)
-			{
-				const ArchetypeRecord& record = m_Archetypes.Records[i];
-
-				if (record.ComponentOffsets.size() > 0)
-				{
-					size_t entitySize = record.ComponentOffsets.back() + m_Components.GetComponentInfo(record.Components.back()).Size;
-					m_DeletedEntitiesStorages[i].DataStorage.SetEntitySize(entitySize);
-				}
-			}
-		}
 	}
 
 	std::unordered_map<Entity, size_t>::iterator Entities::FindEntity(Entity entity)

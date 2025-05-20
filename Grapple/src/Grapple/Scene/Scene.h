@@ -37,6 +37,7 @@ namespace Grapple
 		void OnRender(const Viewport& viewport);
 
 		void OnUpdateRuntime();
+		void OnUpdateEditor();
 		void OnViewportResize(uint32_t width, uint32_t height);
 
 		World& GetECSWorld();

@@ -188,6 +188,8 @@ namespace Grapple
 
             if (m_Mode == EditorMode::Play && !m_PlaymodePaused)
                 Scene::GetActive()->OnUpdateRuntime();
+            else if (m_Mode == EditorMode::Edit)
+                Scene::GetActive()->OnUpdateEditor();
         }
 
         {
@@ -381,9 +383,6 @@ namespace Grapple
                 EditorGUI::ObjectField(
                     Grapple_SERIALIZATION_DESCRIPTOR_OF(SSAO),
                     postProcessing.SSAOPass.get());
-                EditorGUI::ObjectField(
-                    Grapple_SERIALIZATION_DESCRIPTOR_OF(AtmospherePass),
-                    postProcessing.Atmosphere.get());
 
                 ImGui::TreePop();
             }
