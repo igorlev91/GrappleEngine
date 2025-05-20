@@ -5,6 +5,8 @@
 #include "Grapple/Renderer/Renderer.h"
 #include "Grapple/Renderer/MaterialsTable.h"
 
+#include "Grapple/Scene/Transform.h"
+
 #include <algorithm>
 
 namespace Grapple

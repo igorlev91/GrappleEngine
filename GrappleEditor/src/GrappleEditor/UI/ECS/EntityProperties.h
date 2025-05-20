@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Grapple/Scene/Components.h"
+#include "Grapple/Scene/Transform.h"
 
 #include "GrappleECS/World.h"
 

@@ -7,8 +7,6 @@
 #include "GrappleECS/Entity/ComponentInitializer.h"
 #include "GrappleECS/System/SystemInitializer.h"
 
-#include "Grapple/Scene/Components.h"
-
 namespace Grapple
 {
 	struct Grapple_API Children

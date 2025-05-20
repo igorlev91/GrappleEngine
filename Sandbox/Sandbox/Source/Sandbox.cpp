@@ -8,6 +8,7 @@
 #include <Grapple/Core/Time.h>
 
 #include <Grapple/Scene/Components.h>
+#include <Grapple/Scene/Transform.h>
 #include <Grapple/Scene/Prefab.h>
 
 #include <Grapple/Input/InputManager.h>

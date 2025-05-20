@@ -11,6 +11,7 @@
 #include "Grapple/Math/Math.h"
 #include "Grapple/Scene/Components.h"
 #include "Grapple/Scene/Hierarchy.h"
+#include "Grapple/Scene/Transform.h"
 #include "Grapple/Input/InputManager.h"
 
 #include "Grapple/Scripting/ScriptingEngine.h"
