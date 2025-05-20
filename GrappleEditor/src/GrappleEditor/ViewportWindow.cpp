@@ -32,7 +32,7 @@ namespace Grapple
 		if (!ShowWindow || !m_IsVisible)
 			return;
 
-		Ref<Scene> scene = Scene::GetActive();
+		Ref<Scene> scene = GetScene();
 		if (scene == nullptr)
 			return;
 

@@ -184,8 +184,7 @@ namespace Grapple
 
 	void Renderer2D::End()
 	{
-		if (s_Renderer2DData.QuadIndex > 0)
-			FlushAll();
+		FlushAll();
 
 		s_Renderer2DData.CurrentFont = nullptr;
 		s_Renderer2DData.CurrentMaterial = nullptr;
@@ -522,6 +521,9 @@ namespace Grapple
 	{
 		Grapple_PROFILE_FUNCTION();
 
+		if (s_Renderer2DData.QuadIndex == 0)
+			return;
+
 		if (s_Renderer2DData.DefaultMaterial == nullptr)
 		{
 			s_Renderer2DData.QuadIndex = 0;
@@ -567,6 +569,9 @@ namespace Grapple
 	void Renderer2D::FlushText()
 	{
 		Grapple_PROFILE_FUNCTION();
+
+		if (s_Renderer2DData.TextQuadIndex == 0)
+			return;
 
 		if (s_Renderer2DData.TextMaterial == nullptr || !s_Renderer2DData.FontAtlasPropertyIndex.has_value())
 		{

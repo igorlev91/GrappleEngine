@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Grapple/Scene/Scene.h"
 #include "Grapple/Renderer/Shader.h"
 #include "Grapple/Renderer/Material.h"
 #include "Grapple/Renderer/VertexArray.h"
@@ -21,7 +22,7 @@ namespace Grapple
 			Depth,
 		};
 
-		SceneViewportWindow(EditorCamera& camera);
+		SceneViewportWindow(EditorCamera& camera, std::string_view name = "Scene Viewport");
 
 		virtual void OnAttach() override;
 
