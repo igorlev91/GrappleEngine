@@ -38,6 +38,7 @@ namespace Grapple
 		None,
 		Scene,
 		Texture,
+		Sprite,
 		Prefab,
 		Shader,
 		Material,

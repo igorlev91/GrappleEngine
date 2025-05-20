@@ -13,6 +13,7 @@
 #include "GrappleEditor/EditorLayer.h"
 #include "GrappleEditor/AssetManager/EditorShaderCache.h"
 #include "GrappleEditor/AssetManager/MaterialImporter.h"
+#include "GrappleEditor/AssetManager/SpriteImporter.h"
 
 #include <imgui.h>
 
@@ -104,6 +105,21 @@ namespace Grapple
 
 				EditorGUI::EndPropertyGrid();
 			}
+
+			break;
+		}
+		case AssetType::Sprite:
+		{
+			Ref<Sprite> sprite = AssetManager::GetAsset<Sprite>(handle);
+			Grapple_CORE_ASSERT(sprite);
+
+			if (ImGui::Button("Save"))
+			{
+				SpriteImporter::SerializeSprite(sprite, AssetManager::GetAssetMetadata(handle)->Path);
+			}
+
+			SerializablePropertyRenderer propertiesRenderer;
+			propertiesRenderer.Serialize("Sprite", SerializationValue(*sprite));
 
 			break;
 		}

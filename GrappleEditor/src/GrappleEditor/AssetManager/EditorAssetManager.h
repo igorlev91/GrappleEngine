@@ -1,8 +1,7 @@
-
-
 #pragma once
 
 #include "GrappleCore/Core.h"
+#include "Grapple/AssetManager/AssetManager.h"
 #include "Grapple/AssetManager/AssetManagerBase.h"
 
 #include "GrappleEditor/AssetManager/EditorAssetRegistry.h"
@@ -52,6 +51,8 @@ namespace Grapple
 		void AddAssetsPackage(const std::filesystem::path& path);
 
 		Ref<Asset> LoadAsset(AssetHandle handle);
+
+		inline static Ref<EditorAssetManager> GetInstance() { return As<EditorAssetManager>(AssetManager::GetInstance()); }
 	private:
 		void RemoveFromRegistryWithoutSerialization(AssetHandle handle);
 

@@ -16,6 +16,7 @@
 #include "GrappleEditor/ShaderCompiler/ShaderCompiler.h"
 
 #include "GrappleEditor/AssetManager/TextureImporter.h"
+#include "GrappleEditor/AssetManager/SpriteImporter.h"
 #include "GrappleEditor/AssetManager/PrefabImporter.h"
 #include "GrappleEditor/Serialization/SceneSerializer.h"
 #include "GrappleEditor/AssetManager/MaterialImporter.h"
@@ -35,6 +36,7 @@ namespace Grapple
         m_AssetImporters.emplace(AssetType::Prefab, PrefabImporter::ImportPrefab);
         m_AssetImporters.emplace(AssetType::Material, MaterialImporter::ImportMaterial);
         m_AssetImporters.emplace(AssetType::Mesh, MeshImporter::ImportMesh);
+        m_AssetImporters.emplace(AssetType::Sprite, SpriteImporter::ImportSprite);
         m_AssetImporters.emplace(AssetType::Scene, [](const AssetMetadata& metadata) -> Ref<Asset>
         {
             Ref<Scene> scene = CreateRef<Scene>(EditorLayer::GetInstance().GetECSContext());
@@ -158,6 +160,8 @@ namespace Grapple
             type = AssetType::Prefab;
         else if (extension == ".flrmat")
             type = AssetType::Material;
+        else if (extension == ".flrsprite")
+            type = AssetType::Sprite;
         else if (extension == ".glsl")
             type = AssetType::Shader;
         else if (extension == ".ttf")

@@ -7,7 +7,7 @@
 
 namespace Grapple
 {
-    YAMLSerializer::YAMLSerializer(YAML::Emitter& emitter, const World& world)
+    YAMLSerializer::YAMLSerializer(YAML::Emitter& emitter, const World* world)
         : m_Emitter(emitter), m_MapStarted(false), m_ObjectSerializationStarted(false), m_World(world) {}
 
     void YAMLSerializer::PropertyKey(std::string_view key)
@@ -209,17 +209,20 @@ namespace Grapple
 
         if (&descriptor == &Grapple_SERIALIZATION_DESCRIPTOR_OF(Entity))
         {
+            if (m_World == nullptr)
+                return;
+
             Entity* entityIds = (Entity*)objectData;
             if (isArray)
             {
                 m_Emitter << YAML::BeginSeq;
                 for (size_t i = 0; i < arraySize; i++)
-                    SerializeEntityId(m_Emitter, m_World, entityIds[i]);
+                    SerializeEntityId(m_Emitter, *m_World, entityIds[i]);
                 m_Emitter << YAML::EndSeq;
             }
             else
             {
-                SerializeEntityId(m_Emitter, m_World, entityIds[0]);
+                SerializeEntityId(m_Emitter, *m_World, entityIds[0]);
             }
 
             return;
@@ -532,7 +535,8 @@ namespace Grapple
             }
             else
             {
-                if (YAML::Node objectNode = CurrentNode()[m_CurrentPropertyKey])
+                YAML::Node objectNode = m_CurrentPropertyKey.empty() ? CurrentNode() : CurrentNode()[m_CurrentPropertyKey];
+                if (objectNode)
                 {
                     m_NodesStack.push_back(objectNode);
                     descriptor.Callback(objectData, *this);

@@ -1,4 +1,3 @@
-
 #include "EditorIcons.h"
 
 namespace Grapple

@@ -11,6 +11,7 @@
 #include "GrappleEditor/UI/EditorGUI.h"
 
 #include "GrappleEditor/AssetManager/MaterialImporter.h"
+#include "GrappleEditor/AssetManager/SpriteImporter.h"
 
 #include <fstream>
 #include <imgui.h>
@@ -99,6 +100,22 @@ namespace Grapple
     Rotation: [0, 0, 0]
     Scale: [1, 1, 1])";
                         }
+                    };
+                }
+
+                if (ImGui::MenuItem("Sprite"))
+                {
+                    m_ShowNewFileNamePopup = true;
+                    m_OnNewFileNameEntered = [this, nodeIndex = m_NodeRenderIndex](std::string_view name)
+                    {
+						std::filesystem::path path = m_AssetTree[nodeIndex].Path / name;
+                        path.replace_extension(".flrsprite");
+
+						Ref<Sprite> sprite = CreateRef<Sprite>();
+						Ref<EditorAssetManager> editorAssetManager = EditorAssetManager::GetInstance();
+
+						SpriteImporter::SerializeSprite(sprite, path);
+                        editorAssetManager->ImportAsset(path, sprite);
                     };
                 }
 

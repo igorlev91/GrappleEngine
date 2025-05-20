@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include "Grapple/AssetManager/Asset.h"
