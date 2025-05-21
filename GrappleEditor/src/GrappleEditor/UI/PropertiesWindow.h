@@ -4,6 +4,7 @@
 
 #include "GrappleEditor/AssetManager/TextureImporter.h"
 #include "GrappleEditor/UI/AssetManagerWindow.h"
+#include "GrappleEditor/UI/SpriteEditor.h"
 
 #include <unordered_map>
 #include <functional>
@@ -24,5 +25,6 @@ namespace Grapple
 		bool RenderMaterialEditor(AssetHandle handle);
 	private:
 		AssetManagerWindow& m_AssetManagerWindow;
+		SpriteEditor m_SpriteEditor;
 	};
 }

@@ -8,6 +8,7 @@
 
 #include "GrappleEditor/UI/EditorGUI.h"
 #include "GrappleEditor/UI/ECS/EntityProperties.h"
+#include "GrappleEditor/UI/SpriteEditor.h"
 #include "GrappleEditor/UI/SerializablePropertyRenderer.h"
 
 #include "GrappleEditor/EditorLayer.h"
@@ -26,19 +27,26 @@ namespace Grapple
 
 	void PropertiesWindow::OnAttach()
 	{
-		m_AssetManagerWindow.OnAssetSelectionChanged.Bind([](AssetHandle handle)
-			{
-				if (!AssetManager::IsAssetHandleValid(handle))
-					return;
+		m_AssetManagerWindow.OnAssetSelectionChanged.Bind([this](AssetHandle handle)
+		{
+			if (!AssetManager::IsAssetHandleValid(handle))
+				return;
 
-				switch (AssetManager::GetAssetMetadata(handle)->Type)
-				{
-				case AssetType::Texture:
-					s_SelectedTextureImportSettings = TextureImportSettings();
-					TextureImporter::DeserializeImportSettings(handle, s_SelectedTextureImportSettings);
-					break;
-				}
-			});
+			switch (AssetManager::GetAssetMetadata(handle)->Type)
+			{
+			case AssetType::Texture:
+				s_SelectedTextureImportSettings = TextureImportSettings();
+				TextureImporter::DeserializeImportSettings(handle, s_SelectedTextureImportSettings);
+				break;
+			case AssetType::Sprite:
+			{
+				Ref<Sprite> sprite = AssetManager::GetAsset<Sprite>(handle);
+				Grapple_CORE_ASSERT(sprite);
+				m_SpriteEditor = SpriteEditor(sprite);
+				break;
+			}
+			}
+		});
 	}
 
 	void PropertiesWindow::OnImGuiRender()
@@ -120,6 +128,12 @@ namespace Grapple
 
 			SerializablePropertyRenderer propertiesRenderer;
 			propertiesRenderer.Serialize("Sprite", SerializationValue(*sprite));
+
+			if (ImGui::Begin("Sprite Editor"))
+			{
+				m_SpriteEditor.OnImGuiRenderer();
+				ImGui::End();
+			}
 
 			break;
 		}
@@ -408,7 +422,7 @@ namespace Grapple
 			if (propertyRenderer.PropertiesGridStarted())
 				EditorGUI::EndPropertyGrid();
 		}
-		
+
 		return false;
 	}
 }
