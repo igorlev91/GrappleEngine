@@ -61,9 +61,8 @@ namespace Grapple
         }
 
         ImGui::Image((ImTextureID)texture->GetRendererId(), textureSize * m_Zoom, ImVec2(0, 1), ImVec2(1, 0));
-        bool imageHovered = ImGui::IsItemHovered();
-
         ImRect imageRect = { ImGui::GetItemRectMin(), ImGui::GetItemRectMax() };
+        bool imageHovered = ImGui::IsMouseHoveringRect(imageRect.Min, imageRect.Max);
 
         ImVec2 mousePositionTextureSpace = WindowToTextureSpace(mousePosition);
         mousePositionTextureSpace.x = glm::round(mousePositionTextureSpace.x);
@@ -133,30 +132,37 @@ namespace Grapple
                 ValidateSelectionRect();
             }
         }
-        else if (imageHovered)
+        else
         {
-            if (ImGui::IsMouseDown(ImGuiMouseButton_Left))
+            bool leftButtonDown = ImGui::IsMouseDown(ImGuiMouseButton_Left);
+            if (leftButtonDown && imageHovered)
             {
-                if (selectionSides == SelectionRectSide::None)
-                {
-                    if (!m_SelectionStarted)
-                    {
-                        m_SelectionStart = mousePositionTextureSpace;
-                        m_SelectionStarted = true;
-                    }
-
-                    m_SelectionEnd = mousePositionTextureSpace;
-                }
-                else
-                {
-                    m_ResizedSides = selectionSides;
-                    ValidateSelectionRect();
-                }
+				m_CanResize = true;
             }
+
+			if (leftButtonDown && m_CanResize)
+			{
+				if (selectionSides == SelectionRectSide::None)
+				{
+					if (!m_SelectionStarted)
+					{
+						m_SelectionStart = mousePositionTextureSpace;
+						m_SelectionStarted = true;
+					}
+
+					m_SelectionEnd = mousePositionTextureSpace;
+				}
+				else
+				{
+					m_ResizedSides = selectionSides;
+					ValidateSelectionRect();
+				}
+			}
 
             if (ImGui::IsMouseReleased(ImGuiMouseButton_Left))
             {
                 m_SelectionStarted = false;
+                m_CanResize = false;
             }
         }
 
@@ -367,6 +373,10 @@ namespace Grapple
             glm::vec2(m_SelectionStart.x, m_SelectionStart.y),
             glm::vec2(m_SelectionEnd.x, m_SelectionEnd.y)) / glm::vec2(textureSize.x, textureSize.y);
 
+        // Flip vertically because ImGui's Y axis is opposite to texture coordinates Y
+        uvMin.y = 1.0f - uvMin.y;
+        uvMax.y = 1.0f - uvMax.y;
+        std::swap(uvMin.y, uvMax.y);
         return Math::Rect(uvMin, uvMax);
     }
 
@@ -390,6 +400,10 @@ namespace Grapple
             ImVec2 textureSize = ImVec2((float)texture->GetWidth(), (float)texture->GetHeight());
             m_SelectionStart = ImVec2(textureSize.x * m_Sprite->UVMin.x, textureSize.y * m_Sprite->UVMin.y);
             m_SelectionEnd = ImVec2(textureSize.x * m_Sprite->UVMax.x, textureSize.y * m_Sprite->UVMax.y);
+
+            // Flip vertically
+            m_SelectionStart.y = textureSize.y - m_SelectionStart.y;
+            m_SelectionEnd.y = textureSize.y - m_SelectionEnd.y;
         }
     }
 
