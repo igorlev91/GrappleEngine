@@ -3,11 +3,14 @@
 #include "Grapple/Renderer/Texture.h"
 #include "Grapple/Renderer/Sprite.h"
 
+#include "Grapple/Math/Math.h"
+
 #include "GrappleEditor/ImGui/ImGuiLayer.h"
+#include "GrappleEditor/UI/AssetEditor.h"
 
 namespace Grapple
 {
-    class SpriteEditor
+    class SpriteEditor : public AssetEditor
     {
     public:
         enum class SelectionRectSide
@@ -24,13 +27,13 @@ namespace Grapple
             BottomRight = Bottom | Right,
         };
 
-        SpriteEditor()
-            : m_Sprite(nullptr) {}
-
-        SpriteEditor(const Ref<Sprite>& sprite);
-
-        bool OnImGuiRenderer();
+        void OnEvent(Event& event) override;
+        void OnOpen(AssetHandle asset) override;
+        void OnClose() override;
+        void OnRenderImGui(bool& show) override;
     private:
+        bool RendererWindowContent();
+
         ImVec2 WindowToTextureSpace(ImVec2 windowSpace);
         ImVec2 TextureToWindowSpace(ImVec2 textureSpace);
 
@@ -38,6 +41,7 @@ namespace Grapple
         bool RenderSelectionSide(const char* name, ImVec2 position, ImVec2 size);
 
         void ValidateSelectionRect();
+        Math::Rect SelectionToUVRect();
     private:
         Ref<Sprite> m_Sprite = nullptr;
         SelectionRectSide m_ResizedSides = SelectionRectSide::None;

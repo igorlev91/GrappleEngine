@@ -16,6 +16,7 @@
 
 #include "GrappleEditor/UI/EditorTitleBar.h"
 #include "GrappleEditor/UI/PrefabEditor.h"
+#include "GrappleEditor/UI/SpriteEditor.h"
 #include "GrappleEditor/UI/QuickSearch/QuickSearch.h"
 #include "GrappleEditor/UI/Profiler/ProfilerWindow.h"
 
@@ -102,6 +103,7 @@ namespace Grapple
 
 		std::vector<Ref<AssetEditor>> m_AssetEditorWindows;
 		Ref<PrefabEditor> m_PrefabEditor;
+		Ref<SpriteEditor> m_SpriteEditor;
 
 		SceneWindow m_SceneWindow;
 		PropertiesWindow m_PropertiesWindow;

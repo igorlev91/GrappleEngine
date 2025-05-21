@@ -1,6 +1,10 @@
 #include "SpriteEditor.h"
 
+#include "Grapple/AssetManager/AssetManager.h"
+
 #include "GrappleEditor/ImGui/ImGuiLayer.h"
+#include "GrappleEditor/UI/EditorGUI.h"
+#include "GrappleEditor/AssetManager/SpriteImporter.h"
 
 #include <glm/glm.hpp>
 
@@ -8,19 +12,7 @@ namespace Grapple
 {
     Grapple_IMPL_ENUM_BITFIELD(SpriteEditor::SelectionRectSide);
 
-    SpriteEditor::SpriteEditor(const Ref<Sprite>& sprite)
-        : m_Sprite(sprite)
-    {
-        const Ref<Texture>& texture = sprite->GetTexture();
-        if (texture)
-        {
-            ImVec2 textureSize = ImVec2((float)texture->GetWidth(), (float)texture->GetHeight());
-            m_SelectionStart = ImVec2(textureSize.x * sprite->UVMin.x, textureSize.y * sprite->UVMin.y);
-            m_SelectionEnd = ImVec2(textureSize.x * sprite->UVMax.x, textureSize.y * sprite->UVMax.y);
-        }
-    }
-
-    bool SpriteEditor::OnImGuiRenderer()
+    bool SpriteEditor::RendererWindowContent()
     {
         bool result = false;
         ImGuiWindowFlags windowFlags = ImGuiWindowFlags_AlwaysHorizontalScrollbar
@@ -28,13 +20,90 @@ namespace Grapple
             | ImGuiWindowFlags_NoScrollWithMouse
             | ImGuiWindowFlags_NoMove;
 
+        const Ref<Texture>& texture = m_Sprite->GetTexture();
+
+        ImGui::BeginDisabled(texture == nullptr);
+
+        ImVec2 initialCursorPosition = ImGui::GetCursorPos();
+        const float selectionInfoWidth = 300.0f;
+        if (EditorGUI::BeginPropertyGrid(selectionInfoWidth))
+        {
+            Math::Rect uvRect = SelectionToUVRect();
+
+            glm::vec2 textureSize(0.0f);
+            glm::ivec2 position(0);
+            glm::ivec2 size(0);
+
+            if (texture)
+            {
+                textureSize = glm::vec2((float)texture->GetWidth(), (float)texture->GetHeight());
+
+                position = (glm::ivec2)(uvRect.Min * textureSize);
+                size = (glm::ivec2)(uvRect.GetSize() * textureSize);
+            }
+
+            bool shouldClamp = false;
+            if (EditorGUI::IntVector2PropertyField("Position", position))
+            {
+                ValidateSelectionRect();
+                m_SelectionStart = ImVec2((float)position.x, (float)position.y);
+                m_SelectionEnd = ImVec2((float)(position.x + size.x), (float)(position.y + size.y));
+
+                shouldClamp = true;
+            }
+
+            if (EditorGUI::IntVector2PropertyField("Size", size))
+            {
+                ValidateSelectionRect();
+                m_SelectionEnd = ImVec2((float)(position.x + size.x), (float)(position.y + size.y));
+                shouldClamp = true;
+            }
+
+            if (shouldClamp)
+            {
+                m_SelectionStart.x = glm::clamp(m_SelectionStart.x, 0.0f, textureSize.x);
+                m_SelectionStart.y = glm::clamp(m_SelectionStart.y, 0.0f, textureSize.y);
+
+                m_SelectionEnd.x = glm::clamp(m_SelectionEnd.x, 0.0f, textureSize.x);
+                m_SelectionEnd.y = glm::clamp(m_SelectionEnd.y, 0.0f, textureSize.y);
+            }
+
+            EditorGUI::EndPropertyGrid();
+        }
+
+        ImVec2 viewportPosition = ImGui::GetCursorPos();
+
+        const auto& style = ImGui::GetStyle();
+        ImGui::SetCursorPos(ImVec2(
+            initialCursorPosition.x + selectionInfoWidth + style.ItemSpacing.x * 2.0f,
+            initialCursorPosition.y + style.ItemInnerSpacing.y));
+
+        if (ImGui::Button("Save"))
+        {
+            Math::Rect uvRect = SelectionToUVRect();
+
+            m_Sprite->UVMin = uvRect.Min;
+            m_Sprite->UVMax = uvRect.Max;
+
+            if (AssetManager::IsAssetHandleValid(m_Sprite->Handle))
+            {
+                const AssetMetadata* metadata = AssetManager::GetAssetMetadata(m_Sprite->Handle);
+                SpriteImporter::SerializeSprite(m_Sprite, metadata->Path);
+            }
+        }
+
+        ImGui::SetCursorPos(viewportPosition);
+
+        ImGui::EndDisabled();
+
+        // Viewport
+
         if (!ImGui::BeginChild("Viewport", ImVec2(0, 0), false, windowFlags))
         {
             ImGui::EndChild();
             return false;
         }
 
-        const Ref<Texture>& texture = m_Sprite->GetTexture();
         if (!texture)
         {
             ImGui::EndChild();
@@ -159,12 +228,6 @@ namespace Grapple
             }
         }
 
-        glm::vec2 uvMin = glm::min(glm::vec2(m_SelectionStart.x, m_SelectionStart.y), glm::vec2(m_SelectionEnd.x, m_SelectionEnd.y)) / glm::vec2(textureSize.x, textureSize.y);
-        glm::vec2 uvMax = glm::max(glm::vec2(m_SelectionStart.x, m_SelectionStart.y), glm::vec2(m_SelectionEnd.x, m_SelectionEnd.y)) / glm::vec2(textureSize.x, textureSize.y);
-
-        m_Sprite->UVMin = uvMin;
-        m_Sprite->UVMax = uvMax;
-
         ImGui::EndChild();
         return result;
     }
@@ -268,5 +331,64 @@ namespace Grapple
             std::swap(m_SelectionStart.x, m_SelectionEnd.x);
         if (m_SelectionEnd.y < m_SelectionStart.y)
             std::swap(m_SelectionStart.y, m_SelectionEnd.y);
+    }
+
+    Math::Rect SpriteEditor::SelectionToUVRect()
+    {
+        const Ref<Texture>& texture = m_Sprite->GetTexture();
+        Grapple_CORE_ASSERT(texture);
+
+        ImVec2 textureSize = ImVec2((float)texture->GetWidth(), (float)texture->GetHeight());
+        glm::vec2 uvMin = glm::min(
+            glm::vec2(m_SelectionStart.x, m_SelectionStart.y),
+            glm::vec2(m_SelectionEnd.x, m_SelectionEnd.y)) / glm::vec2(textureSize.x, textureSize.y);
+
+        glm::vec2 uvMax = glm::max(
+            glm::vec2(m_SelectionStart.x, m_SelectionStart.y),
+            glm::vec2(m_SelectionEnd.x, m_SelectionEnd.y)) / glm::vec2(textureSize.x, textureSize.y);
+
+        return Math::Rect(uvMin, uvMax);
+    }
+
+    void SpriteEditor::OnEvent(Event& event)
+    {
+    }
+
+    void SpriteEditor::OnOpen(AssetHandle asset)
+    {
+        Grapple_CORE_ASSERT(AssetManager::IsAssetHandleValid(asset));
+        const AssetMetadata* metadata = AssetManager::GetAssetMetadata(asset);
+
+        Grapple_CORE_ASSERT(metadata->Type == AssetType::Sprite);
+
+        m_Sprite = AssetManager::GetAsset<Sprite>(asset);
+        Grapple_CORE_ASSERT(m_Sprite);
+
+        const Ref<Texture>& texture = m_Sprite->GetTexture();
+        if (texture)
+        {
+            ImVec2 textureSize = ImVec2((float)texture->GetWidth(), (float)texture->GetHeight());
+            m_SelectionStart = ImVec2(textureSize.x * m_Sprite->UVMin.x, textureSize.y * m_Sprite->UVMin.y);
+            m_SelectionEnd = ImVec2(textureSize.x * m_Sprite->UVMax.x, textureSize.y * m_Sprite->UVMax.y);
+        }
+    }
+
+    void SpriteEditor::OnClose()
+    {
+        m_Sprite = nullptr;
+        m_SelectionStart = ImVec2(0.0f, 0.0f);
+        m_SelectionEnd = ImVec2(0.0f, 0.0f);
+        m_Zoom = 1.0f;
+        m_HasSelection = false;
+        m_SelectionStarted = false;
+        m_ResizedSides = SelectionRectSide::None;
+    }
+
+    void SpriteEditor::OnRenderImGui(bool& show)
+    {
+        if (ImGui::Begin("Sprite Editor", &show))
+            RendererWindowContent();
+
+        ImGui::End();
     }
 }
