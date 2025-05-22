@@ -75,6 +75,9 @@ namespace Grapple
 		Sprite(AssetManager::GetAsset<Grapple::Sprite>(sprite)),
 		Flags(SpriteRenderFlags::None) {}
 
+	SpriteComponent::SpriteComponent(const Ref<Grapple::Sprite>& sprite)
+		: Sprite(sprite), Color(1.0f), Tilling(1.0f), Flags(SpriteRenderFlags::None) {}
+
 	Grapple_IMPL_COMPONENT(SpriteLayer);
 	SpriteLayer::SpriteLayer()
 		: Layer(0) {}

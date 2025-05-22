@@ -87,6 +87,7 @@ namespace Grapple
 
         SpriteComponent();
         SpriteComponent(AssetHandle sprite);
+        SpriteComponent(const Ref<Sprite>& sprite);
 
         glm::vec4 Color;
         glm::vec2 Tilling;
