@@ -30,6 +30,7 @@ namespace Grapple
 		}
 
 		void RegisterComponents();
+		void ReregisterComponents();
 
 		inline void Clear()
 		{
