@@ -4,6 +4,7 @@
 #include "Grapple/Renderer/RenderData.h"
 #include "Grapple/Renderer/Viewport.h"
 #include "Grapple/Renderer/RenderPass.h"
+#include "Grapple/Renderer/RendererSubmitionQueue.h"
 
 #include "Grapple/Renderer/VertexArray.h"
 #include "Grapple/Renderer/Material.h"
@@ -13,14 +14,6 @@
 
 namespace Grapple
 {
-	enum class MeshRenderFlags : uint8_t
-	{
-		None = 0,
-		DontCastShadows = 1,
-	};
-
-	Grapple_IMPL_ENUM_BITFIELD(MeshRenderFlags);
-
 	struct RendererStatistics
 	{
 		uint32_t DrawCallsCount = 0;
@@ -178,6 +171,8 @@ namespace Grapple
 		static void RemoveRenderPass(Ref<RenderPass> pass);
 		static void ExecuteRenderPasses();
 
+		static RendererSubmitionQueue& GetOpaqueSubmitionQueue();
+
 		static Viewport& GetMainViewport();
 		static Viewport& GetCurrentViewport();
 
@@ -193,5 +188,6 @@ namespace Grapple
 		static void ExecuteShadowPass();
 		static void FlushInstances(uint32_t count, uint32_t baseInstance);
 		static void FlushShadowPassInstances(uint32_t baseInstance);
+		static void ReloadShaders();
 	};
 }

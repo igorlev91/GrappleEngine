@@ -124,7 +124,7 @@ namespace Grapple
 		memcpy_s(m_Buffer + properties[index].Offset, properties[index].Size, values, sizeof(*values) * count);
 	}
 
-	void Material::SetShaderProperties()
+	void Material::SetShaderProperties() const
 	{
 		if (!m_Shader)
 			return;
