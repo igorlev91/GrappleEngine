@@ -48,6 +48,7 @@ namespace Grapple
 
 		ShadowSettings()
 			: Quality(ShadowQuality::Medium),
+			Enabled(true),
 			LightSize(0.009f),
 			Cascades(MaxCascades),
 			Bias(0.001f),
@@ -58,6 +59,8 @@ namespace Grapple
 			CascadeSplits[2] = 150.0f;
 			CascadeSplits[3] = 300.0f;
 		}
+
+		bool Enabled;
 
 		float LightSize;
 		float Bias;
@@ -89,6 +92,7 @@ namespace Grapple
 	{
 		void OnSerialize(ShadowSettings& settings, SerializationStream& stream)
 		{
+			stream.Serialize("Enabled", SerializationValue(settings.Enabled));
 			stream.Serialize("LightSize", SerializationValue(settings.LightSize));
 			stream.Serialize("Bias", SerializationValue(settings.Bias));
 

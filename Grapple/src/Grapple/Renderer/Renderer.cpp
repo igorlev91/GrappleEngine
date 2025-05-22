@@ -727,7 +727,8 @@ namespace Grapple
 
 		s_RendererData.Statistics.ObjectsSubmitted += (uint32_t)s_RendererData.Queue.size();
 
-		ExecuteShadowPass();
+		if (s_RendererData.ShadowMappingSettings.Enabled && s_RendererData.CurrentViewport->ShadowMappingEnabled)
+			ExecuteShadowPass();
 
 		// Geometry
 
@@ -755,8 +756,17 @@ namespace Grapple
 		}
 
 		FrameBufferAttachmentsMask previousMask = s_RendererData.CurrentViewport->RenderTarget->GetWriteMask();
-		for (size_t i = 0; i < 4; i++)
-			s_RendererData.ShadowsRenderTarget[i]->BindAttachmentTexture(0, 28 + (uint32_t)i);
+
+		if (s_RendererData.ShadowMappingSettings.Enabled)
+		{
+			for (size_t i = 0; i < 4; i++)
+				s_RendererData.ShadowsRenderTarget[i]->BindAttachmentTexture(0, 28 + (uint32_t)i);
+		}
+		else
+		{
+			for (size_t i = 0; i < 4; i++)
+				s_RendererData.WhiteTexture->Bind(28 + (uint32_t)i);
+		}
 
 		ExecuteGeomertyPass();
 		s_RendererData.CurrentViewport->RenderTarget->SetWriteMask(previousMask);
