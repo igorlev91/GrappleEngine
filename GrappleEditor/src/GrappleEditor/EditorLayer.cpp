@@ -612,7 +612,10 @@ namespace Grapple
 
         ScriptingEngine::UnloadAllModules();
 
+        Grapple_CORE_INFO("Compiling...");
         BuildSystem::BuildModules();
+        Grapple_CORE_INFO("Linking...");
+        BuildSystem::LinkModules();
 
         ScriptingEngine::LoadModules();
         m_ECSContext.Components.RegisterComponents();

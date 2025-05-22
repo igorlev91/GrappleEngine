@@ -6,5 +6,6 @@ namespace Grapple
 	{
 	public:
 		static void BuildModules();
+		static void LinkModules();
 	};
 }
