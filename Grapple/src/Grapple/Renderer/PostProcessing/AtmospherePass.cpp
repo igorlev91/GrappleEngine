@@ -8,7 +8,7 @@ namespace Grapple
 
 	void AtmospherePass::OnRender(RenderingContext& context)
 	{
-		if (!AtmosphereMaterial)
+		if (!AtmosphereMaterial || !Enabled)
 			return;
 
 		Renderer::DrawFullscreenQuad(AtmosphereMaterial);
