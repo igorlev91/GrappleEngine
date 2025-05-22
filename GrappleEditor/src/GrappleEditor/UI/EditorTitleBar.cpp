@@ -99,10 +99,12 @@ namespace Grapple
 
 		if (EditorGUI::BeginMenu("Scripting"))
 		{
+			ImGui::BeginDisabled(Platform::IsDebuggerAttached());
 			if (ImGui::MenuItem("Reload"))
 			{
 				EditorLayer::GetInstance().ReloadScriptingModules();
 			}
+			ImGui::EndDisabled();
 
 			EditorGUI::EndMenu();
 		}

@@ -595,6 +595,7 @@ namespace Grapple
 
     void EditorLayer::ReloadScriptingModules()
     {
+        Grapple_CORE_ASSERT(!Platform::IsDebuggerAttached());
         Grapple_CORE_ASSERT(m_Mode == EditorMode::Edit);
 
         Ref<Scene> active = Scene::GetActive();
