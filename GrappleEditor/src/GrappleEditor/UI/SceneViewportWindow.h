@@ -9,6 +9,7 @@
 
 #include "GrappleEditor/ViewportWindow.h"
 #include "GrappleEditor/EditorCamera.h"
+#include "GrappleEditor/EditorCameraController.h"
 
 namespace Grapple
 {
@@ -41,6 +42,7 @@ namespace Grapple
 		Entity GetEntityUnderCursor() const;
 	private:
 		EditorCamera& m_Camera;
+		EditorCameraController m_CameraController;
 		bool m_IsToolbarHovered;
 
 		ViewportOverlay m_Overlay;
