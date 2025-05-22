@@ -1,14 +1,14 @@
 #pragma once
 
-#include "Flare/Renderer/Texture.h"
-#include "Flare/Renderer/Sprite.h"
+#include "Grapple/Renderer/Texture.h"
+#include "Grapple/Renderer/Sprite.h"
 
-#include "Flare/Math/Math.h"
+#include "Grapple/Math/Math.h"
 
-#include "FlareEditor/ImGui/ImGuiLayer.h"
-#include "FlareEditor/UI/AssetEditor.h"
+#include "GrappleEditor/ImGui/ImGuiLayer.h"
+#include "GrappleEditor/UI/AssetEditor.h"
 
-namespace Flare
+namespace Grapple
 {
     class SpriteEditor : public AssetEditor
     {

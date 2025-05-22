@@ -1,16 +1,16 @@
 #include "SpriteEditor.h"
 
-#include "Flare/AssetManager/AssetManager.h"
+#include "Grapple/AssetManager/AssetManager.h"
 
-#include "FlareEditor/ImGui/ImGuiLayer.h"
-#include "FlareEditor/UI/EditorGUI.h"
-#include "FlareEditor/AssetManager/SpriteImporter.h"
+#include "GrappleEditor/ImGui/ImGuiLayer.h"
+#include "GrappleEditor/UI/EditorGUI.h"
+#include "GrappleEditor/AssetManager/SpriteImporter.h"
 
 #include <glm/glm.hpp>
 
-namespace Flare
+namespace Grapple
 {
-    FLARE_IMPL_ENUM_BITFIELD(SpriteEditor::SelectionRectSide);
+    Grapple_IMPL_ENUM_BITFIELD(SpriteEditor::SelectionRectSide);
 
     void SpriteEditor::RenderWindowContent()
     {
@@ -41,9 +41,8 @@ namespace Flare
         {
             if (m_Sprite->GetTexture())
                 RenderViewportContent();
-
-            ImGui::EndChild();
         }
+		ImGui::EndChild();
 
         ImGui::PopStyleColor();
     }
@@ -180,10 +179,8 @@ namespace Flare
     void SpriteEditor::RenderSidebar()
     {
         if (ImGui::BeginChild("Sidebar"))
-        {
             RenderSidebarContent();
-            ImGui::EndChild();
-        }
+		ImGui::EndChild();
     }
 
     void SpriteEditor::RenderSidebarContent()
@@ -389,7 +386,7 @@ namespace Flare
     Math::Rect SpriteEditor::SelectionToUVRect()
     {
         const Ref<Texture>& texture = m_Sprite->GetTexture();
-        FLARE_CORE_ASSERT(texture);
+        Grapple_CORE_ASSERT(texture);
 
         ImVec2 textureSize = ImVec2((float)texture->GetWidth(), (float)texture->GetHeight());
         glm::vec2 uvMin = glm::min(
@@ -413,13 +410,13 @@ namespace Flare
 
     void SpriteEditor::OnOpen(AssetHandle asset)
     {
-        FLARE_CORE_ASSERT(AssetManager::IsAssetHandleValid(asset));
+        Grapple_CORE_ASSERT(AssetManager::IsAssetHandleValid(asset));
         const AssetMetadata* metadata = AssetManager::GetAssetMetadata(asset);
 
-        FLARE_CORE_ASSERT(metadata->Type == AssetType::Sprite);
+        Grapple_CORE_ASSERT(metadata->Type == AssetType::Sprite);
 
         m_Sprite = AssetManager::GetAsset<Sprite>(asset);
-        FLARE_CORE_ASSERT(m_Sprite);
+        Grapple_CORE_ASSERT(m_Sprite);
 
         const Ref<Texture>& texture = m_Sprite->GetTexture();
         if (texture)
