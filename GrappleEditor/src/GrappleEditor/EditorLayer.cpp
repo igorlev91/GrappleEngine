@@ -404,6 +404,9 @@ namespace Grapple
                 EditorGUI::ObjectField(
                     Grapple_SERIALIZATION_DESCRIPTOR_OF(SSAO),
                     postProcessing.SSAOPass.get());
+                EditorGUI::ObjectField(
+                    Grapple_SERIALIZATION_DESCRIPTOR_OF(AtmospherePass),
+                    postProcessing.Atmosphere.get());
 
                 ImGui::TreePop();
             }

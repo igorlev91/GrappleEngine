@@ -13,6 +13,8 @@
 #include "GrappleEditor/AssetManager/MaterialImporter.h"
 #include "GrappleEditor/AssetManager/SpriteImporter.h"
 
+#include "GrapplePlatform/Platform.h"
+
 #include <fstream>
 #include <imgui.h>
 
@@ -84,9 +86,8 @@ namespace Grapple
             {
                 if (ImGui::MenuItem("Folder"))
                 {
-                    m_ShowNewFileNamePopup = true;
-                    m_OnNewFileNameEntered = [this, nodeIndex = m_NodeRenderIndex](std::string_view name)
-					{
+                    ShowCreateNewFilePopup([this, nodeIndex = m_NodeRenderIndex](std::string_view name)
+                    {
                         Grapple_CORE_ASSERT(m_AssetTree[nodeIndex].IsDirectory);
 
                         std::filesystem::path path = m_AssetTree[nodeIndex].Path / name;
@@ -94,75 +95,17 @@ namespace Grapple
                             Grapple_CORE_ERROR("Failed to create directory: '{}'", path.string());
                         else
                             RebuildAssetTree();
-					};
+                    });
                 }
 
                 ImGui::Separator();
 
-                if (ImGui::MenuItem("Prefab"))
-                {
-                    m_ShowNewFileNamePopup = true;
-                    m_OnNewFileNameEntered = [this, nodeIndex = m_NodeRenderIndex](std::string_view name)
-                    {
-                        Grapple_CORE_ASSERT(m_AssetTree[nodeIndex].IsDirectory);
-                        std::filesystem::path path = m_AssetTree[nodeIndex].Path / name;
-                        path.replace_extension(".flrprefab");
-
-                        if (!std::filesystem::exists(path))
-                        {
-                            std::ofstream output(path);
-                            output << R"(Components:
-  - Name: struct Grapple::TransformComponent
-    Position: [0, 0, 0]
-    Rotation: [0, 0, 0]
-    Scale: [1, 1, 1])";
-                        }
-                    };
-                }
-
-                if (ImGui::MenuItem("Sprite"))
-                {
-                    m_ShowNewFileNamePopup = true;
-                    m_OnNewFileNameEntered = [this, nodeIndex = m_NodeRenderIndex](std::string_view name)
-                    {
-						std::filesystem::path path = m_AssetTree[nodeIndex].Path / name;
-                        path.replace_extension(".flrsprite");
-
-						Ref<Sprite> sprite = CreateRef<Sprite>();
-						Ref<EditorAssetManager> editorAssetManager = EditorAssetManager::GetInstance();
-
-						SpriteImporter::SerializeSprite(sprite, path);
-                        editorAssetManager->ImportAsset(path, sprite);
-                    };
-                }
-
-                if (ImGui::MenuItem("Material"))
-                {
-                    m_ShowNewFileNamePopup = true;
-                    m_OnNewFileNameEntered = [this, nodeIndex = m_NodeRenderIndex](std::string_view name)
-                    {
-                        std::filesystem::path path = m_AssetTree[nodeIndex].Path / name;
-                        path.replace_extension(".flrmat");
-
-                        std::optional<AssetHandle> meshShaderHandle = ShaderLibrary::FindShader("Mesh");
-
-                        if (meshShaderHandle)
-                        {
-                            Ref<Material> material = CreateRef<Material>(meshShaderHandle.value());
-                            MaterialImporter::SerializeMaterial(material, path);
-
-                            m_AssetManager->ImportAsset(path, material);
-                            RebuildAssetTree();
-                        }
-                        else
-                        {
-                            Grapple_CORE_ERROR("Failed to find Mesh shader");
-                        }
-                    };
-                }
+                RenderCreateAssetMenuItems(node);
 
                 ImGui::EndMenu();
             }
+
+            RenderFileOrDirectoryMenuItems(node);
 
             ImGui::EndMenu();
         }
@@ -195,7 +138,7 @@ namespace Grapple
 
         if (node.IsImported)
         {
-            RenderAssetItem(node.Handle);
+            RenderAssetItem(&node, node.Handle);
             return;
         }
         else
@@ -211,8 +154,8 @@ namespace Grapple
 
             const ImGuiStyle& style = ImGui::GetStyle();
             ImGui::PushStyleColor(ImGuiCol_Text, style.Colors[ImGuiCol_TextDisabled]);
-
             bool opened = ImGui::TreeNodeEx(node.Name.c_str(), flags, node.Name.c_str());
+            ImGui::PopStyleColor();
 
             if (opened)
             {
@@ -224,17 +167,17 @@ namespace Grapple
                         node.IsImported = node.Handle != NULL_ASSET_HANDLE;
                     }
 
+                    RenderFileOrDirectoryMenuItems(node);
+
                     ImGui::EndMenu();
                 }
 
                 ImGui::TreePop();
             }
-
-            ImGui::PopStyleColor();
         }
     }
 
-    void AssetManagerWindow::RenderAssetItem(AssetHandle handle)
+    void AssetManagerWindow::RenderAssetItem(AssetTreeNode* node, AssetHandle handle)
     {
         ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow
             | ImGuiTreeNodeFlags_FramePadding
@@ -288,13 +231,10 @@ namespace Grapple
 
             if (ImGui::MenuItem("Remove"))
             {
-                for (AssetTreeNode& node : m_AssetTree)
+                if (node)
                 {
-                    if (node.Handle == handle)
-                    {
-                        node.IsImported = false;
-                        break;
-                    }
+                    node->IsImported = false;
+                    node->Handle = NULL_ASSET_HANDLE;
                 }
 
                 m_AssetManager->RemoveFromRegistry(handle);
@@ -306,13 +246,16 @@ namespace Grapple
                     m_AssetManager->ReloadAsset(handle);
             }
 
+            if (node)
+                RenderFileOrDirectoryMenuItems(*node);
+
             ImGui::EndMenu();
         }
 
         if (opened)
         {
             for (AssetHandle handle : metadata->SubAssets)
-                RenderAssetItem(handle);
+                RenderAssetItem(nullptr, handle);
 
             ImGui::TreePop();
         }
@@ -357,6 +300,14 @@ namespace Grapple
         }
     }
 
+    void AssetManagerWindow::ShowCreateNewFilePopup(const FileNameCallback& callback)
+    {
+        std::memset(m_TextInputBuffer, 0, sizeof(m_TextInputBuffer));
+
+        m_ShowNewFilePopup = true;
+        m_OnNewFileNameCallback = callback;
+    }
+
     void AssetManagerWindow::RenderCreateNewFilePopup()
     {
         bool createNewFile = false;
@@ -364,32 +315,36 @@ namespace Grapple
         ImVec2 center = ImGui::GetMainViewport()->GetCenter();
         ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 
-        if (m_ShowNewFileNamePopup)
+        if (m_ShowNewFilePopup)
         {
-            m_ShowNewFileNamePopup = false;
-            std::memset(m_TextInputBuffer, 0, sizeof(m_TextInputBuffer));
-            ImGui::OpenPopup("EnterNewFileName");
+            ImGui::OpenPopup(m_FileNamePopupId);
+            m_ShowNewFilePopup = false;
         }
 
-        if (ImGui::BeginPopupModal("EnterNewFileName", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+        const auto& style = ImGui::GetStyle();
+
+        const float popupWidth = 300.0f;
+        const float popupContentWidth = popupWidth - style.WindowPadding.x * 2.0f;
+        ImGui::SetNextWindowSize(ImVec2(popupWidth, 100.0f));
+        if (ImGui::BeginPopupModal(m_FileNamePopupId, nullptr, ImGuiWindowFlags_AlwaysAutoResize))
         {
-            ImGui::SetCursorPosY(ImGui::GetCursorPosY() + ImGui::GetStyle().FramePadding.y);
-            ImGui::Text("Name");
-            ImGui::SameLine();
+            ImGui::PushItemWidth(popupContentWidth);
 
             ImGui::PushID("FileNameField");
             ImGui::InputText("", m_TextInputBuffer, 512);
             ImGui::PopID();
 
+            ImGui::PopItemWidth();
+
             if (ImGui::Button("Create"))
                 createNewFile = true;
+
+            ImGui::SameLine();
 
             if (ImGui::IsKeyPressed(ImGuiKey_Enter))
                 createNewFile = true;
             if (ImGui::IsKeyPressed(ImGuiKey_Escape))
                 ImGui::CloseCurrentPopup();
-
-            ImGui::SameLine();
 
             if (ImGui::Button("Cancel"))
                 ImGui::CloseCurrentPopup();
@@ -404,11 +359,81 @@ namespace Grapple
         {
             std::string_view fileName = m_TextInputBuffer;
 
-            if (m_OnNewFileNameEntered)
+            if (m_OnNewFileNameCallback)
             {
-                m_OnNewFileNameEntered(fileName);
-                m_OnNewFileNameEntered = nullptr;
+                m_OnNewFileNameCallback(fileName);
+                m_OnNewFileNameCallback = nullptr;
             }
+        }
+    }
+
+    void AssetManagerWindow::RenderFileOrDirectoryMenuItems(const AssetTreeNode& node)
+    {
+        ImGui::Separator();
+
+        if (ImGui::MenuItem("Show In File Explorer"))
+            Platform::OpenFileExplorer(node.Path);
+    }
+
+    void AssetManagerWindow::RenderCreateAssetMenuItems(const AssetTreeNode& rootNode)
+    {
+        if (ImGui::MenuItem("Prefab"))
+        {
+            ShowCreateNewFilePopup([this, nodeIndex = m_NodeRenderIndex](std::string_view name)
+            {
+                Grapple_CORE_ASSERT(m_AssetTree[nodeIndex].IsDirectory);
+                std::filesystem::path path = m_AssetTree[nodeIndex].Path / name;
+                path.replace_extension(".flrprefab");
+
+                if (!std::filesystem::exists(path))
+                {
+                    std::ofstream output(path);
+                    output << R"(Components:
+- Name: struct Grapple::TransformComponent
+    Position: [0, 0, 0]
+    Rotation: [0, 0, 0]
+    Scale: [1, 1, 1])";
+                }
+            });
+        }
+
+        if (ImGui::MenuItem("Sprite"))
+        {
+            ShowCreateNewFilePopup([this, nodeIndex = m_NodeRenderIndex](std::string_view name)
+            {
+                std::filesystem::path path = m_AssetTree[nodeIndex].Path / name;
+                path.replace_extension(".flrsprite");
+
+                Ref<Sprite> sprite = CreateRef<Sprite>();
+                Ref<EditorAssetManager> editorAssetManager = EditorAssetManager::GetInstance();
+
+                SpriteImporter::SerializeSprite(sprite, path);
+                editorAssetManager->ImportAsset(path, sprite);
+            });
+        }
+
+        if (ImGui::MenuItem("Material"))
+        {
+            ShowCreateNewFilePopup([this, nodeIndex = m_NodeRenderIndex](std::string_view name)
+            {
+                std::filesystem::path path = m_AssetTree[nodeIndex].Path / name;
+                path.replace_extension(".flrmat");
+
+                std::optional<AssetHandle> meshShaderHandle = ShaderLibrary::FindShader("Mesh");
+
+                if (meshShaderHandle)
+                {
+                    Ref<Material> material = CreateRef<Material>(meshShaderHandle.value());
+                    MaterialImporter::SerializeMaterial(material, path);
+
+                    m_AssetManager->ImportAsset(path, material);
+                    RebuildAssetTree();
+                }
+                else
+                {
+                    Grapple_CORE_ERROR("Failed to find Mesh shader");
+                }
+            });
         }
     }
 }

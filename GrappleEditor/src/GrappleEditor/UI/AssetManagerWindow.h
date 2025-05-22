@@ -41,15 +41,21 @@ namespace Grapple
 
 		void SetOpenAction(AssetType assetType, const std::function<void(AssetHandle)>& action);
 	private:
+		using FileNameCallback = std::function<void(std::string_view)>;
+
 		void RenderDirectory();
 		void RenderFile();
-		void RenderAssetItem(AssetHandle handle);
+		void RenderAssetItem(AssetTreeNode* node, AssetHandle handle);
 
 		void BuildDirectory(uint32_t parentIndex, const std::filesystem::path& path);
 
 		void OnOpenFile(AssetHandle handle);
 
+		void ShowCreateNewFilePopup(const FileNameCallback& callback);
 		void RenderCreateNewFilePopup();
+
+		void RenderFileOrDirectoryMenuItems(const AssetTreeNode& node);
+		void RenderCreateAssetMenuItems(const AssetTreeNode& rootNode);
 	public:
 		Signal<AssetHandle> OnAssetSelectionChanged;
 	private:
@@ -61,9 +67,10 @@ namespace Grapple
 		std::vector<AssetTreeNode> m_AssetTree;
 
 		std::unordered_map<AssetType, std::function<void(AssetHandle)>> m_FileOpenActions;
+		const char* m_FileNamePopupId = "Enter name";
 
+		bool m_ShowNewFilePopup = false;
 		char m_TextInputBuffer[512];
-		bool m_ShowNewFileNamePopup = false;
-		std::function<void(std::string_view fileName)> m_OnNewFileNameEntered;
+		std::function<void(std::string_view fileName)> m_OnNewFileNameCallback;
 	};
 }
