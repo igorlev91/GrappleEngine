@@ -1,14 +1,14 @@
 #pragma once
 
-#include "Grapple/Renderer/Texture.h"
-#include "Grapple/Renderer/Sprite.h"
+#include "Flare/Renderer/Texture.h"
+#include "Flare/Renderer/Sprite.h"
 
-#include "Grapple/Math/Math.h"
+#include "Flare/Math/Math.h"
 
-#include "GrappleEditor/ImGui/ImGuiLayer.h"
-#include "GrappleEditor/UI/AssetEditor.h"
+#include "FlareEditor/ImGui/ImGuiLayer.h"
+#include "FlareEditor/UI/AssetEditor.h"
 
-namespace Grapple
+namespace Flare
 {
     class SpriteEditor : public AssetEditor
     {
@@ -34,6 +34,7 @@ namespace Grapple
     private:
         void RenderWindowContent();
         void RenderViewport();
+        void RenderViewportContent();
         void RenderSidebar();
         void RenderSidebarContent();
 
