@@ -46,7 +46,6 @@ namespace Grapple
 			MeshRenderFlags flags,
 			int32_t entityIndex)
 		{
-			Grapple_PROFILE_FUNCTION();
 			if (m_ErrorMaterial == nullptr)
 				return;
 
