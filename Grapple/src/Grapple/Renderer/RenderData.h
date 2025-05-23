@@ -10,7 +10,7 @@
 
 namespace Grapple
 {
-	struct FrustumPlanes
+	struct Grapple_API FrustumPlanes
 	{
 		static constexpr size_t PlanesCount = 6;
 		static constexpr size_t NearPlaneIndex = 0;
@@ -19,6 +19,8 @@ namespace Grapple
 		static constexpr size_t RightPlaneIndex = 3;
 		static constexpr size_t TopPlaneIndex = 4;
 		static constexpr size_t BottomPlaneIndex = 5;
+
+		void SetFromViewAndProjection(const glm::mat4& view, const glm::mat4& inverseViewProjection, glm::vec3 viewDirection);
 
 		inline bool ContainsPoint(const glm::vec3& point) const
 		{
