@@ -3,6 +3,7 @@
 #include "Grapple/Scene/Components.h"
 #include "Grapple/AssetManager/AssetManager.h"
 
+#include "Grapple/Renderer/RendererPrimitives.h"
 #include "Grapple/Renderer/DebugRenderer.h"
 
 #include "GrappleECS/World.h"
@@ -74,7 +75,7 @@ namespace Grapple
 			}
 		}
 
-		Math::AABB cubeAABB = Renderer::GetCubeMesh()->GetSubMeshes()[0].Bounds;
+		Math::AABB cubeAABB = RendererPrimitives::GetCube()->GetSubMeshes()[0].Bounds;
 		for (EntityView view : m_DecalsQuery)
 		{
 			auto transforms = view.View<TransformComponent>();
