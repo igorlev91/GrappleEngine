@@ -76,9 +76,9 @@ namespace Grapple
 
 			if (removedComponent.has_value())
 				m_World.Entities.RemoveEntityComponent(entity, removedComponent.value());
-
-			ImGui::EndChild();
 		}
+
+		ImGui::EndChild();
 	}
 
 
@@ -231,7 +231,7 @@ namespace Grapple
 				}
 
 				EditorGUI::FloatPropertyField("Shadow Bias", environment.ShadowSettings.Bias);
-				EditorGUI::FloatPropertyField("Shadow Normal Bias", environment.ShadowSettings.Bias);
+				EditorGUI::FloatPropertyField("Shadow Normal Bias", environment.ShadowSettings.NormalBias);
 				EditorGUI::IntPropertyField("Shadow Cascades", environment.ShadowSettings.Cascades);
 				EditorGUI::FloatPropertyField("Softness", environment.ShadowSettings.Softness);
 				EditorGUI::FloatPropertyField("Light Size", environment.ShadowSettings.LightSize);
