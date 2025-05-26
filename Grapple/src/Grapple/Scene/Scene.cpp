@@ -260,7 +260,7 @@ namespace Grapple
 		Renderer2D::End();
 
 		Renderer::Flush();
-		Renderer::ExecuteRenderPasses();
+		Renderer::ExecutePostProcessingPasses();
 	}
 
 	void Scene::OnUpdateRuntime()
