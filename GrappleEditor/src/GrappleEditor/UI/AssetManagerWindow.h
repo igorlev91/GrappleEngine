@@ -40,6 +40,7 @@ namespace Grapple
 		void RebuildAssetTree();
 
 		void SetOpenAction(AssetType assetType, const std::function<void(AssetHandle)>& action);
+		void ClearOpenActions();
 	private:
 		using FileNameCallback = std::function<void(std::string_view)>;
 

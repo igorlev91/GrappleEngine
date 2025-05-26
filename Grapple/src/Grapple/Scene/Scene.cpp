@@ -60,6 +60,8 @@ namespace Grapple
 		m_EnvironmentQuery = m_World.NewQuery().With<Environment>().Create();
 		m_PointLightsQuery = m_World.NewQuery().With<TransformComponent>().With<PointLight>().Create();
 		m_SpotLightsQuery = m_World.NewQuery().With<TransformComponent>().With<SpotLight>().Create();
+
+		m_TestQuery = m_World.NewQuery().Created().With<TransformComponent>().Create();
 		
 		systemsManager.RegisterSystem("Sprites Renderer", m_2DRenderingGroup, new SpritesRendererSystem());
 		systemsManager.RegisterSystem("Meshes Renderer", m_2DRenderingGroup, new MeshesRendererSystem());
@@ -274,12 +276,25 @@ namespace Grapple
 		//       only if the game isn't paused, however clearing deleted entites should
 		//       be done regardless of the pause state
 		m_World.Entities.ClearQueuedForDeletion();
+		m_World.Entities.ClearCreatedEntitiesQueryResult();
 	}
 
 	void Scene::OnUpdateEditor()
 	{
 		m_World.GetSystemsManager().ExecuteSystem<TransformPropagationSystem>();
+
+		for (const auto& archetype : m_World.GetArchetypes().Records)
+		{
+			Span<Entity> ids = m_World.Entities.GetCreateEntities(archetype.Id);
+
+			for (Entity id : ids)
+			{
+				Grapple_CORE_INFO("Created this frame: Entity({}; {})", id.GetIndex(), id.GetGeneration());
+			}
+		}
+
 		m_World.Entities.ClearQueuedForDeletion();
+		m_World.Entities.ClearCreatedEntitiesQueryResult();
 	}
 
 	void Scene::OnViewportResize(uint32_t width, uint32_t height)

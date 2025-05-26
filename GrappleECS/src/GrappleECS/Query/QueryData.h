@@ -16,6 +16,7 @@ namespace Grapple
 	{
 		AllEntities,
 		DeletedEntities,
+		CreatedEntities,
 	};
 
 	struct QueryCreationData

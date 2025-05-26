@@ -9,9 +9,10 @@
 
 namespace Grapple
 {
-	struct Archetypes
+	struct GrappleECS_API Archetypes
 	{
 		Archetypes() = default;
+		~Archetypes();
 
 		Archetypes(const Archetypes&) = delete;
 		Archetypes& operator=(const Archetypes&) = delete;
