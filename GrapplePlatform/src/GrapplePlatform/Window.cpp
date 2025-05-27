@@ -10,5 +10,6 @@ namespace Grapple
 #ifdef Grapple_PLATFORM_WINDOWS
 		return CreateScope<WindowsWindow>(properties);
 #endif
+		return nullptr;
 	}
 }

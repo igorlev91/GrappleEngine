@@ -16,6 +16,7 @@
 #include "GrapplePlatform/Events.h"
 
 #include "GrapplePlatform/Platform.h"
+#include "GrapplePlatform/Windows/WindowsWindow.h"
 
 namespace Grapple
 {
@@ -32,6 +33,18 @@ namespace Grapple
 		properties.CustomTitleBar = true;
 
 		m_Window = Window::Create(properties);
+		switch (RendererAPI::GetAPI())
+		{
+		case RendererAPI::API::OpenGL:
+			As<WindowsWindow>(m_Window)->SetUsesOpenGL();
+			break;
+		case RendererAPI::API::Vulkan:
+			As<WindowsWindow>(m_Window)->SetUsesVulkan();
+			break;
+		}
+
+		m_Window->Initialize();
+
 		m_GraphicsContext = GraphicsContext::Create(m_Window->GetNativeWindow());
 		m_GraphicsContext->Initialize();
 		
