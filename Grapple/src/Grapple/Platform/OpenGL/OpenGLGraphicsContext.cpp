@@ -23,4 +23,6 @@ namespace Grapple
 	{
 		glfwSwapBuffers(m_Window);
 	}
+
+	void OpenGLGraphicsContext::OnWindowResize() {}
 }
