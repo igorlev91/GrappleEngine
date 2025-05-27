@@ -2,10 +2,11 @@
 
 #include "GrappleCore/Assert.h"
 #include "Grapple/Platform/OpenGL/OpenGLRendererAPI.h"
+#include "Grapple/Platform/Vulkan/VulkanRendererAPI.h"
 
 namespace Grapple
 {
-	RendererAPI::API s_API = RendererAPI::API::OpenGL;
+	RendererAPI::API s_API = RendererAPI::API::Vulkan;
 
 	Scope<RendererAPI> RendererAPI::Create()
 	{
@@ -13,6 +14,8 @@ namespace Grapple
 		{
 		case API::OpenGL:
 			return CreateScope<OpenGLRendererAPI>();
+		case API::Vulkan:
+			return CreateScope<VulkanRendererAPI>();
 		default:
 			Grapple_CORE_ASSERT(false, "Unsupported rendering API");
 		}

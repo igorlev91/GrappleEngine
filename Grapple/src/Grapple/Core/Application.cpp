@@ -23,14 +23,14 @@ namespace Grapple
 	Application* s_Instance = nullptr;
 
 	Application::Application(CommandLineArguments arguments)
-		: m_Running(true), m_CommandLineArguments(arguments)
+		: m_Running(true), m_CommandLineArguments(arguments), m_PreviousFrameTime(0)
 	{
 		s_Instance = this;
 
 		WindowProperties properties;
 		properties.Title = "Grapple Engine";
 		properties.Size = glm::uvec2(1280, 720);
-		properties.CustomTitleBar = true;
+		properties.CustomTitleBar = RendererAPI::GetAPI() == RendererAPI::API::OpenGL;
 
 		m_Window = Window::Create(properties);
 		switch (RendererAPI::GetAPI())
@@ -57,6 +57,10 @@ namespace Grapple
 				return true;
 			});
 
+			if (RendererAPI::GetAPI() == RendererAPI::API::Vulkan)
+				return;
+
+
 			dispatcher.Dispatch<WindowResizeEvent>([this](WindowResizeEvent& event) -> bool
 			{
 				RenderCommand::SetViewport(0, 0, event.GetWidth(), event.GetHeight());
@@ -76,26 +80,36 @@ namespace Grapple
 	Application::~Application()
 	{
 		ScriptingEngine::Shutdown();
-		Renderer2D::Shutdown();
-		DebugRenderer::Shutdown();
-		Renderer::Shutdown();
+
+		if (RendererAPI::GetAPI() != RendererAPI::API::Vulkan)
+		{
+			Renderer2D::Shutdown();
+			DebugRenderer::Shutdown();
+			Renderer::Shutdown();
+		}
 	}
 
 	void Application::Run()
 	{
 		InputManager::Initialize();
 
-		RenderCommand::Initialize();
-		Renderer::Initialize();
-		Renderer2D::Initialize();
-		DebugRenderer::Initialize();
+		if (RendererAPI::GetAPI() != RendererAPI::API::Vulkan)
+		{
+			RenderCommand::Initialize();
+			Renderer::Initialize();
+			Renderer2D::Initialize();
+			DebugRenderer::Initialize();
+		}
 
 		ScriptingEngine::Initialize();
 
-		RenderCommand::SetLineWidth(1.2f);
+		if (RendererAPI::GetAPI() != RendererAPI::API::Vulkan)
+		{
+			RenderCommand::SetLineWidth(1.2f);
 
-		for (const Ref<Layer>& layer : m_LayersStack.GetLayers())
-			layer->OnAttach();
+			for (const Ref<Layer>& layer : m_LayersStack.GetLayers())
+				layer->OnAttach();
+		}
 
 		while (m_Running)
 		{
@@ -113,16 +127,19 @@ namespace Grapple
 				InputManager::Update();
 				m_Window->OnUpdate();
 
+				if (RendererAPI::GetAPI() != RendererAPI::API::Vulkan)
 				{
-					Grapple_PROFILE_SCOPE("Layers::OnUpdate");
-					for (const Ref<Layer>& layer : m_LayersStack.GetLayers())
-						layer->OnUpdate(deltaTime);
-				}
+					{
+						Grapple_PROFILE_SCOPE("Layers::OnUpdate");
+						for (const Ref<Layer>& layer : m_LayersStack.GetLayers())
+							layer->OnUpdate(deltaTime);
+					}
 
-				{
-					Grapple_PROFILE_SCOPE("Layers::OnImGui");
-					for (const Ref<Layer>& layer : m_LayersStack.GetLayers())
-						layer->OnImGUIRender();
+					{
+						Grapple_PROFILE_SCOPE("Layers::OnImGui");
+						for (const Ref<Layer>& layer : m_LayersStack.GetLayers())
+							layer->OnImGUIRender();
+					}
 				}
 
 				{
@@ -137,8 +154,11 @@ namespace Grapple
 			Profiler::EndFrame();
 		}
 
-		for (const Ref<Layer>& layer : m_LayersStack.GetLayers())
-			layer->OnDetach();
+		if (RendererAPI::GetAPI() != RendererAPI::API::Vulkan)
+		{
+			for (const Ref<Layer>& layer : m_LayersStack.GetLayers())
+				layer->OnDetach();
+		}
 	}
 
 	void Application::Close()
