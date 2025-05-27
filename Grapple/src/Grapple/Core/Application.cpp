@@ -45,8 +45,7 @@ namespace Grapple
 
 		m_Window->Initialize();
 
-		m_GraphicsContext = GraphicsContext::Create(m_Window->GetNativeWindow());
-		m_GraphicsContext->Initialize();
+		GraphicsContext::Create(m_Window->GetNativeWindow());
 		
 		m_Window->SetEventCallback([this](Event& event)
 		{
@@ -59,7 +58,6 @@ namespace Grapple
 
 			dispatcher.Dispatch<WindowResizeEvent>([this](WindowResizeEvent& event) -> bool
 			{
-				m_GraphicsContext->OnWindowResize();
 				RenderCommand::SetViewport(0, 0, event.GetWidth(), event.GetHeight());
 				return true;
 			});
@@ -87,6 +85,8 @@ namespace Grapple
 			DebugRenderer::Shutdown();
 			Renderer::Shutdown();
 		}
+
+		GraphicsContext::Shutdown();
 	}
 
 	void Application::Run()
@@ -144,7 +144,7 @@ namespace Grapple
 
 				{
 					Grapple_PROFILE_SCOPE("SwapBuffers");
-					m_GraphicsContext->SwapBuffers();
+					GraphicsContext::GetInstance().Present();
 				}
 
 				m_PreviousFrameTime = currentTime;
