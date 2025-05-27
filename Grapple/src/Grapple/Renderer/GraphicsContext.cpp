@@ -32,6 +32,7 @@ namespace Grapple
 
 	void GraphicsContext::Shutdown()
 	{
+		s_Instance->Release();
 		s_Instance = nullptr;
 	}
 }
