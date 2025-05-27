@@ -21,6 +21,7 @@ namespace Grapple
 		{
 			None,
 			OpenGL,
+			Vulkan,
 		};
 	public:
 		virtual void Initialize() = 0;
