@@ -16,8 +16,9 @@ Grapple_IMPL_COMPONENT(PrefabSpawner);
 void PrefabSpawnSystem::OnConfig(Grapple::World& world, SystemConfig& config)
 {
 	m_Query = world.NewQuery()
+		.All()
 		.With<PrefabSpawner>()
-		.Create();
+		.Build();
 }
 
 void PrefabSpawnSystem::OnUpdate(Grapple::World& world, SystemExecutionContext& context)

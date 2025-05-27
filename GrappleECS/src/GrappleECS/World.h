@@ -122,9 +122,9 @@ namespace Grapple
 			return (T*)Entities.GetSingletonComponent(COMPONENT_ID(T));
 		}
 
-		inline QueryBuilder NewQuery()
+		inline QueryTargetSelector NewQuery()
 		{
-			return QueryBuilder(m_Queries);
+			return QueryTargetSelector(m_Queries);
 		}
 
 		static World& GetCurrent();
