@@ -84,7 +84,7 @@ namespace Grapple
 		DeletedEntitiesStorage& GetDeletedEntityStorage(ArchetypeId archetype);
 		const DeletedEntitiesStorage& GetDeletedEntityStorage(ArchetypeId archetype) const;
 
-		Span<Entity> GetCreateEntities(ArchetypeId archetype);
+		Span<Entity> GetCreatedEntities(ArchetypeId archetype);
 
 		void ClearQueuedForDeletion();
 		void ClearCreatedEntitiesQueryResult();
