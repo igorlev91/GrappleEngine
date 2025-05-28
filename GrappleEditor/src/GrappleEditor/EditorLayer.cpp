@@ -5,6 +5,7 @@
 
 #include "Grapple.h"
 #include "Grapple/Core/Application.h"
+#include "Grapple/Core/Time.h"
 #include "Grapple/Renderer2D/Renderer2D.h"
 #include "Grapple/Renderer/Renderer.h"
 #include "Grapple/Renderer/Font.h"
@@ -169,7 +170,6 @@ namespace Grapple
     void EditorLayer::OnUpdate(float deltaTime)
     {
         Grapple_PROFILE_FUNCTION();
-        m_PreviousFrameTime = deltaTime;
 
         if (m_Mode == EditorMode::Play)
         {
@@ -370,8 +370,8 @@ namespace Grapple
             ImGui::Begin("Renderer");
             const auto& stats = Renderer::GetStatistics();
 
-            ImGui::Text("Frame time %f ms", m_PreviousFrameTime * 1000.0f);
-            ImGui::Text("FPS %f", 1.0f / m_PreviousFrameTime);
+            ImGui::Text("Frame time %f ms", Time::GetDeltaTime() * 1000.0f);
+            ImGui::Text("FPS %f", 1.0f / Time::GetDeltaTime());
             ImGui::Text("Shadow Pass %f ms", stats.ShadowPassTime);
             ImGui::Text("Geometry Pass %f ms", stats.GeometryPassTime);
 

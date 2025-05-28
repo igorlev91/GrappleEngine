@@ -27,8 +27,7 @@ namespace Grapple
 		void Release() override;
 		void BeginFrame() override;
 		void Present() override;
-
-		void WaitForDevice();
+		void WaitForDevice() override;
 
 		Ref<VulkanCommandBuffer> GetPrimaryCommandBuffer() const { return m_PrimaryCommandBuffer; }
 
@@ -61,6 +60,7 @@ namespace Grapple
 		void RecreateSwapChain();
 		void ReleaseSwapChain();
 		void CreateSwapChainImageViews();
+		void CreateSwapChainFrameBuffers();
 
 		uint32_t ChooseSwapChainFormat(const std::vector<VkSurfaceFormatKHR>& formats);
 		VkExtent2D GetSwapChainExtent(const VkSurfaceCapabilitiesKHR& capabilities);

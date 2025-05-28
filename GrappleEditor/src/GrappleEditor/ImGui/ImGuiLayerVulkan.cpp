@@ -49,6 +49,7 @@ namespace Grapple
 	void ImGuiLayerVulkan::ShutdownRenderer()
 	{
 		ImGui_ImplVulkan_Shutdown();
+		ImGui_ImplGlfw_Shutdown();
 		vkDestroyDescriptorPool(VulkanContext::GetInstance().GetDevice(), m_DescriptorPool, nullptr);
 	}
 
