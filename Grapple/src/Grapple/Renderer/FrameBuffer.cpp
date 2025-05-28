@@ -2,6 +2,7 @@
 
 #include "Grapple/Renderer/RendererAPI.h"
 #include "Grapple/Platform/OpenGL/OpenGLFrameBuffer.h"
+#include "Grapple/Platform/Vulkan/VulkanFrameBuffer.h"
 
 namespace Grapple
 {
@@ -11,6 +12,8 @@ namespace Grapple
 		{
 		case RendererAPI::API::OpenGL:
 			return CreateRef<OpenGLFrameBuffer>(specifications);
+		case RendererAPI::API::Vulkan:
+			return CreateRef<VulkanFrameBuffer>(specifications);
 		}
 
 		return nullptr;

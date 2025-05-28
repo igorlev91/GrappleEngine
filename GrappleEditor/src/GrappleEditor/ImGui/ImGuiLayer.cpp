@@ -83,6 +83,11 @@ namespace Grapple
 		return s_Instance->GetTextureId(texture);
 	}
 
+	ImTextureID ImGuiLayer::GetId(const Ref<const FrameBuffer>& frameBuffer, uint32_t attachmentIndex)
+	{
+		return s_Instance->GetFrameBufferAttachmentId(frameBuffer, attachmentIndex);
+	}
+
 	void ImGuiLayer::SetThemeColors()
 	{
 		ImGuiStyle& style = ImGui::GetStyle();

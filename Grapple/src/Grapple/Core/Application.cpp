@@ -127,13 +127,10 @@ namespace Grapple
 
 				GraphicsContext::GetInstance().BeginFrame();
 
-				if (RendererAPI::GetAPI() != RendererAPI::API::Vulkan)
 				{
-					{
-						Grapple_PROFILE_SCOPE("Layers::OnUpdate");
-						for (const Ref<Layer>& layer : m_LayersStack.GetLayers())
-							layer->OnUpdate(deltaTime);
-					}
+					Grapple_PROFILE_SCOPE("Layers::OnUpdate");
+					for (const Ref<Layer>& layer : m_LayersStack.GetLayers())
+						layer->OnUpdate(deltaTime);
 				}
 
 				{

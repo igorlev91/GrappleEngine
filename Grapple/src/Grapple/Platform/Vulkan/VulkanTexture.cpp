@@ -170,6 +170,7 @@ namespace Grapple
 
 	VulkanTexture::~VulkanTexture()
 	{
+		Grapple_CORE_ASSERT(VulkanContext::GetInstance().IsValid());
 		VulkanContext::GetInstance().NotifyImageViewDeletionHandler(m_ImageView);
 
 		VkDevice device = VulkanContext::GetInstance().GetDevice();
