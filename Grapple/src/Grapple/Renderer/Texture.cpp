@@ -2,6 +2,7 @@
 
 #include "Grapple/Renderer/RendererAPI.h"
 #include "Grapple/Platform/OpenGL/OpenGLTexture.h"
+#include "Grapple/Platform/Vulkan/VulkanTexture.h"
 
 namespace Grapple
 {
@@ -14,6 +15,8 @@ namespace Grapple
 		{
 		case RendererAPI::API::OpenGL:
 			return CreateRef<OpenGLTexture>(path, specifications);
+		case RendererAPI::API::Vulkan:
+			return CreateRef<VulkanTexture>(path, specifications);
 		}
 
 		return nullptr;
@@ -25,6 +28,8 @@ namespace Grapple
 		{
 		case RendererAPI::API::OpenGL:
 			return CreateRef<OpenGLTexture>(width, height, data, format, filtering);
+		case RendererAPI::API::Vulkan:
+			return CreateRef<VulkanTexture>();
 		}
 
 		return nullptr;

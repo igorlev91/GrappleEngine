@@ -4,6 +4,7 @@
 
 #include "Grapple/Core/Application.h"
 #include "Grapple/Platform/Vulkan/VulkanContext.h"
+#include "Grapple/Platform/Vulkan/VulkanTexture.h"
 
 #include <ImGuizmo.h>
 
@@ -40,6 +41,7 @@ namespace Grapple
 		info.Instance = VulkanContext::GetInstance().GetVulkanInstance();
 		info.PhysicalDevice = VulkanContext::GetInstance().GetPhysicalDevice();
 		info.Queue = VulkanContext::GetInstance().GetGraphicsQueue();
+		info.QueueFamily = VulkanContext::GetInstance().GetGraphicsQueueFamilyIndex();
 		info.Device = VulkanContext::GetInstance().GetDevice();
 		info.ImageCount = 10;
 		info.MinImageCount = 2;
@@ -102,5 +104,29 @@ namespace Grapple
 			ImGui::UpdatePlatformWindows();
 			ImGui::RenderPlatformWindowsDefault();
 		}
+	}
+
+	ImTextureID ImGuiLayerVulkan::GetTextureId(const Ref<const Texture>& texture)
+	{
+		Grapple_CORE_ASSERT(texture);
+
+		Ref<const VulkanTexture> vulkanTexture = As<const VulkanTexture>(texture);
+		VkImageView image = vulkanTexture->GetImageViewHandle();
+		auto it = m_ImageToDescriptor.find((uint64_t)image);
+
+		if (it == m_ImageToDescriptor.end())
+		{
+			VkDescriptorSet descriptorSet = ImGui_ImplVulkan_AddTexture(vulkanTexture->GetDefaultSampler(), image, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+			m_ImageToDescriptor.emplace((uint64_t)image, descriptorSet);
+
+			return (ImTextureID)descriptorSet;
+		}
+
+		return (ImTextureID)it->second;
+	}
+
+	ImTextureID ImGuiLayerVulkan::GetFrameBufferAttachmentId(const Ref<const FrameBuffer>& frameBuffer, uint32_t attachment)
+	{
+		return (ImTextureID)0;
 	}
 }

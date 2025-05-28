@@ -75,4 +75,16 @@ namespace Grapple
 			glfwMakeContextCurrent(currentContext);
 		}
 	}
+
+	ImTextureID ImGuiLayerOpenGL::GetTextureId(const Ref<const Texture>& texture)
+	{
+		Grapple_CORE_ASSERT(texture);
+		return (ImTextureID)texture->GetRendererId();
+	}
+
+	ImTextureID ImGuiLayerOpenGL::GetFrameBufferAttachmentId(const Ref<const FrameBuffer>& frameBuffer, uint32_t attachment)
+	{
+		Grapple_CORE_ASSERT(frameBuffer && attachment < frameBuffer->GetAttachmentsCount());
+		return (ImTextureID)frameBuffer->GetColorAttachmentRendererId(attachment);
+	}
 }

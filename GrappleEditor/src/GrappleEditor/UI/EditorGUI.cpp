@@ -25,6 +25,11 @@ namespace Grapple
         s_EditorIcons.Initialize();
     }
 
+    void EditorGUI::Uninitialize()
+    {
+        s_EditorIcons.Uninitialize();
+    }
+
     bool EditorGUI::BeginPropertyGrid(float width)
     {
         float windowWidth = width == 0.0f ? ImGui::GetContentRegionAvail().x : width;
@@ -53,7 +58,11 @@ namespace Grapple
         }
 
         ImRect uvs = s_EditorIcons.GetIconUVs(iconPosition);
-        ImGui::Image(s_EditorIcons.GetTexture()->GetRendererId(), ImVec2(size, size), uvs.Min, uvs.Max);
+
+        if (RendererAPI::GetAPI() != RendererAPI::API::Vulkan)
+        {
+			ImGui::Image(s_EditorIcons.GetTexture()->GetRendererId(), ImVec2(size, size), uvs.Min, uvs.Max);
+        }
     }
 
     const EditorIcons& EditorGUI::GetIcons()

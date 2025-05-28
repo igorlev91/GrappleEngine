@@ -1,6 +1,8 @@
 #pragma once
 
 #include "GrappleCore/Core.h"
+#include "Grapple/Renderer/Texture.h"
+#include "Grapple/Renderer/FrameBuffer.h"
 
 #include <stdint.h>
 
@@ -48,6 +50,10 @@ namespace Grapple
 		virtual void RenderCurrentWindow() = 0;
 		virtual void UpdateWindows() = 0;
 
+		virtual ImTextureID GetTextureId(const Ref<const Texture>& texture) = 0;
+		virtual ImTextureID GetFrameBufferAttachmentId(const Ref<const FrameBuffer>& frameBuffer, uint32_t attachment) = 0;
+
+		static ImTextureID GetId(const Ref<const Texture>& texture);
 		static void SetThemeColors();
 	public:
 		static Ref<ImGuiLayer> Create();

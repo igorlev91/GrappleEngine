@@ -30,7 +30,7 @@ namespace Grapple
 		WindowProperties properties;
 		properties.Title = "Grapple Engine";
 		properties.Size = glm::uvec2(1280, 720);
-		properties.CustomTitleBar = RendererAPI::GetAPI() == RendererAPI::API::OpenGL;
+		properties.CustomTitleBar = true;
 
 		m_Window = Window::Create(properties);
 		switch (RendererAPI::GetAPI())
@@ -156,6 +156,8 @@ namespace Grapple
 
 		for (const Ref<Layer>& layer : m_LayersStack.GetLayers())
 			layer->OnDetach();
+
+		Font::SetDefault(nullptr);
 	}
 
 	void Application::Close()

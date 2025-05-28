@@ -60,7 +60,7 @@ namespace Grapple
 		std::vector<const char*> enabledLayers;
 		const char* validationLayerName = "VK_LAYER_KHRONOS_validation";
 
-		for (auto l : supportedLayers)
+		for (const auto& l : supportedLayers)
 		{
 			Grapple_CORE_INFO(l.layerName);
 		}
@@ -213,6 +213,30 @@ namespace Grapple
 		VK_CHECK_RESULT(vkDeviceWaitIdle(m_Device));
 	}
 
+	void VulkanContext::CreateBuffer(size_t size, VkBufferUsageFlags usage, VkMemoryPropertyFlags memoryProperties, VkBuffer& buffer, VkDeviceMemory& memory)
+	{
+		VkBufferCreateInfo info{};
+		info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+		info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+		info.size = size;
+		info.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+
+		VK_CHECK_RESULT(vkCreateBuffer(VulkanContext::GetInstance().GetDevice(), &info, nullptr, &buffer));
+
+		VkMemoryRequirements memoryRequirements{};
+		vkGetBufferMemoryRequirements(VulkanContext::GetInstance().GetDevice(), buffer, &memoryRequirements);
+
+		VkMemoryAllocateInfo allocation{};
+		allocation.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+		allocation.allocationSize = memoryRequirements.size;
+		allocation.memoryTypeIndex = VulkanContext::GetInstance().FindMemoryType(
+			memoryRequirements.memoryTypeBits,
+			memoryProperties);
+
+		VK_CHECK_RESULT(vkAllocateMemory(VulkanContext::GetInstance().GetDevice(), &allocation, nullptr, &memory));
+		VK_CHECK_RESULT(vkBindBufferMemory(VulkanContext::GetInstance().GetDevice(), buffer, memory, 0));
+	}
+
 	Ref<VulkanCommandBuffer> VulkanContext::BeginTemporaryCommandBuffer()
 	{
 		VkCommandBuffer commandBuffer;
@@ -248,10 +272,32 @@ namespace Grapple
 		submitInfo.signalSemaphoreCount = 0;
 		submitInfo.pSignalSemaphores = nullptr;
 		VK_CHECK_RESULT(vkQueueSubmit(m_GraphicsQueue, 1, &submitInfo, nullptr));
-
-		WaitForDevice();
+		VK_CHECK_RESULT(vkQueueWaitIdle(m_GraphicsQueue));
 
 		vkFreeCommandBuffers(m_Device, m_CommandBufferPool, 1, &buffer);
+	}
+
+	void VulkanContext::NotifyImageViewDeletionHandler(VkImageView deletedImageView)
+	{
+		if (m_ImageDeletationHandler)
+		{
+			m_ImageDeletationHandler(deletedImageView);
+		}
+	}
+
+	uint32_t VulkanContext::FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties)
+	{
+		VkPhysicalDeviceMemoryProperties deviceMemoryProperties{};
+		vkGetPhysicalDeviceMemoryProperties(m_PhysicalDevice, &deviceMemoryProperties);
+
+		for (uint32_t i = 0; i < deviceMemoryProperties.memoryTypeCount; i++)
+		{
+			if ((typeFilter & (1 << i)) && (deviceMemoryProperties.memoryTypes[i].propertyFlags & properties) == properties)
+				return i;
+		}
+
+		Grapple_CORE_ASSERT(false);
+		return UINT32_MAX;
 	}
 
 	void VulkanContext::CreateInstance(const Span<const char*>& enabledLayers)
@@ -464,7 +510,7 @@ namespace Grapple
 		VK_CHECK_RESULT(vkGetPhysicalDeviceSurfacePresentModesKHR(m_PhysicalDevice, m_Surface, &presentModeCount, presentModes.data()));
 
 		uint32_t formatIndex = ChooseSwapChainFormat(formats);
-		VkPresentModeKHR presentMode = ChoosePrensentMode(presentModes);
+		VkPresentModeKHR presentMode = ChoosePresentMode(presentModes);
 		VkExtent2D swapChainExtent = GetSwapChainExtent(surfaceCapabilities);
 
 		m_SwapChainExtent.x = swapChainExtent.width;
@@ -519,6 +565,8 @@ namespace Grapple
 
 	void VulkanContext::RecreateSwapChain()
 	{
+		WaitForDevice();
+
 		ReleaseSwapChain();
 		CreateSwapChain();
 		CreateSwapChainFrameBuffers();
@@ -607,8 +655,9 @@ namespace Grapple
 		return extent;
 	}
 
-	VkPresentModeKHR VulkanContext::ChoosePrensentMode(const std::vector<VkPresentModeKHR>& modes)
+	VkPresentModeKHR VulkanContext::ChoosePresentMode(const std::vector<VkPresentModeKHR>& modes)
 	{
+		return VK_PRESENT_MODE_FIFO_KHR;
 		for (auto mode : modes)
 		{
 			if (mode == VK_PRESENT_MODE_MAILBOX_KHR)
