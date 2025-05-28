@@ -1,6 +1,7 @@
 #include "Shader.h"
 
 #include "Grapple/Platform/OpenGL/OpenGLShader.h"
+#include "Grapple/Platform/Vulkan/VulkanShader.h"
 #include "Grapple/Renderer/RendererAPI.h"
 
 namespace Grapple
@@ -14,6 +15,8 @@ namespace Grapple
 		{
 		case RendererAPI::API::OpenGL:
 			return CreateRef<OpenGLShader>();
+		case RendererAPI::API::Vulkan:
+			return CreateRef<VulkanShader>();
 		}
 
 		return nullptr;
