@@ -2,6 +2,8 @@
 
 #include "Grapple/Renderer/RendererAPI.h"
 #include "Grapple/Platform/OpenGL/OpenGLBuffer.h"
+#include "Grapple/Platform/Vulkan/VulkanVertexBuffer.h"
+#include "Grapple/Platform/Vulkan/VulkanIndexBuffer.h"
 
 namespace Grapple
 {
@@ -11,6 +13,8 @@ namespace Grapple
 		{
 		case RendererAPI::API::OpenGL:
 			return CreateRef<OpenGLVertexBuffer>(size);
+		case RendererAPI::API::Vulkan:
+			return CreateRef<VulkanVertexBuffer>();
 		}
 
 		return nullptr;
@@ -25,6 +29,8 @@ namespace Grapple
 		case RendererAPI::API::OpenGL:
 			vertexBuffer = CreateRef<OpenGLVertexBuffer>(size, data);
 			break;
+		case RendererAPI::API::Vulkan:
+			return CreateRef<VulkanVertexBuffer>();
 		default:
 			return nullptr;
 		}
@@ -39,6 +45,8 @@ namespace Grapple
 		{
 		case RendererAPI::API::OpenGL:
 			return CreateRef<OpenGLIndexBuffer>(format, size);
+		case RendererAPI::API::Vulkan:
+			return CreateRef<VulkanIndexBuffer>();
 		}
 
 		return nullptr;
@@ -50,6 +58,8 @@ namespace Grapple
 		{
 		case RendererAPI::API::OpenGL:
 			return CreateRef<OpenGLIndexBuffer>(format, indices);
+		case RendererAPI::API::Vulkan:
+			return CreateRef<VulkanIndexBuffer>();
 		}
 
 		return nullptr;

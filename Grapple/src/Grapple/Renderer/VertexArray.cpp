@@ -2,6 +2,7 @@
 
 #include "Grapple/Renderer/RendererAPI.h"
 #include "Grapple/Platform/OpenGL/OpenGLVertexArray.h"
+#include "Grapple/Platform/Vulkan/VulkanVertexArray.h"
 
 namespace Grapple
 {
@@ -11,6 +12,8 @@ namespace Grapple
 		{
 		case RendererAPI::API::OpenGL:
 			return CreateRef<OpenGLVertexArray>();
+		case RendererAPI::API::Vulkan:
+			return CreateRef<VulkanVertexArray>();
 		}
 
 		return nullptr;

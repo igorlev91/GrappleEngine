@@ -2,9 +2,11 @@
 
 #include "GrappleEditor/ImGui/ImGuiLayer.h"
 
+#include <vulkan/vulkan.h>
+
 namespace Grapple
 {
-	class ImGuiLayerOpenGL : public ImGuiLayer
+	class ImGuiLayerVulkan : public ImGuiLayer
 	{
 	public:
 		void InitializeRenderer() override;
@@ -16,5 +18,7 @@ namespace Grapple
 
 		void RenderCurrentWindow() override;
 		void UpdateWindows() override;
+	private:
+		VkDescriptorPool m_DescriptorPool = VK_NULL_HANDLE;
 	};
 }

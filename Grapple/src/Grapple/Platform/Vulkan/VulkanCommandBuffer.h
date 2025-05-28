@@ -7,7 +7,7 @@
 
 namespace Grapple
 {
-	class VulkanCommandBuffer
+	class Grapple_API VulkanCommandBuffer
 	{
 	public:
 		VulkanCommandBuffer(VkCommandBuffer commandBuffer);

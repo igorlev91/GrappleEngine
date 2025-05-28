@@ -8,6 +8,7 @@
 #include "GrapplePlatform/Window.h"
 
 #include "GrappleEditor/ImGui/ImGuiLayerOpenGL.h"
+#include "GrappleEditor/ImGui/ImGuiLayerVulkan.h"
 
 #include <imgui_internal.h>
 #include <ImGuizmo.h>
@@ -61,6 +62,8 @@ namespace Grapple
 		io.FontDefault = roboto;
 
 		SetThemeColors();
+
+		InitializeFonts();
 	}
 
 	void ImGuiLayer::OnDetach()
@@ -152,6 +155,8 @@ namespace Grapple
 		{
 		case RendererAPI::API::OpenGL:
 			return CreateRef<ImGuiLayerOpenGL>();
+		case RendererAPI::API::Vulkan:
+			return CreateRef<ImGuiLayerVulkan>();
 		}
 
 		return nullptr;
