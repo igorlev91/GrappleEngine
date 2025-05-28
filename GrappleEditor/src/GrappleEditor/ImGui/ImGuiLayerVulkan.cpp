@@ -119,6 +119,8 @@ namespace Grapple
 			VkDescriptorSet descriptorSet = ImGui_ImplVulkan_AddTexture(vulkanTexture->GetDefaultSampler(), image, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 			m_ImageToDescriptor.emplace((uint64_t)image, descriptorSet);
 
+			Grapple_CORE_ASSERT(descriptorSet);
+
 			return (ImTextureID)descriptorSet;
 		}
 
@@ -127,6 +129,7 @@ namespace Grapple
 
 	ImTextureID ImGuiLayerVulkan::GetFrameBufferAttachmentId(const Ref<const FrameBuffer>& frameBuffer, uint32_t attachment)
 	{
+		Grapple_CORE_ASSERT(false);
 		return (ImTextureID)0;
 	}
 }

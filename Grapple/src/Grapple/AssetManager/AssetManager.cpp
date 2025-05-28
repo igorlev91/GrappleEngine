@@ -11,6 +11,11 @@ namespace Grapple
 		s_Instance = assetManager;
 	}
 
+	void AssetManager::Uninitialize()
+	{
+		s_Instance = nullptr;
+	}
+
 	Ref<AssetManagerBase> AssetManager::GetInstance()
 	{
 		return s_Instance;

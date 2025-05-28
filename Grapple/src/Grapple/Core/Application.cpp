@@ -4,6 +4,8 @@
 
 #include "GrappleCore/Profiler/Profiler.h"
 
+#include "Grapple/AssetManager/AssetManager.h"
+
 #include "Grapple/Renderer/Renderer.h"
 #include "Grapple/Renderer2D/Renderer2D.h"
 #include "Grapple/Renderer/DebugRenderer.h"
@@ -157,6 +159,9 @@ namespace Grapple
 		for (const Ref<Layer>& layer : m_LayersStack.GetLayers())
 			layer->OnDetach();
 
+		m_LayersStack.Clear();
+
+		AssetManager::Uninitialize();
 		Font::SetDefault(nullptr);
 	}
 
