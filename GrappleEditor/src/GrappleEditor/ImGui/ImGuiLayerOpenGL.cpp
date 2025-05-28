@@ -3,6 +3,9 @@
 #include "GrappleCore/Profiler/Profiler.h"
 
 #include "Grapple/Core/Application.h"
+#include "Grapple/Platform/OpenGL/OpenGLTexture.h"
+#include "Grapple/Platform/OpenGL/OpenGLFrameBuffer.h"
+
 #include "GrapplePlatform/Window.h"
 
 #include <ImGuizmo.h>
@@ -79,12 +82,12 @@ namespace Grapple
 	ImTextureID ImGuiLayerOpenGL::GetTextureId(const Ref<const Texture>& texture)
 	{
 		Grapple_CORE_ASSERT(texture);
-		return (ImTextureID)texture->GetRendererId();
+		return (ImTextureID)(size_t)As<const OpenGLTexture>(texture)->GetId();
 	}
 
 	ImTextureID ImGuiLayerOpenGL::GetFrameBufferAttachmentId(const Ref<const FrameBuffer>& frameBuffer, uint32_t attachment)
 	{
 		Grapple_CORE_ASSERT(frameBuffer && attachment < frameBuffer->GetAttachmentsCount());
-		return (ImTextureID)frameBuffer->GetColorAttachmentRendererId(attachment);
+		return (ImTextureID)(size_t)As<const OpenGLFrameBuffer>(frameBuffer)->GetAttachmentId(attachment);
 	}
 }

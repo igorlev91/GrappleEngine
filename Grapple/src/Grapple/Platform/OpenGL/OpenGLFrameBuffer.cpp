@@ -82,12 +82,6 @@ namespace Grapple
         Create();
     }
 
-    void* OpenGLFrameBuffer::GetColorAttachmentRendererId(uint32_t attachmentIndex) const
-    {
-        Grapple_CORE_ASSERT((size_t)attachmentIndex < m_ColorAttachments.size());
-        return (void*)(size_t)(m_ColorAttachments[attachmentIndex]);
-    }
-
     uint32_t OpenGLFrameBuffer::GetAttachmentsCount() const
     {
         return (uint32_t)m_ColorAttachments.size();
