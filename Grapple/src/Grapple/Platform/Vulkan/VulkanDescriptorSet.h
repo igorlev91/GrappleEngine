@@ -3,6 +3,7 @@
 #include "GrappleCore/Collections/Span.h"
 
 #include "Grapple/Renderer/UniformBuffer.h"
+#include "Grapple/Renderer/ShaderStorageBuffer.h"
 #include "Grapple/Renderer/Texture.h"
 
 #include <vector>
@@ -33,6 +34,7 @@ namespace Grapple
 		~VulkanDescriptorSet();
 
 		void WriteUniformBuffer(const Ref<const UniformBuffer>& uniformBuffer, uint32_t binding);
+		void WriteStorageBuffer(const Ref<const ShaderStorageBuffer>& storageBuffer, uint32_t binding);
 		void WriteTexture(const Ref<const Texture>& texture, uint32_t binding);
 		void WriteTextures(const Span<Ref<const Texture>>& textures, size_t arrayOffset, uint32_t binding);
 
