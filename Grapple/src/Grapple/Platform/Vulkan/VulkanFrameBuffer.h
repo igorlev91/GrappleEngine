@@ -4,6 +4,7 @@
 
 #include "Grapple/Renderer/FrameBuffer.h"
 #include "Grapple/Platform/Vulkan/VulkanRenderPass.h"
+#include "Grapple/Platform/Vulkan/VulkanAllocation.h"
 
 #include <vulkan/vulkan.h>
 #include <vector>
@@ -50,7 +51,7 @@ namespace Grapple
 
 		std::vector<VkImage> m_AttachmentsImages;
 		std::vector<VkImageView> m_AttachmentsImageViews;
-		std::vector<VkDeviceMemory> m_AttachmentImagesMemory;
+		std::vector<VulkanAllocation> m_AttachmentAllocations;
 		std::vector<VkSampler> m_DefaultSamplers;
 
 		Ref<VulkanRenderPass> m_CompatibleRenderPass = nullptr;

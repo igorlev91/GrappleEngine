@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Grapple/Renderer/Buffer.h"
+#include "Grapple/Platform/Vulkan/VulkanAllocation.h"
 
 #include <vulkan/vulkan.h>
 
@@ -25,7 +26,7 @@ namespace Grapple
 		void* m_Mapped = nullptr;
 
 		VkBuffer m_Buffer = VK_NULL_HANDLE;
-		VkDeviceMemory m_BufferMemory = VK_NULL_HANDLE;
+		VulkanAllocation m_Allocation;
 
 		size_t m_Size = 0;
 
