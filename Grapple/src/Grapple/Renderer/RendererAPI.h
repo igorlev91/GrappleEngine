@@ -14,6 +14,8 @@ namespace Grapple
 		uint32_t InstancesCount;
 	};
 
+	class Material;
+
 	class Grapple_API RendererAPI
 	{
 	public:
@@ -59,6 +61,8 @@ namespace Grapple
 			size_t baseVertexIndex,
 			size_t startIndex,
 			size_t indicesCount) = 0;
+
+		virtual void ApplyMaterialProperties(const Ref<const Material>& materail) = 0;
 	public:
 		static Scope<RendererAPI> Create();
 		static API GetAPI();

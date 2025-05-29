@@ -523,7 +523,7 @@ namespace Grapple
 
 	void Renderer2D::FlushQuads()
 	{
-	Grapple_PROFILE_FUNCTION();
+		Grapple_PROFILE_FUNCTION();
 
 		if (s_Renderer2DData.QuadIndex == 0)
 			return;
