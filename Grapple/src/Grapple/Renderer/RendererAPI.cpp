@@ -6,7 +6,7 @@
 
 namespace Grapple
 {
-	RendererAPI::API s_API = RendererAPI::API::OpenGL;
+	RendererAPI::API s_API = RendererAPI::API::Vulkan;
 
 	Scope<RendererAPI> RendererAPI::Create()
 	{

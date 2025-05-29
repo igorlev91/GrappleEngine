@@ -207,6 +207,8 @@ namespace Grapple
 		else if (presentResult != VK_SUCCESS)
 			Grapple_CORE_ERROR("Failed to present");
 
+		VK_CHECK_RESULT(vkQueueWaitIdle(m_PresentQueue));
+
 		glfwSwapBuffers(m_Window);
 	}
 
@@ -221,7 +223,7 @@ namespace Grapple
 		info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
 		info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 		info.size = size;
-		info.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+		info.usage = usage;
 
 		VK_CHECK_RESULT(vkCreateBuffer(VulkanContext::GetInstance().GetDevice(), &info, nullptr, &buffer));
 

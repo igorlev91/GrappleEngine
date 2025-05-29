@@ -87,6 +87,9 @@ namespace Grapple
 
 	void SpritesRendererSystem::RenderText(SystemExecutionContext& context)
 	{
+		if (RendererAPI::GetAPI() != RendererAPI::API::OpenGL)
+			return;
+
 		for (EntityView view : m_TextQuery)
 		{
 			auto transforms = view.View<TransformComponent>();
@@ -117,6 +120,9 @@ namespace Grapple
 
 	void MeshesRendererSystem::OnUpdate(World& world, SystemExecutionContext& context)
 	{
+		if (RendererAPI::GetAPI() != RendererAPI::API::OpenGL)
+			return;
+
 		Grapple_PROFILE_FUNCTION();
 
 		AssetHandle currentMaterialHandle = NULL_ASSET_HANDLE;

@@ -17,6 +17,7 @@ namespace Grapple
 		virtual void WaitForDevice() = 0;
 	public:
 		static GraphicsContext& GetInstance();
+		static bool IsInitialized();
 		static void Create(void* windowHandle);
 		static void Shutdown();
 	};

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Grapple/Renderer/Pipeline.h"
+
 #include "Grapple/Platform/Vulkan/VulkanRenderPass.h"
 #include "Grapple/Platform/Vulkan/VulkanFrameBuffer.h"
 
@@ -21,9 +23,19 @@ namespace Grapple
 		void EndRenderPass();
 
 		void TransitionImageLayout(VkImage image, VkImageLayout oldLayout, VkImageLayout newLayout);
+		void TransitionDepthImageLayout(VkImage image, VkImageLayout oldLayout, VkImageLayout newLayout);
 
 		void ClearImage(VkImage image, const glm::vec4& clearColor, VkImageLayout oldLayout, VkImageLayout newLayout);
 		void CopyBufferToImage(VkBuffer buffer, VkImage image, VkExtent3D size);
+		void CopyBuffer(VkBuffer sourceBuffer, VkBuffer destinationBuffer, size_t size, size_t sourceOffset, size_t destinationOffset);
+
+		void BindPipeline(const Ref<const Pipeline>& pipeline);
+		void BindVertexBuffers(const Span<Ref<const VertexBuffer>>& vertexBuffers);
+		void BindIndexBuffer(const Ref<const IndexBuffer>& indexBuffer);
+
+		void SetViewportAndScisors(Math::Rect viewportRect);
+
+		void DrawIndexed(uint32_t indicesCount);
 
 		VkCommandBuffer GetHandle() const { return m_CommandBuffer; }
 	private:
