@@ -97,6 +97,8 @@ namespace Grapple
 		std::vector<const char*> deviceExtensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME, VK_KHR_MAINTENANCE1_EXTENSION_NAME };
 		CreateLogicalDevice(Span<const char*>::FromVector(enabledLayers), Span<const char*>::FromVector(deviceExtensions));
 
+		CreateMemoryAllocator();
+
 		CreateSwapChain();
 
 		{
@@ -131,6 +133,8 @@ namespace Grapple
 
 		m_ColorOnlyPass = nullptr;
 		m_SwapChainFrameBuffers.clear();
+
+		vmaDestroyAllocator(m_Allocator);
 
 		ReleaseSwapChain();
 
@@ -245,6 +249,23 @@ namespace Grapple
 
 		VK_CHECK_RESULT(vkAllocateMemory(VulkanContext::GetInstance().GetDevice(), &allocation, nullptr, &memory));
 		VK_CHECK_RESULT(vkBindBufferMemory(VulkanContext::GetInstance().GetDevice(), buffer, memory, 0));
+	}
+
+	VulkanAllocation VulkanContext::CreateStagingBuffer(size_t size, VkBuffer& buffer)
+	{
+		VkBufferCreateInfo info{};
+		info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+		info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+		info.size = size;
+		info.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+
+		VmaAllocationCreateInfo allocationInfo{};
+		allocationInfo.usage = VMA_MEMORY_USAGE_CPU_TO_GPU;
+
+		VulkanAllocation allocation{};
+		VK_CHECK_RESULT(vmaCreateBuffer(m_Allocator, &info, &allocationInfo, &buffer, &allocation.Handle, &allocation.Info));
+
+		return allocation;
 	}
 
 	Ref<VulkanCommandBuffer> VulkanContext::BeginTemporaryCommandBuffer()
@@ -463,6 +484,17 @@ namespace Grapple
 
 		vkGetDeviceQueue(m_Device, *m_GraphicsQueueFamilyIndex, 0, &m_GraphicsQueue);
 		vkGetDeviceQueue(m_Device, *m_PresentQueueFamilyIndex, 0, &m_PresentQueue);
+	}
+
+	void VulkanContext::CreateMemoryAllocator()
+	{
+		VmaAllocatorCreateInfo info{};
+		info.instance = m_Instance;
+		info.device = m_Device;
+		info.physicalDevice = m_PhysicalDevice;
+		info.vulkanApiVersion = VK_API_VERSION_1_3;
+
+		VK_CHECK_RESULT(vmaCreateAllocator(&info, &m_Allocator));
 	}
 
 	void VulkanContext::CreateCommandBufferPool()

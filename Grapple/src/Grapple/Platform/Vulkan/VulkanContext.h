@@ -6,10 +6,12 @@
 #include "Grapple/Renderer/GraphicsContext.h"
 #include "Grapple/Platform/Vulkan/VulkanCommandBuffer.h"
 #include "Grapple/Platform/Vulkan/VulkanFrameBuffer.h"
+#include "Grapple/Platform/Vulkan/VulkanAllocation.h"
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 #include <vulkan/vulkan.h>
+#include <vk_mem_alloc.h>
 
 #include <optional>
 #include <functional>
@@ -33,6 +35,7 @@ namespace Grapple
 		bool IsValid() const { return m_Device != VK_NULL_HANDLE; }
 
 		void CreateBuffer(size_t size, VkBufferUsageFlags usage, VkMemoryPropertyFlags memoryProperties, VkBuffer& buffer, VkDeviceMemory& memory);
+		VulkanAllocation CreateStagingBuffer(size_t size, VkBuffer& buffer);
 
 		Ref<VulkanCommandBuffer> GetPrimaryCommandBuffer() const { return m_PrimaryCommandBuffer; }
 
@@ -46,6 +49,9 @@ namespace Grapple
 		VkDevice GetDevice() const { return m_Device; }
 		VkPhysicalDevice GetPhysicalDevice() const { return m_PhysicalDevice; }
 		VkQueue GetGraphicsQueue() const { return m_GraphicsQueue; }
+
+		VmaAllocator GetMemoryAllocator() const { return m_Allocator; }
+
 		uint32_t GetGraphicsQueueFamilyIndex() const { return *m_GraphicsQueueFamilyIndex; }
 		Ref<VulkanRenderPass> GetColorOnlyPass() const { return m_ColorOnlyPass; }
 
@@ -62,6 +68,8 @@ namespace Grapple
 		void ChoosePhysicalDevice();
 		void GetQueueFamilyProperties();
 		void CreateLogicalDevice(const Span<const char*>& enabledLayers, const Span<const char*>& enabledExtensions);
+
+		void CreateMemoryAllocator();
 	
 		void CreateCommandBufferPool();
 		VkCommandBuffer CreateCommandBuffer();
@@ -123,5 +131,8 @@ namespace Grapple
 
 		// Render pass
 		Ref<VulkanRenderPass> m_ColorOnlyPass = nullptr;
+
+		// Allocator
+		VmaAllocator m_Allocator = VK_NULL_HANDLE;
 	};
 }
