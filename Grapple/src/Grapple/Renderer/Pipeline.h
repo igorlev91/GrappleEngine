@@ -9,6 +9,11 @@ namespace Grapple
 	{
 		BufferLayout InputLayout;
 		Ref<Shader> Shader;
+
+		CullingMode Culling = CullingMode::Back;
+		bool DepthTest = true;
+		bool DepthWrite = true;
+		DepthComparisonFunction DepthFunction = DepthComparisonFunction::Less;
 	};
 
 	class Pipeline
