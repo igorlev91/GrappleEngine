@@ -85,9 +85,9 @@ namespace Grapple
 		if (RendererAPI::GetAPI() != RendererAPI::API::Vulkan)
 		{
 			DebugRenderer::Shutdown();
-			Renderer::Shutdown();
 		}
 
+		Renderer::Shutdown();
 		GraphicsContext::Shutdown();
 	}
 
@@ -95,10 +95,11 @@ namespace Grapple
 	{
 		InputManager::Initialize();
 
+		RenderCommand::Initialize();
+		Renderer::Initialize();
+
 		if (RendererAPI::GetAPI() != RendererAPI::API::Vulkan)
 		{
-			RenderCommand::Initialize();
-			Renderer::Initialize();
 			DebugRenderer::Initialize();
 		}
 

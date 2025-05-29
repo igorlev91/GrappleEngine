@@ -208,7 +208,12 @@ namespace Grapple
 		else if (presentResult != VK_SUCCESS)
 			Grapple_CORE_ERROR("Failed to present");
 
-		VK_CHECK_RESULT(vkQueueWaitIdle(m_PresentQueue));
+		VkResult waitResult = vkQueueWaitIdle(m_PresentQueue);
+		if (waitResult != VK_SUCCESS)
+		{
+			Grapple_CORE_ERROR("Failed with result: {}", (std::underlying_type_t<VkResult>)waitResult);
+			Grapple_CORE_ASSERT(false);
+		}
 
 		glfwSwapBuffers(m_Window);
 	}

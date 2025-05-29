@@ -127,6 +127,9 @@ namespace Grapple
 
 	void Renderer::ReloadShaders()
 	{
+		if (RendererAPI::GetAPI() == RendererAPI::API::Vulkan)
+			return;
+
 		std::optional<AssetHandle> errorShaderHandle = ShaderLibrary::FindShader("Error");
 		if (errorShaderHandle && AssetManager::IsAssetHandleValid(*errorShaderHandle))
 		{
@@ -180,6 +183,7 @@ namespace Grapple
 
 	void Renderer::Shutdown()
 	{
+		s_RendererData = {};
 	}
 
 	const RendererStatistics& Renderer::GetStatistics()

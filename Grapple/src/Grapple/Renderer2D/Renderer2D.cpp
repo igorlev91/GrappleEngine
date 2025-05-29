@@ -29,7 +29,7 @@ namespace Grapple
 		glm::vec3 Position;
 		glm::vec4 Color;
 		glm::vec2 UV;
-		float TextuteIndex;
+		int32_t TextuteIndex;
 		int32_t EntityIndex;
 	};
 
@@ -77,13 +77,15 @@ namespace Grapple
 
 		RenderData* FrameData = nullptr;
 
-		Ref<Pipeline> Pipeline = nullptr;
-		Ref<VulkanDescriptorSetLayout> DescriptorSetLayout = nullptr;
-		Ref<VulkanDescriptorSet> DescriptorSet = nullptr;
+		Ref<Pipeline> QuadsPipeline = nullptr;
+		Ref<VulkanDescriptorSet> QuadsDescriptorSet = nullptr;
+		Ref<VulkanDescriptorSetPool> QuadsDescriptorPool = nullptr;
+
+		Ref<Pipeline> TextPipeline = nullptr;
+		Ref<VulkanDescriptorSet> TextDescriptorSet = nullptr;
+		Ref<VulkanDescriptorSetPool> TextDescriptorPool = nullptr;
 
 		Ref<UniformBuffer> CameraUniformBuffer = nullptr;
-
-		VkDescriptorPool Pool = VK_NULL_HANDLE;
 	};
 
 	Renderer2DData s_Renderer2DData;
@@ -161,31 +163,49 @@ namespace Grapple
 
 		if (RendererAPI::GetAPI() == RendererAPI::API::Vulkan)
 		{
-			VkDescriptorPoolSize sizes[1];
-			sizes[0].descriptorCount = 1;
-			sizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+			{
+				VkDescriptorSetLayoutBinding bindings[2] = {};
+				bindings[0].binding = 0;
+				bindings[0].descriptorCount = 1;
+				bindings[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+				bindings[0].stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+				bindings[0].pImmutableSamplers = nullptr;
 
-			VkDescriptorPoolCreateInfo info{};
-			info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-			info.maxSets = 1;
-			info.poolSizeCount = 1;
-			info.pPoolSizes = sizes;
+				bindings[1].binding = 1;
+				bindings[1].descriptorCount = (uint32_t)MaxTexturesCount;
+				bindings[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+				bindings[1].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+				bindings[1].pImmutableSamplers = nullptr;
 
-			VK_CHECK_RESULT(vkCreateDescriptorPool(VulkanContext::GetInstance().GetDevice(), &info, nullptr, &s_Renderer2DData.Pool));
+				s_Renderer2DData.QuadsDescriptorPool = CreateRef<VulkanDescriptorSetPool>(1, Span(bindings, 2));
+				s_Renderer2DData.QuadsDescriptorSet = s_Renderer2DData.QuadsDescriptorPool->AllocateSet();
+			}
 
-			VkDescriptorSetLayoutBinding bindings[1];
-			bindings[0].binding = 0;
-			bindings[0].descriptorCount = 1;
-			bindings[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-			bindings[0].stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+			{
+				VkDescriptorSetLayoutBinding bindings[2] = {};
+				bindings[0].binding = 0;
+				bindings[0].descriptorCount = 1;
+				bindings[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+				bindings[0].stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+				bindings[0].pImmutableSamplers = nullptr;
+
+				bindings[1].binding = 1;
+				bindings[1].descriptorCount = 1;
+				bindings[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+				bindings[1].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+				bindings[1].pImmutableSamplers = nullptr;
+
+				s_Renderer2DData.TextDescriptorPool = CreateRef<VulkanDescriptorSetPool>(1, Span(bindings, 2));
+				s_Renderer2DData.TextDescriptorSet = s_Renderer2DData.TextDescriptorPool->AllocateSet();
+			}
 
 			s_Renderer2DData.CameraUniformBuffer = UniformBuffer::Create(sizeof(RenderView), 0);
 
-			s_Renderer2DData.DescriptorSetLayout = CreateRef<VulkanDescriptorSetLayout>(Span(bindings, 1));
-			s_Renderer2DData.DescriptorSet = CreateRef<VulkanDescriptorSet>(s_Renderer2DData.Pool, s_Renderer2DData.DescriptorSetLayout);
+			s_Renderer2DData.QuadsDescriptorSet->WriteUniformBuffer(s_Renderer2DData.CameraUniformBuffer, 0);
+			s_Renderer2DData.QuadsDescriptorSet->FlushWrites();
 
-			s_Renderer2DData.DescriptorSet->WriteUniformBuffer(s_Renderer2DData.CameraUniformBuffer, 0);
-			s_Renderer2DData.DescriptorSet->FlushWrites();
+			s_Renderer2DData.TextDescriptorSet->WriteUniformBuffer(s_Renderer2DData.CameraUniformBuffer, 0);
+			s_Renderer2DData.TextDescriptorSet->FlushWrites();
 		}
 	}
 
@@ -215,24 +235,6 @@ namespace Grapple
 
 	void Renderer2D::Shutdown()
 	{
-		s_Renderer2DData.Pipeline = nullptr;
-		s_Renderer2DData.CurrentFont = nullptr;
-		s_Renderer2DData.CurrentMaterial = nullptr;
-		s_Renderer2DData.QuadsMesh = nullptr;
-		s_Renderer2DData.QuadsVertexBuffer = nullptr;
-		s_Renderer2DData.FrameData = nullptr;
-		s_Renderer2DData.IndexBuffer = nullptr;
-		s_Renderer2DData.TextMaterial = nullptr;
-		s_Renderer2DData.TextMesh = nullptr;
-		s_Renderer2DData.TextVertexBuffer = nullptr;
-
-		for (size_t i = 0; i < MaxTexturesCount; i++)
-		{
-			s_Renderer2DData.Textures[i] = nullptr;
-		}
-
-		vkDestroyDescriptorPool(VulkanContext::GetInstance().GetDevice(), s_Renderer2DData.Pool, nullptr);
-
 		s_Renderer2DData = {};
 	}
 
@@ -243,6 +245,8 @@ namespace Grapple
 
 		s_Renderer2DData.FrameData = &Renderer::GetCurrentViewport().FrameData;
 		s_Renderer2DData.CurrentMaterial = material;
+
+		s_Renderer2DData.CameraUniformBuffer->SetData(&s_Renderer2DData.FrameData->Camera, sizeof(s_Renderer2DData.FrameData->Camera), 0);
 	}
 
 	void Renderer2D::End()
@@ -418,7 +422,7 @@ namespace Grapple
 			vertex.Position = vertices[i];
 			vertex.Color = tint;
 			vertex.UV = uv[i] * tiling;
-			vertex.TextuteIndex = (float)textureIndex;
+			vertex.TextuteIndex = textureIndex;
 			vertex.EntityIndex = entityIndex;
 		}
 
@@ -578,9 +582,12 @@ namespace Grapple
 			s_Renderer2DData.QuadsVertexBuffer->SetData(s_Renderer2DData.Vertices.data(), sizeof(QuadVertex) * s_Renderer2DData.QuadIndex * 4);
 		}
 
+		for (uint32_t i = s_Renderer2DData.TextureIndex; i < MaxTexturesCount; i++)
+			s_Renderer2DData.Textures[i] = Renderer::GetWhiteTexture();
+
 		if (RendererAPI::GetAPI() == RendererAPI::API::Vulkan)
 		{
-			if (s_Renderer2DData.Pipeline == nullptr)
+			if (s_Renderer2DData.QuadsPipeline == nullptr)
 			{
 				PipelineSpecifications specificaionts{};
 				specificaionts.Shader = s_Renderer2DData.DefaultMaterial->GetShader();
@@ -596,24 +603,23 @@ namespace Grapple
 				});
 
 				Ref<VulkanFrameBuffer> renderTarget = As<VulkanFrameBuffer>(Renderer::GetMainViewport().RenderTarget);
-				s_Renderer2DData.Pipeline = CreateRef<VulkanPipeline>(specificaionts,
+				s_Renderer2DData.QuadsPipeline = CreateRef<VulkanPipeline>(specificaionts,
 					renderTarget->GetCompatibleRenderPass(),
-					Span<Ref<const VulkanDescriptorSetLayout>>((Ref<const VulkanDescriptorSetLayout>)s_Renderer2DData.DescriptorSetLayout));
+					Span<Ref<const VulkanDescriptorSetLayout>>((Ref<const VulkanDescriptorSetLayout>)s_Renderer2DData.QuadsDescriptorPool->GetLayout()));
 			}
 
 			Ref<VulkanCommandBuffer> commandBuffer = VulkanContext::GetInstance().GetPrimaryCommandBuffer();
 			Ref<VulkanFrameBuffer> renderTarget = As<VulkanFrameBuffer>(Renderer::GetCurrentViewport().RenderTarget);
 
-			s_Renderer2DData.CameraUniformBuffer->SetData(&s_Renderer2DData.FrameData->Camera, sizeof(s_Renderer2DData.FrameData->Camera), 0);
+			s_Renderer2DData.QuadsDescriptorSet->WriteTextures(Span((Ref<const Texture>*)s_Renderer2DData.Textures, MaxTexturesCount), 0, 1);
+			s_Renderer2DData.QuadsDescriptorSet->FlushWrites();
 
-			commandBuffer->BeginRenderPass(renderTarget->GetCompatibleRenderPass(), renderTarget);
-			commandBuffer->BindDescriptorSet(s_Renderer2DData.DescriptorSet, As<const VulkanPipeline>(s_Renderer2DData.Pipeline)->GetLayoutHandle(), 0);
-			commandBuffer->BindPipeline(s_Renderer2DData.Pipeline);
+			commandBuffer->BindDescriptorSet(s_Renderer2DData.QuadsDescriptorSet, As<const VulkanPipeline>(s_Renderer2DData.QuadsPipeline)->GetLayoutHandle(), 0);
+			commandBuffer->BindPipeline(s_Renderer2DData.QuadsPipeline);
 			commandBuffer->SetViewportAndScisors(Math::Rect(glm::vec2(0.0f), (glm::vec2)renderTarget->GetSize()));
 			commandBuffer->BindVertexBuffers(Span((Ref<const VertexBuffer>)s_Renderer2DData.QuadsVertexBuffer));
 			commandBuffer->BindIndexBuffer(s_Renderer2DData.IndexBuffer);
 			commandBuffer->DrawIndexed((uint32_t)(s_Renderer2DData.QuadIndex * 6));
-			commandBuffer->EndRenderPass();
 
 			s_Renderer2DData.QuadIndex = 0;
 			s_Renderer2DData.TextureIndex = 1;
@@ -669,6 +675,51 @@ namespace Grapple
 		if (!s_Renderer2DData.CurrentFont)
 			s_Renderer2DData.CurrentFont = Font::GetDefault();
 
+		if (RendererAPI::GetAPI() == RendererAPI::API::Vulkan)
+		{
+			{
+				Grapple_PROFILE_SCOPE("UploadVertexData");
+				s_Renderer2DData.TextVertexBuffer->SetData(s_Renderer2DData.TextVertices.data(), s_Renderer2DData.TextQuadIndex * sizeof(TextVertex) * 4);
+			}
+
+			if (s_Renderer2DData.TextPipeline == nullptr)
+			{
+				PipelineSpecifications specificaionts{};
+				specificaionts.Shader = s_Renderer2DData.TextMaterial->GetShader();
+				specificaionts.Culling = CullingMode::Back;
+				specificaionts.DepthTest = true;
+				specificaionts.DepthWrite = true;
+				specificaionts.InputLayout = BufferLayout({
+					BufferLayoutElement("i_Position", ShaderDataType::Float3),
+					BufferLayoutElement("i_Color", ShaderDataType::Float4),
+					BufferLayoutElement("i_UV", ShaderDataType::Float2),
+					BufferLayoutElement("i_EntityIndex", ShaderDataType::Int),
+				});
+
+				Ref<VulkanFrameBuffer> renderTarget = As<VulkanFrameBuffer>(Renderer::GetMainViewport().RenderTarget);
+				s_Renderer2DData.TextPipeline = CreateRef<VulkanPipeline>(specificaionts,
+					renderTarget->GetCompatibleRenderPass(),
+					Span<Ref<const VulkanDescriptorSetLayout>>((Ref<const VulkanDescriptorSetLayout>)s_Renderer2DData.TextDescriptorPool->GetLayout()));
+			}
+
+			Ref<VulkanCommandBuffer> commandBuffer = VulkanContext::GetInstance().GetPrimaryCommandBuffer();
+			Ref<VulkanFrameBuffer> renderTarget = As<VulkanFrameBuffer>(Renderer::GetCurrentViewport().RenderTarget);
+
+			s_Renderer2DData.TextDescriptorSet->WriteTexture(s_Renderer2DData.CurrentFont->GetAtlas(), 1);
+			s_Renderer2DData.TextDescriptorSet->FlushWrites();
+
+			commandBuffer->BindDescriptorSet(s_Renderer2DData.TextDescriptorSet, As<const VulkanPipeline>(s_Renderer2DData.TextPipeline)->GetLayoutHandle(), 0);
+			commandBuffer->BindPipeline(s_Renderer2DData.TextPipeline);
+			commandBuffer->SetViewportAndScisors(Math::Rect(glm::vec2(0.0f), (glm::vec2)renderTarget->GetSize()));
+			commandBuffer->BindVertexBuffers(Span((Ref<const VertexBuffer>)s_Renderer2DData.TextVertexBuffer));
+			commandBuffer->BindIndexBuffer(s_Renderer2DData.IndexBuffer);
+			commandBuffer->DrawIndexed((uint32_t)(s_Renderer2DData.TextQuadIndex * 6));
+
+			s_Renderer2DData.TextQuadIndex = 0;
+
+			return;
+		}
+
 		if (s_Renderer2DData.TextQuadIndex != 0 && s_Renderer2DData.CurrentFont)
 		{
 			s_Renderer2DData.TextVertexBuffer->SetData(s_Renderer2DData.TextVertices.data(), s_Renderer2DData.TextQuadIndex * sizeof(TextVertex) * 4);
@@ -685,6 +736,20 @@ namespace Grapple
 	void Renderer2D::FlushAll()
 	{
 		Grapple_PROFILE_FUNCTION();
+
+		if (RendererAPI::GetAPI() == RendererAPI::API::Vulkan)
+		{
+			Ref<VulkanCommandBuffer> commandBuffer = VulkanContext::GetInstance().GetPrimaryCommandBuffer();
+			Ref<VulkanFrameBuffer> renderTarget = As<VulkanFrameBuffer>(Renderer::GetCurrentViewport().RenderTarget);
+
+			commandBuffer->BeginRenderPass(renderTarget->GetCompatibleRenderPass(), renderTarget);
+
+			FlushQuads();
+			FlushText();
+
+			commandBuffer->EndRenderPass();
+			return;
+		}
 
 		FlushQuads();
 		FlushText();

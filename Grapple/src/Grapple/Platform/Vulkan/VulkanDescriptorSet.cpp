@@ -50,6 +50,11 @@ namespace Grapple
 		VK_CHECK_RESULT(vkAllocateDescriptorSets(VulkanContext::GetInstance().GetDevice(), &info, &m_Set));
 	}
 
+	VulkanDescriptorSet::VulkanDescriptorSet(VkDescriptorPool pool, VkDescriptorSet set)
+		: m_Pool(pool), m_Set(set)
+	{
+	}
+
 	VulkanDescriptorSet::~VulkanDescriptorSet()
 	{
 	}
@@ -88,14 +93,17 @@ namespace Grapple
 			image.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 			image.imageView = vulkanTexture->GetImageViewHandle();
 			image.sampler = vulkanTexture->GetDefaultSampler();
+
+			Grapple_CORE_ASSERT(image.imageView);
+			Grapple_CORE_ASSERT(image.sampler);
 		}
 
 		auto& write = m_Writes.emplace_back();
 		write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 		write.descriptorCount = (uint32_t)textures.GetSize();
-		write.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		write.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 		write.dstBinding = binding;
-		write.dstArrayElement = arrayOffset;
+		write.dstArrayElement = (uint32_t)arrayOffset;
 		write.dstSet = m_Set;
 		write.pBufferInfo = nullptr;
 		write.pImageInfo = &m_Images[firstBindingIndex];
@@ -109,5 +117,50 @@ namespace Grapple
 
 		vkUpdateDescriptorSets(VulkanContext::GetInstance().GetDevice(), (uint32_t)m_Writes.size(), m_Writes.data(), 0, nullptr);
 		m_Writes.clear();
+	}
+
+
+
+	VulkanDescriptorSetPool::VulkanDescriptorSetPool(size_t maxSets, const Span<VkDescriptorSetLayoutBinding>& bindings)
+	{
+		std::vector<VkDescriptorPoolSize> sizes(bindings.GetSize());
+		for (size_t i = 0; i < bindings.GetSize(); i++)
+		{
+			sizes[i].descriptorCount = bindings[i].descriptorCount;
+			sizes[i].type = bindings[i].descriptorType;
+		}
+
+		VkDescriptorPoolCreateInfo info{};
+		info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+		info.maxSets = (uint32_t)maxSets;
+		info.poolSizeCount = (uint32_t)sizes.size();
+		info.pPoolSizes = sizes.data();
+		info.pNext = nullptr;
+		info.flags = 0;
+
+		VK_CHECK_RESULT(vkCreateDescriptorPool(VulkanContext::GetInstance().GetDevice(), &info, nullptr, &m_Pool));
+
+		m_Layout = CreateRef<VulkanDescriptorSetLayout>(bindings);
+	}
+
+	VulkanDescriptorSetPool::~VulkanDescriptorSetPool()
+	{
+		vkDestroyDescriptorPool(VulkanContext::GetInstance().GetDevice(), m_Pool, nullptr);
+	}
+
+	Ref<VulkanDescriptorSet> VulkanDescriptorSetPool::AllocateSet()
+	{
+		VkDescriptorSetLayout layout = m_Layout->GetHandle();
+		VkDescriptorSetAllocateInfo info{};
+		info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+		info.descriptorPool = m_Pool;
+		info.descriptorSetCount = 1;
+		info.pNext = nullptr;
+		info.pSetLayouts = &layout;
+
+		VkDescriptorSet set = VK_NULL_HANDLE;
+
+		VK_CHECK_RESULT(vkAllocateDescriptorSets(VulkanContext::GetInstance().GetDevice(), &info, &set));
+		return CreateRef<VulkanDescriptorSet>(m_Pool, set);
 	}
 }
