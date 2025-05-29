@@ -202,6 +202,7 @@ namespace Grapple
 
 	void Renderer::Shutdown()
 	{
+		s_RendererData.PrimaryDescriptorPool->ReleaseSet(s_RendererData.PrimaryDescriptorSet);
 		s_RendererData = {};
 	}
 

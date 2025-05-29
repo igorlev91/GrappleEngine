@@ -45,6 +45,12 @@ namespace Grapple
 		s_API->DrawIndexed(mesh, indicesCount);
 	}
 
+	void RenderCommand::DrawIndexed(const Ref<const VertexArray>& mesh, size_t firstIndex, size_t indicesCount)
+	{
+		Grapple_PROFILE_FUNCTION();
+		s_API->DrawIndexed(mesh, firstIndex, indicesCount);
+	}
+
 	void RenderCommand::DrawInstanced(const Ref<const VertexArray>& mesh, size_t instancesCount)
 	{
 		Grapple_PROFILE_FUNCTION();
