@@ -18,7 +18,7 @@
 
 #include "GrappleCore/Profiler/Profiler.h"
 
-#include <random>
+#include "Grapple/Platform/Vulkan/VulkanDescriptorSet.h"
 
 namespace Grapple
 {
@@ -121,6 +121,9 @@ namespace Grapple
 
 		Ref<GPUTimer> ShadowPassTimer = nullptr;
 		Ref<GPUTimer> GeometryPassTimer = nullptr;
+
+		Ref<VulkanDescriptorSet> PrimaryDescriptorSet = nullptr;
+		Ref<VulkanDescriptorSetPool> PrimaryDescriptorPool = nullptr;
 	};
 	
 	RendererData s_RendererData;
@@ -176,6 +179,22 @@ namespace Grapple
 		{
 			uint32_t pixel = 0xffff8080;
 			s_RendererData.DefaultNormalMap = Texture::Create(1, 1, &pixel, TextureFormat::RGBA8);
+		}
+
+		if (RendererAPI::GetAPI() == RendererAPI::API::Vulkan)
+		{
+			VkDescriptorSetLayoutBinding bindings[1] = {};
+			bindings[0].binding = 0;
+			bindings[0].descriptorCount = 1;
+			bindings[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+			bindings[0].pImmutableSamplers = nullptr;
+			bindings[0].stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+
+			s_RendererData.PrimaryDescriptorPool = CreateRef<VulkanDescriptorSetPool>(1, Span(bindings, 1));
+			s_RendererData.PrimaryDescriptorSet = s_RendererData.PrimaryDescriptorPool->AllocateSet();
+
+			s_RendererData.PrimaryDescriptorSet->WriteUniformBuffer(s_RendererData.CameraBuffer, 0);
+			s_RendererData.PrimaryDescriptorSet->FlushWrites();
 		}
 
 		Project::OnProjectOpen.Bind(ReloadShaders);
@@ -473,6 +492,7 @@ namespace Grapple
 		s_RendererData.CurrentViewport = &viewport;
 		s_RendererData.OpaqueQueue.m_CameraPosition = viewport.FrameData.Camera.Position;
 
+		if (RendererAPI::GetAPI() != RendererAPI::API::Vulkan)
 		{
 			Grapple_PROFILE_SCOPE("UpdateLightUniformBuffer");
 			s_RendererData.CurrentViewport->FrameData.Light.PointLightsCount = (uint32_t)s_RendererData.PointLights.size();
@@ -487,16 +507,19 @@ namespace Grapple
 			s_RendererData.CameraBuffer->SetData(&viewport.FrameData.Camera, sizeof(RenderView), 0);
 		}
 
+		if (RendererAPI::GetAPI() != RendererAPI::API::Vulkan)
 		{
 			Grapple_PROFILE_SCOPE("UploadPointLightsData");
 			s_RendererData.PointLightsShaderBuffer->SetData(MemorySpan::FromVector(s_RendererData.PointLights));
 		}
 
+		if (RendererAPI::GetAPI() != RendererAPI::API::Vulkan)
 		{
 			Grapple_PROFILE_SCOPE("UploadSpotLightsData");
 			s_RendererData.SpotLightsShaderBuffer->SetData(MemorySpan::FromVector(s_RendererData.SpotLights));
 		}
 
+		if (RendererAPI::GetAPI() != RendererAPI::API::Vulkan)
 		{
 			Grapple_PROFILE_SCOPE("ResizeShadowBuffers");
 			uint32_t size = (uint32_t)GetShadowMapResolution(s_RendererData.ShadowMappingSettings.Quality);
@@ -521,6 +544,7 @@ namespace Grapple
 			}
 		}
 
+		if (RendererAPI::GetAPI() != RendererAPI::API::Vulkan)
 		{
 			Grapple_PROFILE_SCOPE("ClearShadowBuffers");
 			for (size_t i = 0; i < s_RendererData.ShadowMappingSettings.Cascades; i++)
@@ -950,8 +974,11 @@ namespace Grapple
 
 	void Renderer::EndScene()
 	{
-		s_RendererData.Statistics.ShadowPassTime += s_RendererData.ShadowPassTimer->GetElapsedTime().value_or(0.0f);
-		s_RendererData.Statistics.GeometryPassTime += s_RendererData.GeometryPassTimer->GetElapsedTime().value_or(0.0f);
+		if (RendererAPI::GetAPI() != RendererAPI::API::Vulkan)
+		{
+			s_RendererData.Statistics.ShadowPassTime += s_RendererData.ShadowPassTimer->GetElapsedTime().value_or(0.0f);
+			s_RendererData.Statistics.GeometryPassTime += s_RendererData.GeometryPassTimer->GetElapsedTime().value_or(0.0f);
+		}
 
 		s_RendererData.PointLights.clear();
 		s_RendererData.SpotLights.clear();
@@ -1115,5 +1142,15 @@ namespace Grapple
 	ShadowSettings& Renderer::GetShadowSettings()
 	{
 		return s_RendererData.ShadowMappingSettings;
+	}
+
+	Ref<VulkanDescriptorSet> Renderer::GetPrimaryDescriptorSet()
+	{
+		return s_RendererData.PrimaryDescriptorSet;
+	}
+
+	Ref<VulkanDescriptorSetLayout> Renderer::GetPrimaryDescriptorSetLayout()
+	{
+		return s_RendererData.PrimaryDescriptorPool->GetLayout();
 	}
 }

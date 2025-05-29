@@ -144,6 +144,8 @@ namespace Grapple
 		glm::vec4 Color;
 	};
 
+	class VulkanDescriptorSet;
+	class VulkanDescriptorSetLayout;
 	class Grapple_API Renderer
 	{
 	public:
@@ -189,6 +191,9 @@ namespace Grapple
 
 		static Ref<FrameBuffer> GetShadowsRenderTarget(size_t index);
 		static ShadowSettings& GetShadowSettings();
+
+		static Ref<VulkanDescriptorSet> GetPrimaryDescriptorSet();
+		static Ref<VulkanDescriptorSetLayout> GetPrimaryDescriptorSetLayout();
 	private:
 		static void ExecuteGeomertyPass();
 		static void ExecuteDecalsPass();
