@@ -141,7 +141,7 @@ namespace Grapple
 				RenderTableRow("Total Indices", (int32_t)mesh->GetIndexBufferSize());
 
 				const char* indexFormatText = "";
-				switch (mesh->GetVertexArray()->GetIndexBuffer()->GetIndexFormat())
+				switch (mesh->GetIndexFormat())
 				{
 				case IndexBuffer::IndexFormat::UInt16:
 					indexFormatText = "UInt16";

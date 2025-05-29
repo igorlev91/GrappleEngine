@@ -9,8 +9,6 @@ namespace Grapple
 		: m_VertexBufferIndex(0)
 	{
 		glGenVertexArrays(1, &m_Id);
-
-		GLenum error = glGetError();
 		glBindBuffer(GL_ARRAY_BUFFER, m_Id);
 	}
 	
