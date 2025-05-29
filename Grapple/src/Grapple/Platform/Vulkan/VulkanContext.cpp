@@ -114,10 +114,11 @@ namespace Grapple
 			m_ColorOnlyPass = CreateRef<VulkanRenderPass>(Span<VkAttachmentDescription>(attachment));
 		}
 
-		CreateSwapChainFrameBuffers();
-
 		CreateSyncObjects();
 		CreateCommandBufferPool();
+
+		CreateSwapChainFrameBuffers();
+
 		m_PrimaryCommandBuffer = CreateRef<VulkanCommandBuffer>(CreateCommandBuffer());
 	}
 
