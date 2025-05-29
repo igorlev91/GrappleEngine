@@ -239,11 +239,11 @@ namespace Grapple
     }
 
     static void ParseShaderMetadata(const ShaderSourceParser& parser,
-        ShaderFeatures& features,
+        Ref<ShaderMetadata> metadata,
         std::vector<ShaderError>& errors,
-        const std::unordered_map<std::string, size_t>& propertyNameToIndex,
-        ShaderProperties& properties)
+        const std::unordered_map<std::string, size_t>& propertyNameToIndex)
     {
+        ShaderFeatures& features = metadata->Features;
         const Block& rootBlock = parser.GetBlock(0);
         for (const auto& element : rootBlock.Elements)
         {
@@ -287,6 +287,18 @@ namespace Grapple
                 else
                     errors.emplace_back(element.Value.Position, fmt::format("Unknown depth function '{}'", element.Value.Value));
             }
+            else if (element.Name.Value == "Type")
+            {
+                if (element.Value.Value == "Surface")
+                    metadata->Type = ShaderType::Surface;
+                else if (element.Value.Value == "2D")
+                    metadata->Type = ShaderType::_2D;
+                else
+                {
+                    errors.emplace_back(element.Value.Position, fmt::format("Invalid shader type '{}'", element.Value.Value));
+                    continue;
+                }
+            }
             else if (element.Name.Value == "Properties")
             {
                 if (element.Type != BlockElementType::Block)
@@ -302,7 +314,7 @@ namespace Grapple
                     if (it == propertyNameToIndex.end())
                         continue;
 
-                    ShaderProperty& shaderProperty = properties[it->second];
+                    ShaderProperty& shaderProperty = metadata->Properties[it->second];
                     shaderProperty.Hidden = false;
                     shaderProperty.DisplayName = shaderProperty.Name;
 
@@ -369,7 +381,7 @@ namespace Grapple
 
     static void Reflect(spirv_cross::Compiler& compiler,
         std::unordered_map<std::string, size_t>& propertyNameToIndex,
-        ShaderProperties& properties)
+        ShaderProperties& properties, ShaderPushConstantsRange& pushConsntantsRange)
     {
         const spirv_cross::ShaderResources& resources = compiler.get_shader_resources();
       
@@ -379,8 +391,9 @@ namespace Grapple
             const auto& bufferType = compiler.get_type(resource.base_type_id);
             size_t bufferSize = compiler.get_declared_struct_size(bufferType);
             uint32_t binding = compiler.get_decoration(resource.id, spv::DecorationBinding);
-
             uint32_t membersCount = (uint32_t)bufferType.member_types.size();
+
+            pushConsntantsRange.Size = bufferSize;
 
             for (uint32_t i = 0; i < membersCount; i++)
             {
@@ -547,11 +560,8 @@ namespace Grapple
         std::vector<PreprocessedShaderProgram> programs;
         std::unordered_map<std::string, size_t> propertyNameToIndex;
         ShaderOutputs shaderOutputs;
-        ShaderProperties shaderProperties;
 
         std::vector<ShaderError> errors;
-
-        ShaderFeatures shaderFeatures;
         std::string_view source = sourceString;
 
         ShaderSourceParser parser(shaderPath, source, errors);
@@ -574,7 +584,10 @@ namespace Grapple
 
             return false;
         }
-        
+
+        Ref<ShaderMetadata> metadata = CreateRef<ShaderMetadata>();
+        metadata->Type = ShaderType::Surface;
+
         for (const PreprocessedShaderProgram& program : programs)
         {
             shaderc_shader_kind shaderKind = (shaderc_shader_kind)0;
@@ -624,8 +637,11 @@ namespace Grapple
 
             try
             {
+                ShaderPushConstantsRange& range = metadata->PushConstantsRanges.emplace_back();
+                range.Stage = program.Stage;
+
                 spirv_cross::Compiler compiler(compiledVulkanShader.value());
-                Reflect(compiler, propertyNameToIndex, shaderProperties);
+                Reflect(compiler, propertyNameToIndex, metadata->Properties, range);
 
                 if (program.Stage == ShaderStageType::Pixel)
                     ExtractShaderOutputs(compiler, shaderOutputs);
@@ -658,12 +674,8 @@ namespace Grapple
 			}
 		}
 
-        ParseShaderMetadata(parser, shaderFeatures, errors, propertyNameToIndex, shaderProperties);
-
-        Ref<ShaderMetadata> metadata = CreateRef<ShaderMetadata>();
-        metadata->Properties = std::move(shaderProperties);
-        metadata->Features = shaderFeatures;
         metadata->Outputs = std::move(shaderOutputs);
+        ParseShaderMetadata(parser, metadata, errors, propertyNameToIndex);
 
         for (const auto& program : programs)
             metadata->Stages.push_back(program.Stage);

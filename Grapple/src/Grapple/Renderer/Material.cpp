@@ -7,7 +7,7 @@
 #include "Grapple/Renderer/RendererAPI.h"
 #include "Grapple/Renderer/Renderer.h"
 
-#include "Grapple/Platform/OpenGL/OpenGLShader.h"
+#include "Grapple/Platform/Vulkan/VulkanMaterial.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -67,6 +67,61 @@ namespace Grapple
 		m_Shader = AssetManager::GetAsset<Shader>(shaderHandle);
 		
 		Initialize();
+	}
+
+	Ref<Material> Material::Create()
+	{
+		switch (RendererAPI::GetAPI())
+		{
+		case RendererAPI::API::Vulkan:
+			return CreateRef<VulkanMaterial>();
+		case RendererAPI::API::OpenGL:
+			return CreateRef<Material>();
+		}
+
+		Grapple_CORE_ASSERT(false);
+		return nullptr;
+	}
+
+	Ref<Material> Material::Create(Ref<Shader> shader)
+	{
+		Ref<Material> material = nullptr;
+		switch (RendererAPI::GetAPI())
+		{
+		case RendererAPI::API::Vulkan:
+			material = CreateRef<VulkanMaterial>();
+			break;
+		case RendererAPI::API::OpenGL:
+			material = CreateRef<Material>();
+			break;
+		}
+
+		Grapple_CORE_ASSERT(material);
+		
+		material->SetShader(shader);
+
+		return material;
+	}
+
+	Ref<Material> Material::Create(AssetHandle shaderHandle)
+	{
+		Ref<Material> material = nullptr;
+		switch (RendererAPI::GetAPI())
+		{
+		case RendererAPI::API::Vulkan:
+			material = CreateRef<VulkanMaterial>();
+			break;
+		case RendererAPI::API::OpenGL:
+			material = CreateRef<Material>();
+			break;
+		}
+
+		Grapple_CORE_ASSERT(material);
+		
+		Grapple_CORE_ASSERT(AssetManager::IsAssetHandleValid(shaderHandle));
+		material->SetShader(AssetManager::GetAsset<Shader>(shaderHandle));
+
+		return material;
 	}
 
 	void Material::Initialize()

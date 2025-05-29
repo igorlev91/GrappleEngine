@@ -10,6 +10,8 @@
 
 namespace Grapple
 {
+	class Material;
+
 	class Grapple_API VulkanCommandBuffer
 	{
 	public:
@@ -36,6 +38,7 @@ namespace Grapple
 		void BindIndexBuffer(const Ref<const IndexBuffer>& indexBuffer);
 
 		void BindDescriptorSet(const Ref<const VulkanDescriptorSet>& descriptorSet, VkPipelineLayout pipelineLayout, uint32_t index);
+		void ApplyMaterial(const Ref<const Material>& material);
 
 		void SetViewportAndScisors(Math::Rect viewportRect);
 
@@ -44,5 +47,6 @@ namespace Grapple
 		VkCommandBuffer GetHandle() const { return m_CommandBuffer; }
 	private:
 		VkCommandBuffer m_CommandBuffer = VK_NULL_HANDLE;
+		Ref<VulkanRenderPass> m_CurrentRenderPass = nullptr;
 	};
 }

@@ -7,13 +7,44 @@ namespace Grapple
 {
 	VulkanPipeline::VulkanPipeline(const PipelineSpecifications& specifications,
 		const Ref<VulkanRenderPass>& renderPass,
-		const Span<Ref<const VulkanDescriptorSetLayout>>& layouts)
-		: m_Specifications(specifications)
+		const Span<Ref<const VulkanDescriptorSetLayout>>& layouts,
+		const Span<ShaderPushConstantsRange>& pushConstantsRanges)
+		: m_Specifications(specifications), m_CompatbileRenderPass(renderPass)
+	{
+		CreatePipelineLayout(layouts, pushConstantsRanges);
+		Create();
+	}
+
+	VulkanPipeline::VulkanPipeline(const PipelineSpecifications& specifications, const Ref<VulkanRenderPass>& renderPass)
+		: m_Specifications(specifications), m_CompatbileRenderPass(renderPass), m_OwnsPipelineLayout(false)
+	{
+		Grapple_CORE_ASSERT(m_Specifications.Shader);
+		Grapple_CORE_ASSERT(m_Specifications.Shader->IsLoaded());
+
+		m_PipelineLayout = As<const VulkanShader>(m_Specifications.Shader)->GetPipelineLayout();
+
+		Create();
+	}
+
+	VulkanPipeline::~VulkanPipeline()
+	{
+		Grapple_CORE_ASSERT(VulkanContext::GetInstance().IsValid());
+
+		if (m_OwnsPipelineLayout)
+			vkDestroyPipelineLayout(VulkanContext::GetInstance().GetDevice(), m_PipelineLayout, nullptr);
+
+		vkDestroyPipeline(VulkanContext::GetInstance().GetDevice(), m_Pipeline, nullptr);
+	}
+
+	const PipelineSpecifications& Grapple::VulkanPipeline::GetSpecifications() const
+	{
+		return m_Specifications;
+	}
+
+	void VulkanPipeline::CreatePipelineLayout(const Span<Ref<const VulkanDescriptorSetLayout>>& layouts, const Span<ShaderPushConstantsRange>& pushConstantsRanges)
 	{
 		VkPipelineLayoutCreateInfo layoutInfo{};
 		layoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-		layoutInfo.pPushConstantRanges = nullptr;
-		layoutInfo.pushConstantRangeCount = 0;
 		layoutInfo.flags = 0;
 
 		std::vector<VkDescriptorSetLayout> descriptorSetLayouts(layouts.GetSize());
@@ -25,9 +56,35 @@ namespace Grapple
 		layoutInfo.setLayoutCount = (uint32_t)descriptorSetLayouts.size();
 		layoutInfo.pSetLayouts = descriptorSetLayouts.data();
 
-		VK_CHECK_RESULT(vkCreatePipelineLayout(VulkanContext::GetInstance().GetDevice(), &layoutInfo, nullptr, &m_PipelineLayout));
+		std::vector<VkPushConstantRange> ranges(pushConstantsRanges.GetSize());
+		for (size_t i = 0; i < pushConstantsRanges.GetSize(); i++)
+		{
+			switch (pushConstantsRanges[i].Stage)
+			{
+			case ShaderStageType::Vertex:
+				ranges[i].stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+				break;
+			case ShaderStageType::Pixel:
+				ranges[i].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+				break;
+			}
 
-		std::vector<VkPipelineColorBlendAttachmentState> attachmentsBlendStates(renderPass->GetColorAttachmnetsCount());
+			ranges[i].offset = (uint32_t)pushConstantsRanges[i].Offset;
+			ranges[i].size = (uint32_t)pushConstantsRanges[i].Size;
+		}
+
+		layoutInfo.pushConstantRangeCount = (uint32_t)ranges.size();
+		layoutInfo.pPushConstantRanges = ranges.data();
+
+		VK_CHECK_RESULT(vkCreatePipelineLayout(VulkanContext::GetInstance().GetDevice(), &layoutInfo, nullptr, &m_PipelineLayout));
+	}
+
+	void VulkanPipeline::Create()
+	{
+		Grapple_CORE_ASSERT(m_CompatbileRenderPass);
+		Grapple_CORE_ASSERT(m_PipelineLayout);
+
+		std::vector<VkPipelineColorBlendAttachmentState> attachmentsBlendStates(m_CompatbileRenderPass->GetColorAttachmnetsCount());
 		for (size_t i = 0; i < attachmentsBlendStates.size(); i++)
 		{
 			VkPipelineColorBlendAttachmentState& attachmentBlendState = attachmentsBlendStates[i];
@@ -139,14 +196,14 @@ namespace Grapple
 
 		VkPipelineShaderStageCreateInfo stages[2] = {};
 		stages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-		stages[0].module = As<VulkanShader>(specifications.Shader)->GetModuleForStage(ShaderStageType::Vertex);
+		stages[0].module = As<VulkanShader>(m_Specifications.Shader)->GetModuleForStage(ShaderStageType::Vertex);
 		stages[0].stage = VK_SHADER_STAGE_VERTEX_BIT;
 		stages[0].pName = "main";
 		stages[0].pSpecializationInfo = nullptr;
 		stages[0].flags = 0;
 
 		stages[1].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-		stages[1].module = As<VulkanShader>(specifications.Shader)->GetModuleForStage(ShaderStageType::Pixel);
+		stages[1].module = As<VulkanShader>(m_Specifications.Shader)->GetModuleForStage(ShaderStageType::Pixel);
 		stages[1].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
 		stages[1].pName = "main";
 		stages[1].pSpecializationInfo = nullptr;
@@ -212,22 +269,9 @@ namespace Grapple
 		info.pTessellationState = nullptr;
 		info.pVertexInputState = &vertexInputState;
 		info.pViewportState = &viewportState;
-		info.renderPass = renderPass->GetHandle();
+		info.renderPass = m_CompatbileRenderPass->GetHandle();
 		info.subpass = 0;
 
 		VK_CHECK_RESULT(vkCreateGraphicsPipelines(VulkanContext::GetInstance().GetDevice(), VK_NULL_HANDLE, 1, &info, nullptr, &m_Pipeline));
-	}
-
-	VulkanPipeline::~VulkanPipeline()
-	{
-		Grapple_CORE_ASSERT(VulkanContext::GetInstance().IsValid());
-
-		vkDestroyPipelineLayout(VulkanContext::GetInstance().GetDevice(), m_PipelineLayout, nullptr);
-		vkDestroyPipeline(VulkanContext::GetInstance().GetDevice(), m_Pipeline, nullptr);
-	}
-
-	const PipelineSpecifications& Grapple::VulkanPipeline::GetSpecifications() const
-	{
-		return m_Specifications;
 	}
 }

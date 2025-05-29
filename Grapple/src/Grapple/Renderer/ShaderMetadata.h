@@ -10,6 +10,12 @@
 
 namespace Grapple
 {
+	enum class ShaderType
+	{
+		_2D,
+		Surface,
+	};
+
 	enum class BlendMode : uint8_t
 	{
 		Opaque,
@@ -169,12 +175,21 @@ namespace Grapple
 		bool DepthTesting;
 		bool DepthWrite;
 	};
+
+	struct ShaderPushConstantsRange
+	{
+		ShaderStageType Stage = ShaderStageType::Vertex;
+		size_t Offset = 0;
+		size_t Size = 0;
+	};
 	
 	struct ShaderMetadata
 	{
+		ShaderType Type;
 		ShaderFeatures Features;
 		ShaderOutputs Outputs;
 		std::vector<ShaderProperty> Properties;
 		std::vector<ShaderStageType> Stages;
+		std::vector<ShaderPushConstantsRange> PushConstantsRanges;
 	};
 }
