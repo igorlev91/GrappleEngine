@@ -210,7 +210,6 @@ namespace Grapple
 
             Grapple_CORE_ERROR("Failed to compile shader '{}' Stage = {}", path, stageName);
             Grapple_CORE_ERROR("Shader Error: {}", shaderModule.GetErrorMessage());
-            Grapple_CORE_INFO(glsl);
             return {};
         }
 
@@ -294,11 +293,8 @@ namespace Grapple
                     metadata->Type = ShaderType::Surface;
                 else if (element.Value.Value == "2D")
                     metadata->Type = ShaderType::_2D;
-                else
-                {
-                    errors.emplace_back(element.Value.Position, fmt::format("Invalid shader type '{}'", element.Value.Value));
-                    continue;
-                }
+                else if (element.Value.Value == "FullscreenQuad")
+                    metadata->Type = ShaderType::FullscreenQuad;
             }
             else if (element.Name.Value == "Properties")
             {
@@ -399,7 +395,6 @@ namespace Grapple
             uint32_t membersCount = (uint32_t)bufferType.member_types.size();
 
             pushConstantsRange.Size = bufferSize;
-
             for (uint32_t i = 0; i < membersCount; i++)
             {
                 const std::string& memberName = compiler.get_member_name(resource.base_type_id, i);
@@ -478,7 +473,7 @@ namespace Grapple
                     else
                         shaderProperty.Name = fmt::format("{}.{}", resource.name, memberName);
 
-                    shaderProperty.Offset = lastPropertyOffset;
+                    shaderProperty.Offset = offset;
                     shaderProperty.Type = shaderDataType.value();
                     shaderProperty.Size = compiler.get_declared_struct_member_size(bufferType, i);
                     shaderProperty.Hidden = true;
@@ -486,7 +481,7 @@ namespace Grapple
                     propertyNameToIndex[shaderProperty.Name] = properties.size() - 1;
                 }
 
-                lastPropertyOffset += compiler.get_declared_struct_member_size(bufferType, i);
+                lastPropertyOffset = offset;
             }
         }
 
@@ -499,7 +494,7 @@ namespace Grapple
             uint32_t binding = compiler.get_decoration(resource.id, spv::DecorationBinding);
             uint32_t descriptorSet = compiler.get_decoration(resource.id, spv::DecorationDescriptorSet);
 
-            if (descriptorSet != materialDescriptorSetIndex)
+            if (metadata->Type != ShaderType::Unknown && descriptorSet != materialDescriptorSetIndex)
                 continue;
 
             ShaderDataType type = ShaderDataType::Sampler;

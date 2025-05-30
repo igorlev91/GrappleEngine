@@ -58,6 +58,8 @@ namespace Grapple
 	{
 		Grapple_PROFILE_FUNCTION();
 
+		return;
+
 		if (!Enabled || !Renderer::GetCurrentViewport().PostProcessingEnabled)
 			return;
 

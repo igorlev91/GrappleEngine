@@ -12,6 +12,7 @@ namespace Grapple
 {
 	enum class ShaderType
 	{
+		Unknown,
 		_2D,
 		Surface,
 		FullscreenQuad,
@@ -205,7 +206,7 @@ namespace Grapple
 	
 	struct ShaderMetadata
 	{
-		ShaderType Type;
+		ShaderType Type = ShaderType::Unknown;
 		ShaderFeatures Features;
 		ShaderOutputs Outputs;
 		std::vector<ShaderProperty> Properties;

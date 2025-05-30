@@ -679,7 +679,7 @@ namespace Grapple
 				}
 			}
 
-			if (rewriteDescriptorSet)
+			if (RendererAPI::GetAPI() == RendererAPI::API::Vulkan && rewriteDescriptorSet)
 			{
 				for (size_t i = 0; i < ShadowSettings::MaxCascades; i++)
 				{
