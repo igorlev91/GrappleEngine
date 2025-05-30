@@ -7,6 +7,7 @@
 #include "Grapple/AssetManager/AssetManager.h"
 
 #include "Grapple/Renderer/Renderer.h"
+#include "Grapple/Renderer/RendererPrimitives.h"
 #include "Grapple/Renderer2D/Renderer2D.h"
 #include "Grapple/Renderer/DebugRenderer.h"
 #include "Grapple/Renderer/RenderCommand.h"
@@ -88,6 +89,7 @@ namespace Grapple
 		}
 
 		Renderer::Shutdown();
+		RendererPrimitives::Clear();
 		GraphicsContext::Shutdown();
 	}
 
