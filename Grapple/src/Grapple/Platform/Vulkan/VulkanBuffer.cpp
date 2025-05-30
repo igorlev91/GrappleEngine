@@ -7,6 +7,10 @@ namespace Grapple
 	VulkanBuffer::VulkanBuffer(GPUBufferUsage usage, VkBufferUsageFlags bufferUsage, size_t size)
 		: m_Usage(usage), m_UsageFlags(bufferUsage), m_Size(size)
 	{
+		if (usage == GPUBufferUsage::Static)
+		{
+			m_UsageFlags |= VK_BUFFER_USAGE_TRANSFER_DST_BIT;
+		}
 	}
 
 	VulkanBuffer::VulkanBuffer(GPUBufferUsage usage, VkBufferUsageFlags bufferUsage)
@@ -43,12 +47,12 @@ namespace Grapple
 		{
 			Grapple_CORE_ASSERT(m_Mapped);
 
-			std::memcpy(m_Mapped, data, size);
+			std::memcpy((uint8_t*)m_Mapped + offset, data, size);
 		}
 		else
 		{
 			VkBuffer stagingBuffer = VK_NULL_HANDLE;
-			VulkanAllocation stagingBufferAllocation = VulkanContext::GetInstance().CreateStagingBuffer(m_Size, stagingBuffer);
+			VulkanAllocation stagingBufferAllocation = VulkanContext::GetInstance().CreateStagingBuffer(size, stagingBuffer);
 
 			void* mapped = nullptr;
 			VK_CHECK_RESULT(vmaMapMemory(VulkanContext::GetInstance().GetMemoryAllocator(), stagingBufferAllocation.Handle, &mapped));
