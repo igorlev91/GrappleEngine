@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Grapple/Renderer/Pipeline.h"
+#include "Grapple/Renderer/CommandBuffer.h"
 
 #include "Grapple/Platform/Vulkan/VulkanRenderPass.h"
 #include "Grapple/Platform/Vulkan/VulkanFrameBuffer.h"
@@ -17,11 +18,23 @@ namespace Grapple
 	class VulkanRenderPass;
 	class VulkanGPUTimer;
 
-	class Grapple_API VulkanCommandBuffer
+	class Grapple_API VulkanCommandBuffer : public CommandBuffer
 	{
 	public:
 		VulkanCommandBuffer(VkCommandBuffer commandBuffer);
 
+		void BeginRenderTarget(const Ref<FrameBuffer> frameBuffer) override;
+		void EndRenderTarget() override;
+
+		void ApplyMaterial(const Ref<const Material>& material) override;
+
+		void SetViewportAndScisors(Math::Rect viewportRect) override;
+
+		void DrawIndexed(const Ref<const Mesh>& mesh, uint32_t subMeshIndex, uint32_t baseInstance, uint32_t instanceCount) override;
+
+		void StartTimer(Ref<GPUTimer> timer) override;
+		void StopTimer(Ref<GPUTimer> timer) override;
+	public:
 		void Reset();
 
 		void Begin();
@@ -49,14 +62,10 @@ namespace Grapple
 
 		void SetPrimaryDescriptorSet(const Ref<VulkanDescriptorSet>& set);
 		void SetSecondaryDescriptorSet(const Ref<VulkanDescriptorSet>& set);
-		void ApplyMaterial(const Ref<const Material>& material);
-
-		void SetViewportAndScisors(Math::Rect viewportRect);
 
 		void DrawIndexed(uint32_t indicesCount);
 		void DrawIndexed(uint32_t firstIndex, uint32_t indicesCount);
 		void DrawIndexed(uint32_t firstIndex, uint32_t indicesCount, uint32_t firstInstance, uint32_t instancesCount);
-		void DrawIndexed(const Ref<const Mesh>& mesh, uint32_t subMeshIndex, uint32_t firstInstance, uint32_t instancesCount);
 
 		void DepthImagesBarrier(Span<VkImage> images, bool hasStencil,
 			VkPipelineStageFlags srcStage, VkAccessFlags srcAccessMask,

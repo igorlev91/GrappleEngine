@@ -2,6 +2,8 @@
 
 #include "GrappleCore/Core.h"
 
+#include "Grapple/Renderer/CommandBuffer.h"
+
 namespace Grapple
 {
 	class Grapple_API GraphicsContext
@@ -15,6 +17,7 @@ namespace Grapple
 		virtual void Present() = 0;
 
 		virtual void WaitForDevice() = 0;
+		virtual Ref<CommandBuffer> GetCommandBuffer() const = 0;
 	public:
 		static GraphicsContext& GetInstance();
 		static bool IsInitialized();

@@ -2,6 +2,8 @@
 
 #include "Grapple/Renderer/GraphicsContext.h"
 
+#include "Grapple/Platform/OpenGL/OpenGLCommandBuffer.h"
+
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
 
@@ -17,7 +19,10 @@ namespace Grapple
 		virtual void BeginFrame() override;
 		virtual void Present() override;
 		virtual void WaitForDevice() override;
+
+		virtual Ref<CommandBuffer> GetCommandBuffer() const override;
 	private:
-		GLFWwindow* m_Window;
+		GLFWwindow* m_Window = nullptr;
+		Ref<OpenGLCommandBuffer> m_PrimaryCommandBuffer = nullptr;
 	};
 }
