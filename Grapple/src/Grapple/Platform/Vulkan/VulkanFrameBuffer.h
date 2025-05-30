@@ -11,6 +11,8 @@
 
 namespace Grapple
 {
+	VkFormat FrameBufferAttachmentFormatToVulkanFormat(FrameBufferTextureFormat format);
+	
 	class VulkanFrameBuffer : public FrameBuffer
 	{
 	public:
