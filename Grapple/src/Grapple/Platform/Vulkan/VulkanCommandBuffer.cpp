@@ -1,6 +1,7 @@
 #include "VulkanCommandBuffer.h"
 
 #include "Grapple/Renderer/Material.h"
+#include "Grapple/Renderer/Renderer.h"
 
 #include "Grapple/Platform/Vulkan/VulkanContext.h"
 #include "Grapple/Platform/Vulkan/VulkanPipeline.h"
@@ -29,6 +30,7 @@ namespace Grapple
 	void VulkanCommandBuffer::End()
 	{
 		VK_CHECK_RESULT(vkEndCommandBuffer(m_CommandBuffer));
+		m_UsedMaterials.clear();
 	}
 
 	void VulkanCommandBuffer::BeginRenderPass(const Ref<VulkanRenderPass>& renderPass, const Ref<VulkanFrameBuffer>& frameBuffer)
@@ -341,6 +343,13 @@ namespace Grapple
 			BindDescriptorSet(m_PrimaryDescriptorSet, pipelineLayout, 0);
 		if (m_SecondaryDescriptorSet)
 			BindDescriptorSet(m_SecondaryDescriptorSet, pipelineLayout, 1);
+
+		Ref<VulkanDescriptorSet> materialDescriptorSet = vulkanMaterial->GetDescriptorSet();
+		if (materialDescriptorSet)
+		{
+			vulkanMaterial->UpdateDescriptorSet();
+			BindDescriptorSet(materialDescriptorSet, pipelineLayout, 2);
+		}
 
 		for (size_t i = 0; i < metadata->PushConstantsRanges.size(); i++)
 		{

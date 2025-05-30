@@ -8,6 +8,8 @@
 
 #include <vulkan/vulkan.h>
 
+#include <unordered_set>
+
 namespace Grapple
 {
 	class Material;
@@ -54,6 +56,8 @@ namespace Grapple
 
 		VkCommandBuffer GetHandle() const { return m_CommandBuffer; }
 	private:
+		std::unordered_set<uint64_t> m_UsedMaterials;
+
 		Ref<VulkanDescriptorSet> m_PrimaryDescriptorSet = nullptr;
 		Ref<VulkanDescriptorSet> m_SecondaryDescriptorSet = nullptr;
 
