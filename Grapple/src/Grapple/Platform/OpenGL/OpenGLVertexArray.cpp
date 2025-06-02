@@ -9,7 +9,6 @@ namespace Grapple
 		: m_VertexBufferIndex(0)
 	{
 		glGenVertexArrays(1, &m_Id);
-		glBindBuffer(GL_ARRAY_BUFFER, m_Id);
 	}
 	
 	OpenGLVertexArray::~OpenGLVertexArray()
@@ -82,6 +81,8 @@ namespace Grapple
 
 			m_VertexBufferIndex++;
 		}
+
+		glBindVertexArray(0);
 	}
 
 	void OpenGLVertexArray::SetIndexBuffer(const Ref<IndexBuffer>& indexbuffer)
@@ -90,6 +91,7 @@ namespace Grapple
 
 		glBindVertexArray(m_Id);
 		m_IndexBuffer->Bind();
+		glBindVertexArray(0);
 	}
 	
 	const Ref<IndexBuffer> OpenGLVertexArray::GetIndexBuffer() const
