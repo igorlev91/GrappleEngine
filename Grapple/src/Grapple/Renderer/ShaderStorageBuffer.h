@@ -6,6 +6,7 @@
 
 namespace Grapple
 {
+    class CommandBuffer;
     class Grapple_API ShaderStorageBuffer
     {
     public:
@@ -13,6 +14,7 @@ namespace Grapple
 
         virtual size_t GetSize() const = 0;
         virtual void SetData(const MemorySpan& data) = 0;
+        virtual void SetData(const MemorySpan& data, size_t offset, Ref<CommandBuffer> commandBuffer) = 0;
 
         virtual void SetDebugName(std::string_view name) = 0;
         virtual const std::string& GetDebugName() const = 0;

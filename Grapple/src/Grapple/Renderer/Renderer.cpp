@@ -650,6 +650,8 @@ namespace Grapple
 		s_RendererData.CurrentViewport = &viewport;
 		s_RendererData.OpaqueQueue.m_CameraPosition = viewport.FrameData.Camera.Position;
 
+		Ref<CommandBuffer> commandBuffer = GraphicsContext::GetInstance().GetCommandBuffer();
+
 		{
 			Grapple_PROFILE_SCOPE("UpdateLightUniformBuffer");
 			s_RendererData.CurrentViewport->FrameData.Light.PointLightsCount = (uint32_t)s_RendererData.PointLights.size();
@@ -666,12 +668,12 @@ namespace Grapple
 
 		{
 			Grapple_PROFILE_SCOPE("UploadPointLightsData");
-			s_RendererData.PointLightsShaderBuffer->SetData(MemorySpan::FromVector(s_RendererData.PointLights));
+			s_RendererData.PointLightsShaderBuffer->SetData(MemorySpan::FromVector(s_RendererData.PointLights), 0, commandBuffer);
 		}
 
 		{
 			Grapple_PROFILE_SCOPE("UploadSpotLightsData");
-			s_RendererData.SpotLightsShaderBuffer->SetData(MemorySpan::FromVector(s_RendererData.SpotLights));
+			s_RendererData.SpotLightsShaderBuffer->SetData(MemorySpan::FromVector(s_RendererData.SpotLights), 0, commandBuffer);
 		}
 
 		if (s_RendererData.ShadowMappingSettings.Enabled)
@@ -716,7 +718,6 @@ namespace Grapple
 
 		}
 
-		Ref<CommandBuffer> commandBuffer = GraphicsContext::GetInstance().GetCommandBuffer();
 		for (size_t i = 0; i < s_RendererData.ShadowMappingSettings.Cascades; i++)
 		{
 			commandBuffer->ClearDepthAttachment(s_RendererData.ShadowsRenderTarget[i], 1.0f);
@@ -920,7 +921,7 @@ namespace Grapple
 
 		{
 			Grapple_PROFILE_SCOPE("SetIntancesData");
-			s_RendererData.InstancesShaderBuffer->SetData(MemorySpan::FromVector(s_RendererData.InstanceDataBuffer));
+			s_RendererData.InstancesShaderBuffer->SetData(MemorySpan::FromVector(s_RendererData.InstanceDataBuffer), 0, commandBuffer);
 		}
 
 		uint32_t baseInstance = 0;
@@ -1100,7 +1101,7 @@ namespace Grapple
 
 			{
 				Grapple_PROFILE_SCOPE("SetInstancesData");
-				instanceBuffer->SetData(MemorySpan::FromVector(s_RendererData.InstanceDataBuffer));
+				instanceBuffer->SetData(MemorySpan::FromVector(s_RendererData.InstanceDataBuffer), 0, commandBuffer);
 			}
 
 			s_RendererData.IndirectDrawData.clear();
