@@ -19,7 +19,7 @@ namespace Grapple
 		case FrameBufferTextureFormat::RF32:
 			return VK_FORMAT_R32_SFLOAT;
 		case FrameBufferTextureFormat::R11G11B10:
-			return VK_FORMAT_R8G8B8A8_UNORM;
+			return VK_FORMAT_B10G11R11_UFLOAT_PACK32;
 		}
 
 		Grapple_CORE_ASSERT(false);

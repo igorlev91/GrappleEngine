@@ -34,20 +34,6 @@ namespace Grapple
 		VkPipelineLayout pipelineLayout = As<const VulkanPipeline>(vulkanMaterial->GetPipeline(m_CurrentRenderPass))->GetLayoutHandle();
 		Ref<const ShaderMetadata> metadata = material->GetShader()->GetMetadata();
 
-		BindPipeline(pipeline);
-
-		if (m_PrimaryDescriptorSet)
-			BindDescriptorSet(m_PrimaryDescriptorSet, pipelineLayout, 0);
-		if (m_SecondaryDescriptorSet)
-			BindDescriptorSet(m_SecondaryDescriptorSet, pipelineLayout, 1);
-
-		Ref<VulkanDescriptorSet> materialDescriptorSet = vulkanMaterial->GetDescriptorSet();
-		if (materialDescriptorSet)
-		{
-			vulkanMaterial->UpdateDescriptorSet();
-			BindDescriptorSet(materialDescriptorSet, pipelineLayout, 2);
-		}
-
 		for (size_t i = 0; i < metadata->PushConstantsRanges.size(); i++)
 		{
 			const ShaderPushConstantsRange& range = metadata->PushConstantsRanges[i];
@@ -66,6 +52,20 @@ namespace Grapple
 			}
 
 			vkCmdPushConstants(m_CommandBuffer, pipelineLayout, stage, (uint32_t)range.Offset, (uint32_t)range.Size, material->GetPropertiesBuffer() + range.Offset);
+		}
+
+		BindPipeline(pipeline);
+
+		if (m_PrimaryDescriptorSet)
+			BindDescriptorSet(m_PrimaryDescriptorSet, pipelineLayout, 0);
+		if (m_SecondaryDescriptorSet)
+			BindDescriptorSet(m_SecondaryDescriptorSet, pipelineLayout, 1);
+
+		Ref<VulkanDescriptorSet> materialDescriptorSet = vulkanMaterial->GetDescriptorSet();
+		if (materialDescriptorSet)
+		{
+			vulkanMaterial->UpdateDescriptorSet();
+			BindDescriptorSet(materialDescriptorSet, pipelineLayout, 2);
 		}
 	}
 
@@ -454,7 +454,7 @@ namespace Grapple
 		if (oldLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL && newLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL)
 		{
 			barrier.srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
-			barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+			barrier.dstAccessMask = VK_ACCESS_NONE;
 
 			sourceStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
 			destinationStage = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;

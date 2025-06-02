@@ -374,17 +374,16 @@ namespace Grapple
 
 				description.format = FrameBufferAttachmentFormatToVulkanFormat(formats[i]);
 				description.samples = VK_SAMPLE_COUNT_1_BIT;
-				description.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+				description.loadOp = VK_ATTACHMENT_LOAD_OP_LOAD;
 				description.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
 				description.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 				description.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-				description.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 
 				if (IsDepthFormat(formats[i]))
 				{
 					depthAttachmentIndex = (uint32_t)i;
 					description.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-					description.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+					description.initialLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 				}
 				else
 				{
