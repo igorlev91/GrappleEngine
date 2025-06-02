@@ -71,6 +71,11 @@ namespace Grapple
 	{
 		SkipWhitespace();
 
+		if (!IsReadPositionValid())
+		{
+			return {};
+		}
+
 		SourcePosition position = m_CurrentPosition;
 
 		size_t start = m_ReadPosition;
