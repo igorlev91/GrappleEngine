@@ -80,6 +80,7 @@ namespace Grapple
 	void VulkanBuffer::Create()
 	{
 		Grapple_CORE_ASSERT(m_Size > 0);
+		Grapple_CORE_ASSERT(m_Buffer == VK_NULL_HANDLE);
 
 		VkBufferCreateInfo info{};
 		info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;

@@ -108,7 +108,7 @@ namespace Grapple
 		// Instancing
 
 		std::vector<InstanceData> InstanceDataBuffer;
-		uint32_t MaxInstances = 1024;
+		uint32_t MaxInstances = 1024 * 24;
 
 		Ref<ShaderStorageBuffer> InstancesShaderBuffer = nullptr;
 		std::vector<DrawIndirectCommandSubMeshData> IndirectDrawData;
@@ -648,7 +648,7 @@ namespace Grapple
 			Grapple_PROFILE_SCOPE("ResizeShadowBuffers");
 			uint32_t size = (uint32_t)GetShadowMapResolution(s_RendererData.ShadowMappingSettings.Quality);
 
-			bool rewriteDescriptorSet = false;
+			bool rewriteDescriptorSet = !s_RendererData.ShadowMappingSettings.Enabled;
 			if (s_RendererData.ShadowsRenderTarget[0] == nullptr)
 			{
 				FrameBufferSpecifications shadowMapSpecs;
@@ -675,9 +675,19 @@ namespace Grapple
 
 			if (RendererAPI::GetAPI() == RendererAPI::API::Vulkan && rewriteDescriptorSet)
 			{
-				for (size_t i = 0; i < ShadowSettings::MaxCascades; i++)
+				if (s_RendererData.ShadowMappingSettings.Enabled)
 				{
-					s_RendererData.PrimaryDescriptorSet->WriteFrameBufferAttachment(s_RendererData.ShadowsRenderTarget[i], 0, (uint32_t)(28 + i));
+					for (size_t i = 0; i < ShadowSettings::MaxCascades; i++)
+					{
+						s_RendererData.PrimaryDescriptorSet->WriteFrameBufferAttachment(s_RendererData.ShadowsRenderTarget[i], 0, (uint32_t)(28 + i));
+					}
+				}
+				else
+				{
+					for (size_t i = 0; i < ShadowSettings::MaxCascades; i++)
+					{
+						s_RendererData.PrimaryDescriptorSet->WriteTexture(s_RendererData.WhiteTexture, (uint32_t)(28 + i));
+					}
 				}
 
 				s_RendererData.PrimaryDescriptorSet->FlushWrites();
@@ -793,25 +803,25 @@ namespace Grapple
 		if (s_RendererData.ShadowMappingSettings.Enabled && s_RendererData.CurrentViewport->ShadowMappingEnabled)
 		{
 			ExecuteShadowPass();
+		}
 
-			if (RendererAPI::GetAPI() == RendererAPI::API::Vulkan)
+		if (RendererAPI::GetAPI() == RendererAPI::API::Vulkan)
+		{
+			Ref<VulkanCommandBuffer> commandBuffer = VulkanContext::GetInstance().GetPrimaryCommandBuffer();
+			VkImage images[4] = { VK_NULL_HANDLE };
+
+			for (int32_t i = 0; i < s_RendererData.ShadowMappingSettings.Cascades; i++)
 			{
-				Ref<VulkanCommandBuffer> commandBuffer = VulkanContext::GetInstance().GetPrimaryCommandBuffer();
-				VkImage images[4] = { VK_NULL_HANDLE };
-
-				for (int32_t i = 0; i < s_RendererData.ShadowMappingSettings.Cascades; i++)
-				{
-					images[i] = As<VulkanFrameBuffer>(s_RendererData.ShadowsRenderTarget[i])->GetAttachmentImage(0);
-				}
-
-				commandBuffer->DepthImagesBarrier(Span(images, s_RendererData.ShadowMappingSettings.Cascades), true,
-					VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
-					VK_ACCESS_NONE,
-					VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
-					VK_ACCESS_SHADER_READ_BIT,
-					VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
-					VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+				images[i] = As<VulkanFrameBuffer>(s_RendererData.ShadowsRenderTarget[i])->GetAttachmentImage(0);
 			}
+
+			commandBuffer->DepthImagesBarrier(Span(images, s_RendererData.ShadowMappingSettings.Cascades), true,
+				VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
+				VK_ACCESS_NONE,
+				VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+				VK_ACCESS_SHADER_READ_BIT,
+				VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
+				VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 		}
 
 		{
@@ -1139,16 +1149,8 @@ namespace Grapple
 		auto mesh = s_RendererData.CurrentInstancingMesh;
 		const SubMesh& subMesh = mesh.Mesh->GetSubMeshes()[mesh.SubMeshIndex];
 
-		if (RendererAPI::GetAPI() == RendererAPI::API::Vulkan)
-		{
-			Ref<VulkanCommandBuffer> commandBuffer = VulkanContext::GetInstance().GetPrimaryCommandBuffer();
-
-			commandBuffer->DrawIndexed(mesh.Mesh, mesh.SubMeshIndex, baseInstance, instanceCount);
-		}
-		else
-		{
-			RenderCommand::DrawInstancesIndexed(mesh.Mesh, mesh.SubMeshIndex, instanceCount, baseInstance);
-		}
+		Ref<CommandBuffer> commandBuffer = GraphicsContext::GetInstance().GetCommandBuffer();
+		commandBuffer->DrawIndexed(mesh.Mesh, mesh.SubMeshIndex, baseInstance, instanceCount);
 
 		s_RendererData.Statistics.DrawCallsCount++;
 		s_RendererData.Statistics.DrawCallsSavedByInstancing += instanceCount - 1;
@@ -1273,6 +1275,9 @@ namespace Grapple
 
 	void Renderer::RemoveRenderPass(Ref<RenderPass> pass)
 	{
+		if (pass == nullptr)
+			return;
+
 		switch (pass->GetQueue())
 		{
 		case RenderPassQueue::BeforeShadows:

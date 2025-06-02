@@ -85,6 +85,7 @@ namespace Grapple
 		void OnOpenProject();
 	private:
 		bool m_UpdateCursorModeNextFrame = false;
+		bool m_ExitPlayModeRequested = false;
 
 		std::set<AssetHandle> m_AssetReloadQueue;
 
