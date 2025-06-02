@@ -1,5 +1,7 @@
 #include "VulkanShaderStorageBuffer.h"
 
+#include "Grapple/Platform/Vulkan/VulkanContext.h"
+
 namespace Grapple
 {
 	VulkanShaderStorageBuffer::VulkanShaderStorageBuffer(size_t size)
@@ -16,5 +18,16 @@ namespace Grapple
 	void VulkanShaderStorageBuffer::SetData(const MemorySpan& data)
 	{
 		m_Buffer.SetData(data.GetBuffer(), data.GetSize(), 0);
+	}
+
+	void VulkanShaderStorageBuffer::SetDebugName(std::string_view name)
+	{
+		m_DebugName = name;
+		VulkanContext::GetInstance().SetDebugName(VK_OBJECT_TYPE_BUFFER, (uint64_t)m_Buffer.GetBuffer(), m_DebugName.c_str());
+	}
+
+	const std::string& VulkanShaderStorageBuffer::GetDebugName() const
+	{
+		return m_DebugName;
 	}
 }
