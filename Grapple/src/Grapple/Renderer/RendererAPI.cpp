@@ -6,21 +6,34 @@
 
 namespace Grapple
 {
-	RendererAPI::API s_API = RendererAPI::API::OpenGL;
+	RendererAPI::API s_API = RendererAPI::API::Vulkan;
+	Scope<RendererAPI> s_Instance = nullptr;
 
-	Scope<RendererAPI> RendererAPI::Create()
+	void RendererAPI::Create(RendererAPI::API api)
 	{
+		s_API = api;
+
 		switch (s_API)
 		{
 		case API::OpenGL:
-			return CreateScope<OpenGLRendererAPI>();
+			s_Instance.reset(new OpenGLRendererAPI());
+			break;
 		case API::Vulkan:
-			return CreateScope<VulkanRendererAPI>();
+			s_Instance.reset(new VulkanRendererAPI());
+			break;
 		default:
 			Grapple_CORE_ASSERT(false, "Unsupported rendering API");
 		}
+	}
 
-		return nullptr;
+	void RendererAPI::Release()
+	{
+		s_Instance.reset(nullptr);
+	}
+
+	const Scope<RendererAPI>& RendererAPI::GetInstance()
+	{
+		return s_Instance;
 	}
 
 	RendererAPI::API RendererAPI::GetAPI()

@@ -5,6 +5,11 @@
 #include "Grapple/Renderer/Renderer.h"
 #include "Grapple/Renderer/RenderCommand.h"
 #include "Grapple/Renderer/ShaderLibrary.h"
+#include "Grapple/Renderer/GraphicsContext.h"
+#include "Grapple/Renderer/CommandBuffer.h"
+#include "Grapple/Renderer/RendererPrimitives.h"
+
+#include "Grapple/Platform/Vulkan/VulkanCommandBuffer.h"
 
 #include "GrappleCore/Profiler/Profiler.h"
 
@@ -41,15 +46,25 @@ namespace Grapple
 		if (!Enabled || !Renderer::GetCurrentViewport().PostProcessingEnabled)
 			return;
 
-		FrameBufferAttachmentsMask writeMask = context.RenderTarget->GetWriteMask();
-
 		m_Material->WritePropertyValue(s_ColorPropertyIndex, Color);
 		m_Material->WritePropertyValue(s_RadiusPropertyIndex, Radius);
 		m_Material->WritePropertyValue(s_SmoothnessPropertyIndex, Smoothness);
 
-		context.RenderTarget->SetWriteMask(0x1);
-		Renderer::DrawFullscreenQuad(m_Material);
-		context.RenderTarget->SetWriteMask(writeMask);
+		Ref<CommandBuffer> commandBuffer = GraphicsContext::GetInstance().GetCommandBuffer();
+		commandBuffer->BeginRenderTarget(context.RenderTarget);
+
+		if (RendererAPI::GetAPI() == RendererAPI::API::Vulkan)
+		{
+			Ref<VulkanCommandBuffer> vulkanCommandBuffer = As<VulkanCommandBuffer>(commandBuffer);
+
+			vulkanCommandBuffer->SetPrimaryDescriptorSet(nullptr);
+			vulkanCommandBuffer->SetSecondaryDescriptorSet(nullptr);
+		}
+
+		commandBuffer->ApplyMaterial(m_Material);
+		commandBuffer->DrawIndexed(RendererPrimitives::GetFullscreenQuadMesh(), 0, 0, 1);
+
+		commandBuffer->EndRenderTarget();
 	}
 
 	void TypeSerializer<Vignette>::OnSerialize(Vignette& vignette, SerializationStream& stream)
