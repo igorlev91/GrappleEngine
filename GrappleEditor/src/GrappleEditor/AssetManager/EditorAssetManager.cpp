@@ -139,6 +139,7 @@ namespace Grapple
 
     std::optional<AssetHandle> EditorAssetManager::FindAssetByPath(const std::filesystem::path& path)
     {
+        Grapple_PROFILE_FUNCTION();
         auto it = m_FilepathToAssetHandle.find(path);
         if (it == m_FilepathToAssetHandle.end())
             return {};
@@ -147,6 +148,8 @@ namespace Grapple
 
     AssetHandle EditorAssetManager::ImportAsset(const std::filesystem::path& path, AssetHandle parentAsset)
     {
+        Grapple_PROFILE_FUNCTION();
+
         AssetType type = AssetType::None;
         std::filesystem::path extension = path.extension();
 

@@ -1,5 +1,7 @@
 #include "EditorAssetRegistry.h"
 
+#include "GrappleCore/Profiler/Profiler.h"
+
 #include "Grapple/Project/Project.h"
 #include "Grapple/Serialization/Serialization.h"
 
@@ -23,6 +25,8 @@ namespace Grapple
 
 	void Grapple::AssetRegistrySerializer::Serialize(const EditorAssetRegistry& registry, const std::filesystem::path& path)
 	{
+        Grapple_PROFILE_FUNCTION();
+
         std::filesystem::path registryPath = path / RegistryFileName;
         std::filesystem::path root = path / AssetsDirectoryName;
 
@@ -67,6 +71,8 @@ namespace Grapple
 
     bool AssetRegistrySerializer::Deserialize(EditorAssetRegistry& registry, const std::filesystem::path& path, std::optional<UUID> packageId)
     {
+        Grapple_PROFILE_FUNCTION();
+
         std::filesystem::path registryPath = path / RegistryFileName;
         std::filesystem::path root = path / AssetsDirectoryName;
 

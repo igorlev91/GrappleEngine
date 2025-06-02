@@ -1,5 +1,7 @@
 #include "Texture.h"
 
+#include "GrappleCore/Profiler/Profiler.h"
+
 #include "Grapple/Renderer/RendererAPI.h"
 #include "Grapple/Platform/OpenGL/OpenGLTexture.h"
 #include "Grapple/Platform/Vulkan/VulkanTexture.h"
@@ -102,6 +104,8 @@ namespace Grapple
 
 	static bool ReadDDSFile(const std::filesystem::path& path, TextureSpecifications& specifications, TextureData& data)
 	{
+		Grapple_PROFILE_FUNCTION();
+
 		std::ifstream inputStream(path, std::ios::in | std::ios::binary);
 
 		if (!inputStream.is_open())
@@ -144,6 +148,7 @@ namespace Grapple
 
 	bool Texture::ReadDataFromFile(const std::filesystem::path& path, TextureSpecifications& specifications, TextureData& data)
 	{
+		Grapple_PROFILE_FUNCTION();
 		if (!std::filesystem::exists(path))
 			return false;
 

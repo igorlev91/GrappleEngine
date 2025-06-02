@@ -1,5 +1,7 @@
 #include "VulkanMaterial.h"
 
+#include "Grapple/AssetManager/AssetManager.h"
+
 #include "Grapple/Platform/Vulkan/VulkanPipeline.h"
 #include "Grapple/Platform/Vulkan/VulkanShader.h"
 #include "Grapple/Platform/Vulkan/VulkanDescriptorSet.h"
@@ -38,6 +40,16 @@ namespace Grapple
 		if (pool)
 		{
 			m_Set = pool->AllocateSet();
+
+			const AssetMetadata* metadata = AssetManager::GetAssetMetadata(Handle);
+			if (metadata != nullptr)
+			{
+				m_Set->SetDebugName(metadata->Name);
+			}
+			else
+			{
+				m_Set->SetDebugName(As<VulkanShader>(m_Shader)->GetDebugName());
+			}
 		}
 	}
 
