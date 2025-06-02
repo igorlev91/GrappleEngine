@@ -152,6 +152,8 @@ namespace Grapple
 
         if (extension == ".png")
             type = AssetType::Texture;
+        if (extension == ".dds")
+            type = AssetType::Texture;
         if (extension == ".jpg")
             type = AssetType::Texture;
         else if (extension == ".Grapple")
