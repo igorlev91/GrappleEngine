@@ -130,6 +130,7 @@ namespace Grapple
 				m_Window->OnUpdate();
 
 				GraphicsContext::GetInstance().BeginFrame();
+				Renderer2D::BeginFrame();
 
 				{
 					Grapple_PROFILE_SCOPE("Layers::OnUpdate");
@@ -143,8 +144,10 @@ namespace Grapple
 						layer->OnImGUIRender();
 				}
 
+				Renderer2D::EndFrame();
+
 				{
-					Grapple_PROFILE_SCOPE("SwapBuffers");
+					Grapple_PROFILE_SCOPE("Present");
 					GraphicsContext::GetInstance().Present();
 				}
 
