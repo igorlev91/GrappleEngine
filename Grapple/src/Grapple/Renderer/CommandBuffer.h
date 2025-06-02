@@ -3,6 +3,8 @@
 #include "GrappleCore/Core.h"
 #include "Grapple/Math/Math.h"
 
+#include "Grapple/Renderer/Texture.h"
+
 namespace Grapple
 {
 	class FrameBuffer;
@@ -24,6 +26,8 @@ namespace Grapple
 			uint32_t subMeshIndex,
 			uint32_t baseInstance,
 			uint32_t instanceCount) = 0;
+
+		virtual void Blit(Ref<FrameBuffer> source, uint32_t sourceAttachment, Ref<FrameBuffer> destination, uint32_t destinationAttachment, TextureFiltering filter) = 0;
 
 		virtual void StartTimer(Ref<GPUTimer> timer) = 0;
 		virtual void StopTimer(Ref<GPUTimer> timer) = 0;

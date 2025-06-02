@@ -26,6 +26,8 @@ namespace Grapple
 			return 2;
 		case ShaderType::Surface:
 			return 2;
+		case ShaderType::FullscreenQuad:
+			return 2;
 		}
 
 		Grapple_CORE_ASSERT(false);
