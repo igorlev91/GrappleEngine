@@ -1,5 +1,7 @@
 #include "VulkanContext.h"
 
+#include "GrappleCore/Profiler/Profiler.h"
+
 namespace Grapple
 {
 	static VkBool32 VulkanDebugCallback(
@@ -56,6 +58,8 @@ namespace Grapple
 
 	void VulkanContext::Initialize()
 	{
+		Grapple_PROFILE_FUNCTION();
+
 		std::vector<VkLayerProperties> supportedLayers = EnumerateAvailableLayers();
 		std::vector<const char*> enabledLayers;
 		const char* validationLayerName = "VK_LAYER_KHRONOS_validation";
@@ -81,7 +85,12 @@ namespace Grapple
 		CreateInstance(Span<const char*>::FromVector(enabledLayers));
 
 		if (m_DebugEnabled)
+		{
 			CreateDebugMessenger();
+
+			m_SetDebugNameFunction = reinterpret_cast<PFN_vkSetDebugUtilsObjectNameEXT>(vkGetInstanceProcAddr(m_Instance, "vkSetDebugUtilsObjectNameEXT"));
+			Grapple_CORE_ASSERT(m_SetDebugNameFunction);
+		}
 
 		CreateSurface();
 		ChoosePhysicalDevice();
@@ -158,6 +167,8 @@ namespace Grapple
 
 	void VulkanContext::BeginFrame()
 	{
+		Grapple_PROFILE_FUNCTION();
+
 		VK_CHECK_RESULT(vkWaitForFences(m_Device, 1, &m_FrameFence, VK_TRUE, UINT64_MAX));
 		VK_CHECK_RESULT(vkResetFences(m_Device, 1, &m_FrameFence));
 
@@ -182,6 +193,7 @@ namespace Grapple
 
 	void VulkanContext::Present()
 	{
+		Grapple_PROFILE_FUNCTION();
 		m_PrimaryCommandBuffer->End();
 
 		VkSubmitInfo submitInfo{};
@@ -214,11 +226,14 @@ namespace Grapple
 		else if (presentResult != VK_SUCCESS)
 			Grapple_CORE_ERROR("Failed to present");
 
-		VkResult waitResult = vkQueueWaitIdle(m_PresentQueue);
-		if (waitResult != VK_SUCCESS)
 		{
-			Grapple_CORE_ERROR("Failed with result: {}", (std::underlying_type_t<VkResult>)waitResult);
-			Grapple_CORE_ASSERT(false);
+			Grapple_PROFILE_SCOPE("WaitIdle");
+			VkResult waitResult = vkQueueWaitIdle(m_PresentQueue);
+			if (waitResult != VK_SUCCESS)
+			{
+				Grapple_CORE_ERROR("Failed with result: {}", (std::underlying_type_t<VkResult>)waitResult);
+				Grapple_CORE_ASSERT(false);
+			}
 		}
 
 		glfwSwapBuffers(m_Window);
@@ -231,6 +246,7 @@ namespace Grapple
 
 	void VulkanContext::CreateBuffer(size_t size, VkBufferUsageFlags usage, VkMemoryPropertyFlags memoryProperties, VkBuffer& buffer, VkDeviceMemory& memory)
 	{
+		Grapple_PROFILE_FUNCTION();
 		VkBufferCreateInfo info{};
 		info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
 		info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
@@ -255,6 +271,7 @@ namespace Grapple
 
 	VulkanAllocation VulkanContext::CreateStagingBuffer(size_t size, VkBuffer& buffer)
 	{
+		Grapple_PROFILE_FUNCTION();
 		VkBufferCreateInfo info{};
 		info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
 		info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
@@ -277,6 +294,7 @@ namespace Grapple
 
 	Ref<VulkanCommandBuffer> VulkanContext::BeginTemporaryCommandBuffer()
 	{
+		Grapple_PROFILE_FUNCTION();
 		VkCommandBuffer commandBuffer;
 
 		VkCommandBufferAllocateInfo info{};
@@ -296,6 +314,7 @@ namespace Grapple
 
 	void VulkanContext::EndTemporaryCommandBuffer(Ref<VulkanCommandBuffer> commandBuffer)
 	{
+		Grapple_PROFILE_FUNCTION();
 		commandBuffer->End();
 
 		VkCommandBuffer buffer = commandBuffer->GetHandle();
@@ -317,6 +336,7 @@ namespace Grapple
 
 	Ref<VulkanRenderPass> VulkanContext::FindOrCreateRenderPass(Span<FrameBufferTextureFormat> formats)
 	{
+		Grapple_PROFILE_FUNCTION();
 		RenderPassKey key;
 		key.Formats.assign(formats.begin(), formats.end());
 
@@ -382,6 +402,27 @@ namespace Grapple
 
 		Grapple_CORE_ASSERT(false);
 		return UINT32_MAX;
+	}
+
+	VkResult VulkanContext::SetDebugName(VkObjectType objectType, uint64_t objectHandle, const char* name)
+	{
+		if (m_DebugEnabled)
+		{
+			if (m_SetDebugNameFunction == nullptr)
+			{
+				return VK_ERROR_EXTENSION_NOT_PRESENT;
+			}
+
+			VkDebugUtilsObjectNameInfoEXT info{};
+			info.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+			info.pObjectName = name;
+			info.objectType = objectType;
+			info.objectHandle = objectHandle;
+
+			return m_SetDebugNameFunction(m_Device, &info);
+		}
+
+		return VK_SUCCESS;
 	}
 
 	void VulkanContext::CreateInstance(const Span<const char*>& enabledLayers)

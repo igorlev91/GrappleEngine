@@ -1,6 +1,7 @@
 #include "VulkanBuffer.h"
 
 #include "Grapple/Platform/Vulkan/VulkanContext.h"
+#include "GrappleCore/Profiler/Profiler.h"
 
 namespace Grapple
 {
@@ -36,6 +37,10 @@ namespace Grapple
 
 	void VulkanBuffer::SetData(const void* data, size_t size, size_t offset)
 	{
+		Grapple_PROFILE_FUNCTION();
+		if (size == 0)
+			return;
+
 		if (m_Size == 0)
 			m_Size = size;
 
@@ -79,6 +84,7 @@ namespace Grapple
 
 	void VulkanBuffer::Create()
 	{
+		Grapple_PROFILE_FUNCTION();
 		Grapple_CORE_ASSERT(m_Size > 0);
 		Grapple_CORE_ASSERT(m_Buffer == VK_NULL_HANDLE);
 
