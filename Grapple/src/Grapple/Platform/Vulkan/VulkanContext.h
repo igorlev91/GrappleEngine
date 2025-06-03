@@ -133,13 +133,15 @@ namespace Grapple
 
 		void CreateSwapChain();
 		void RecreateSwapChain();
-		void ReleaseSwapChain();
+		void ReleaseSwapChainResources();
 		void CreateSwapChainImageViews();
 		void CreateSwapChainFrameBuffers();
 
 		uint32_t ChooseSwapChainFormat(const std::vector<VkSurfaceFormatKHR>& formats);
 		VkExtent2D GetSwapChainExtent(const VkSurfaceCapabilitiesKHR& capabilities);
 		VkPresentModeKHR ChoosePresentMode(const std::vector<VkPresentModeKHR>& modes);
+
+		void DestroyStagingBuffers();
 	private:
 		std::vector<VkLayerProperties> EnumerateAvailableLayers();
 	private:

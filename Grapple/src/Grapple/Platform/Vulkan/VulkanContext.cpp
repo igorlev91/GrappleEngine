@@ -163,6 +163,8 @@ namespace Grapple
 	{
 		WaitForDevice();
 
+		DestroyStagingBuffers();
+
 		if (m_DebugMessenger)
 			m_DestroyDebugMessenger(m_Instance, m_DebugMessenger, nullptr);
 
@@ -172,7 +174,8 @@ namespace Grapple
 
 		vmaDestroyAllocator(m_Allocator);
 
-		ReleaseSwapChain();
+		ReleaseSwapChainResources();
+		vkDestroySwapchainKHR(m_Device, m_SwapChain, nullptr);
 
 		VkCommandBuffer commandBuffer = m_PrimaryCommandBuffer->GetHandle();
 		vkFreeCommandBuffers(m_Device, m_CommandBufferPool, 1, &commandBuffer);
@@ -210,6 +213,10 @@ namespace Grapple
 			Grapple_CORE_ERROR("Failed to acquire swap chain image");
 			return;
 		}
+
+		m_PrimaryCommandBuffer->Reset();
+
+		DestroyStagingBuffers();
 
 		m_PrimaryCommandBuffer->Begin();
 
@@ -271,17 +278,6 @@ namespace Grapple
 		{
 			RecreateSwapChain();
 		}
-
-		m_PrimaryCommandBuffer->Reset();
-		
-		// Destroy staging buffers
-		for (const auto& buffer : m_CurrentFrameStagingBuffers)
-		{
-			vmaFreeMemory(m_Allocator, buffer.Allocation.Handle);
-			vkDestroyBuffer(m_Device, buffer.Buffer, nullptr);
-		}
-
-		m_CurrentFrameStagingBuffers.clear();
 
 		m_VSyncEnabled = m_Window->GetProperties().VSyncEnabled;
 	}
@@ -746,7 +742,9 @@ namespace Grapple
 		createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
 		createInfo.presentMode = presentMode;
 		createInfo.clipped = true;
-		createInfo.oldSwapchain = VK_NULL_HANDLE;
+		createInfo.oldSwapchain = m_SwapChain;
+
+		VkSwapchainKHR oldSwapChain = m_SwapChain;
 
 		VK_CHECK_RESULT(vkCreateSwapchainKHR(m_Device, &createInfo, nullptr, &m_SwapChain));
 
@@ -757,6 +755,11 @@ namespace Grapple
 		m_SwapChainImages.resize(swapChainImageCount);
 		VK_CHECK_RESULT(vkGetSwapchainImagesKHR(m_Device, m_SwapChain, &swapChainImageCount, m_SwapChainImages.data()));
 
+		if (oldSwapChain != VK_NULL_HANDLE)
+		{
+			vkDestroySwapchainKHR(m_Device, oldSwapChain, nullptr);
+		}
+
 		CreateSwapChainImageViews();
 	}
 
@@ -764,23 +767,19 @@ namespace Grapple
 	{
 		WaitForDevice();
 
-		ReleaseSwapChain();
+		ReleaseSwapChainResources();
 		CreateSwapChain();
 		CreateSwapChainFrameBuffers();
 	}
 
-	void VulkanContext::ReleaseSwapChain()
+	void VulkanContext::ReleaseSwapChainResources()
 	{
 		for (VkImageView view : m_SwapChainImageViews)
 			vkDestroyImageView(m_Device, view, nullptr);
+
 		m_SwapChainImageViews.clear();
-
-		vkDestroySwapchainKHR(m_Device, m_SwapChain, nullptr);
 		m_SwapChainImages.clear();
-
 		m_SwapChainFrameBuffers.clear();
-
-		m_SwapChain = VK_NULL_HANDLE;
 	}
 
 	void VulkanContext::CreateSwapChainImageViews()
@@ -861,6 +860,17 @@ namespace Grapple
 		}
 
 		return VK_PRESENT_MODE_FIFO_KHR;
+	}
+
+	void VulkanContext::DestroyStagingBuffers()
+	{
+		for (const auto& buffer : m_CurrentFrameStagingBuffers)
+		{
+			vmaFreeMemory(m_Allocator, buffer.Allocation.Handle);
+			vkDestroyBuffer(m_Device, buffer.Buffer, nullptr);
+		}
+
+		m_CurrentFrameStagingBuffers.clear();
 	}
 
 	std::vector<VkLayerProperties> VulkanContext::EnumerateAvailableLayers()
