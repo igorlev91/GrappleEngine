@@ -166,6 +166,16 @@ namespace Grapple
 				}
 
 				m_PreviousFrameTime = currentTime;
+
+				{
+					Grapple_PROFILE_SCOPE("ExecuteAfterEndFrameFunctions");
+					for (const auto& function : m_AfterEndOfFrameFunctions)
+					{
+						function();
+					}
+
+					m_AfterEndOfFrameFunctions.clear();
+				}
 			}
 
 			Grapple_PROFILE_END_FRAME("Main");
@@ -196,6 +206,11 @@ namespace Grapple
 	void Application::PushOverlay(const Ref<Layer>& layer)
 	{
 		m_LayersStack.PushOverlay(layer);
+	}
+
+	void Application::ExecuteAfterEndOfFrame(std::function<void()>&& function)
+	{
+		m_AfterEndOfFrameFunctions.push_back(function);
 	}
 
 	Application& Application::GetInstance()
