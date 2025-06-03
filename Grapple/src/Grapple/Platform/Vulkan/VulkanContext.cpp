@@ -53,7 +53,7 @@ namespace Grapple
 
 
 	VulkanContext::VulkanContext(Ref<Window> window)
-		: m_Window(window)
+		: m_Window(window), m_VSyncEnabled(window->GetProperties().VSyncEnabled)
 	{
 	}
 
@@ -278,12 +278,11 @@ namespace Grapple
 		{
 			RecreateSwapChain();
 		}
-
-		m_VSyncEnabled = m_Window->GetProperties().VSyncEnabled;
 	}
 
 	void VulkanContext::WaitForDevice()
 	{
+		Grapple_PROFILE_FUNCTION();
 		VK_CHECK_RESULT(vkDeviceWaitIdle(m_Device));
 	}
 
@@ -434,6 +433,7 @@ namespace Grapple
 
 	void VulkanContext::NotifyImageViewDeletionHandler(VkImageView deletedImageView)
 	{
+		Grapple_PROFILE_FUNCTION();
 		if (m_ImageDeletationHandler)
 		{
 			m_ImageDeletationHandler(deletedImageView);
@@ -457,6 +457,7 @@ namespace Grapple
 
 	VkResult VulkanContext::SetDebugName(VkObjectType objectType, uint64_t objectHandle, const char* name)
 	{
+		Grapple_PROFILE_FUNCTION();
 		if (m_DebugEnabled)
 		{
 			if (m_SetDebugNameFunction == nullptr)
@@ -483,6 +484,7 @@ namespace Grapple
 
 	void VulkanContext::CreateInstance(const Span<const char*>& enabledLayers)
 	{
+		Grapple_PROFILE_FUNCTION();
 		std::vector<const char*> instanceExtensions;
 
 		{
@@ -518,6 +520,7 @@ namespace Grapple
 
 	void VulkanContext::CreateDebugMessenger()
 	{
+		Grapple_PROFILE_FUNCTION();
 		Grapple_CORE_ASSERT(m_DebugEnabled);
 
 		m_CreateDebugMessenger = reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(m_Instance, "vkCreateDebugUtilsMessengerEXT"));
@@ -543,11 +546,13 @@ namespace Grapple
 
 	void VulkanContext::CreateSurface()
 	{
+		Grapple_PROFILE_FUNCTION();
 		VK_CHECK_RESULT(glfwCreateWindowSurface(m_Instance, (GLFWwindow*)m_Window->GetNativeWindow(), nullptr, &m_Surface));
 	}
 
 	void VulkanContext::ChoosePhysicalDevice()
 	{
+		Grapple_PROFILE_FUNCTION();
 		uint32_t physicalDevicesCount;
 		VK_CHECK_RESULT(vkEnumeratePhysicalDevices(m_Instance, &physicalDevicesCount, nullptr));
 
@@ -570,6 +575,8 @@ namespace Grapple
 
 	void VulkanContext::GetQueueFamilyProperties()
 	{
+		Grapple_PROFILE_FUNCTION();
+
 		uint32_t count;
 		vkGetPhysicalDeviceQueueFamilyProperties(m_PhysicalDevice, &count, nullptr);
 
@@ -593,6 +600,7 @@ namespace Grapple
 
 	void VulkanContext::CreateLogicalDevice(const Span<const char*>& enabledLayers, const Span<const char*>& enabledExtensions)
 	{
+		Grapple_PROFILE_FUNCTION();
 		float priority = 1.0f;
 		std::vector<VkDeviceQueueCreateInfo> createInfos;
 
@@ -638,6 +646,7 @@ namespace Grapple
 
 	void VulkanContext::CreateMemoryAllocator()
 	{
+		Grapple_PROFILE_FUNCTION();
 		VmaAllocatorCreateInfo info{};
 		info.instance = m_Instance;
 		info.device = m_Device;
@@ -650,6 +659,7 @@ namespace Grapple
 
 	void VulkanContext::CreateCommandBufferPool()
 	{
+		Grapple_PROFILE_FUNCTION();
 		VkCommandPoolCreateInfo createInfo{};
 		createInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
 		createInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
@@ -660,6 +670,7 @@ namespace Grapple
 
 	VkCommandBuffer VulkanContext::CreateCommandBuffer()
 	{
+		Grapple_PROFILE_FUNCTION();
 		VkCommandBufferAllocateInfo allocation{};
 		allocation.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 		allocation.commandBufferCount = 1;
@@ -673,6 +684,7 @@ namespace Grapple
 
 	void VulkanContext::CreateSyncObjects()
 	{
+		Grapple_PROFILE_FUNCTION();
 		VkSemaphoreCreateInfo semaphoreCreateInfo{};
 		semaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 
@@ -687,6 +699,7 @@ namespace Grapple
 
 	void VulkanContext::CreateSwapChain()
 	{
+		Grapple_PROFILE_FUNCTION();
 		VkSurfaceCapabilitiesKHR surfaceCapabilities;
 		VK_CHECK_RESULT(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_PhysicalDevice, m_Surface, &surfaceCapabilities));
 
@@ -760,11 +773,13 @@ namespace Grapple
 			vkDestroySwapchainKHR(m_Device, oldSwapChain, nullptr);
 		}
 
+		m_VSyncEnabled = m_Window->GetProperties().VSyncEnabled;
 		CreateSwapChainImageViews();
 	}
 
 	void VulkanContext::RecreateSwapChain()
 	{
+		Grapple_PROFILE_FUNCTION();
 		WaitForDevice();
 
 		ReleaseSwapChainResources();
@@ -774,6 +789,7 @@ namespace Grapple
 
 	void VulkanContext::ReleaseSwapChainResources()
 	{
+		Grapple_PROFILE_FUNCTION();
 		for (VkImageView view : m_SwapChainImageViews)
 			vkDestroyImageView(m_Device, view, nullptr);
 
@@ -784,6 +800,7 @@ namespace Grapple
 
 	void VulkanContext::CreateSwapChainImageViews()
 	{
+		Grapple_PROFILE_FUNCTION();
 		m_SwapChainImageViews.resize(m_SwapChainImages.size());
 		for (size_t i = 0; i < m_SwapChainImages.size(); i++)
 		{
@@ -812,6 +829,7 @@ namespace Grapple
 
 	void VulkanContext::CreateSwapChainFrameBuffers()
 	{
+		Grapple_PROFILE_FUNCTION();
 		m_SwapChainFrameBuffers.resize(m_FramesInFlight);
 		for (uint32_t i = 0; i < m_FramesInFlight; i++)
 		{
@@ -855,7 +873,7 @@ namespace Grapple
 	{
 		for (auto mode : modes)
 		{
-			if (m_VSyncEnabled && mode == VK_PRESENT_MODE_MAILBOX_KHR)
+			if (!m_Window->GetProperties().VSyncEnabled && mode == VK_PRESENT_MODE_MAILBOX_KHR)
 				return mode;
 		}
 
@@ -864,6 +882,7 @@ namespace Grapple
 
 	void VulkanContext::DestroyStagingBuffers()
 	{
+		Grapple_PROFILE_FUNCTION();
 		for (const auto& buffer : m_CurrentFrameStagingBuffers)
 		{
 			vmaFreeMemory(m_Allocator, buffer.Allocation.Handle);
@@ -875,6 +894,7 @@ namespace Grapple
 
 	std::vector<VkLayerProperties> VulkanContext::EnumerateAvailableLayers()
 	{
+		Grapple_PROFILE_FUNCTION();
 		uint32_t supportedLayersCount = 0;
 		std::vector<VkLayerProperties> supportedLayers;
 
