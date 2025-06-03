@@ -3,6 +3,7 @@
 #include "GrappleCore/Core.h"
 
 #include "Grapple/Renderer/CommandBuffer.h"
+#include "GrapplePlatform/Window.h"
 
 namespace Grapple
 {
@@ -21,7 +22,7 @@ namespace Grapple
 	public:
 		static GraphicsContext& GetInstance();
 		static bool IsInitialized();
-		static void Create(void* windowHandle);
+		static void Create(Ref<Window> window);
 		static void Shutdown();
 	};
 }

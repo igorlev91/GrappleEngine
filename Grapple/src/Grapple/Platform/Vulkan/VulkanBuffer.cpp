@@ -69,6 +69,8 @@ namespace Grapple
 
 	void VulkanBuffer::SetData(MemorySpan data, size_t offset, Ref<CommandBuffer> commandBuffer)
 	{
+		Grapple_PROFILE_FUNCTION();
+
 		StagingBuffer stagingBuffer = FillStagingBuffer(data);
 
 		As<VulkanCommandBuffer>(commandBuffer)->CopyBuffer(stagingBuffer.Buffer, m_Buffer, data.GetSize(), 0, offset);
