@@ -109,7 +109,7 @@ namespace Grapple
 		}
 		else
 		{
-			layoutHandle = m_SetPool->GetLayout()->GetHandle();
+			layoutHandle = As<const VulkanDescriptorSetLayout>(m_SetPool->GetLayout())->GetHandle();
 			createInfo.pSetLayouts = &layoutHandle;
 			createInfo.setLayoutCount = 1;
 		}
