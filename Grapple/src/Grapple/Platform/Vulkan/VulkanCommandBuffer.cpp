@@ -9,6 +9,8 @@
 #include "Grapple/Platform/Vulkan/VulkanIndexBuffer.h"
 #include "Grapple/Platform/Vulkan/VulkanMaterial.h"
 #include "Grapple/Platform/Vulkan/VulkanGPUTimer.h"
+#include "Grapple/Platform/Vulkan/VulkanComputeShader.h"
+#include "Grapple/Platform/Vulkan/VulkanComputePipeline.h"
 
 namespace Grapple
 {
@@ -316,6 +318,13 @@ namespace Grapple
 		vkCmdPipelineBarrier(m_CommandBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT, destinationStage, 0, 0, nullptr, 0, nullptr, 1, &barrier);
 	}
 
+	void VulkanCommandBuffer::DispatchCompute(Ref<ComputePipeline> pipeline, const glm::uvec3& groupCount)
+	{
+		Ref<VulkanComputePipeline> vulkanPipeline = As<VulkanComputePipeline>(pipeline);
+		vkCmdBindPipeline(m_CommandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, vulkanPipeline->GetHandle());
+		vkCmdDispatch(m_CommandBuffer, groupCount.x, groupCount.y, groupCount.z);
+	}
+
 	void VulkanCommandBuffer::StartTimer(Ref<GPUTimer> timer)
 	{
 		Ref<VulkanGPUTimer> vulkanTimer = As<VulkanGPUTimer>(timer);
@@ -415,6 +424,22 @@ namespace Grapple
 			dstAccess = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
 
 			srcStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+			dstStage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+		}
+		else if (oldLayout == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL && newLayout == VK_IMAGE_LAYOUT_GENERAL)
+		{
+			srcAccess = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+			dstAccess = VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_SHADER_WRITE_BIT;
+
+			srcStage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+			dstStage = VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT;
+		}
+		else if (oldLayout == VK_IMAGE_LAYOUT_GENERAL && newLayout == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL)
+		{
+			srcAccess = VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_SHADER_WRITE_BIT;
+			dstAccess = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+
+			srcStage = VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT;
 			dstStage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
 		}
 	}
@@ -761,6 +786,12 @@ namespace Grapple
 	{
 		VkDescriptorSet setHandle = descriptorSet->GetHandle();
 		vkCmdBindDescriptorSets(m_CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, index, 1, &setHandle, 0, nullptr);
+	}
+
+	void VulkanCommandBuffer::BindComputeDescriptorSet(const Ref<const VulkanDescriptorSet>& descriptorSet, VkPipelineLayout pipelineLayout, uint32_t index)
+	{
+		VkDescriptorSet setHandle = descriptorSet->GetHandle();
+		vkCmdBindDescriptorSets(m_CommandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, pipelineLayout, index, 1, &setHandle, 0, nullptr);
 	}
 
 	void VulkanCommandBuffer::SetPrimaryDescriptorSet(const Ref<VulkanDescriptorSet>& set)

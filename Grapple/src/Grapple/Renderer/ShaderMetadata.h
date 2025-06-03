@@ -97,6 +97,8 @@ namespace Grapple
 		Sampler,
 		SamplerArray,
 
+		StorageImage,
+
 		Matrix4x4,
 	};
 
@@ -116,6 +118,7 @@ namespace Grapple
 		case ShaderDataType::Matrix4x4:
 			return 4 * 4 * 4;
 		case ShaderDataType::Sampler:
+		case ShaderDataType::StorageImage:
 			return 4;
 		}
 

@@ -157,6 +157,10 @@ namespace Grapple
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
+	void OpenGLCommandBuffer::DispatchCompute(Ref<ComputePipeline> pipeline, const glm::uvec3& groupCount)
+	{
+	}
+
 	void OpenGLCommandBuffer::StartTimer(Ref<GPUTimer> timer)
 	{
 		As<OpenGLGPUTImer>(timer)->Start();

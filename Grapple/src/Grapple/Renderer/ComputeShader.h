@@ -11,6 +11,7 @@ namespace Grapple
 		std::string Name;
 		glm::uvec3 LocalGroupSize = glm::uvec3(1u);
 		ShaderPushConstantsRange PushConstantsRange;
+		std::vector<ShaderProperty> Properties;
 	};
 
 	class Grapple_API ComputeShader : public Asset

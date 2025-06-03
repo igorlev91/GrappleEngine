@@ -26,6 +26,8 @@ namespace Grapple
 
 		void Blit(Ref<FrameBuffer> source, uint32_t sourceAttachment, Ref<FrameBuffer> destination, uint32_t destinationAttachment, TextureFiltering filter) override;
 
+		void DispatchCompute(Ref<ComputePipeline> pipeline, const glm::uvec3& groupCount) override;
+
 		void StartTimer(Ref<GPUTimer> timer) override;
 		void StopTimer(Ref<GPUTimer> timer) override;
 
