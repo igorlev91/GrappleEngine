@@ -295,6 +295,8 @@ namespace Grapple
                     metadata->Type = ShaderType::_2D;
                 else if (element.Value.Value == "FullscreenQuad")
                     metadata->Type = ShaderType::FullscreenQuad;
+                else if (element.Value.Value == "Debug")
+                    metadata->Type = ShaderType::Debug;
             }
             else if (element.Name.Value == "Name")
             {

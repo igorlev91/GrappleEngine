@@ -16,6 +16,7 @@ namespace Grapple
 		_2D,
 		Surface,
 		FullscreenQuad,
+		Debug,
 	};
 
 	inline uint32_t GetMaterialDescriptorSetIndex(ShaderType type)

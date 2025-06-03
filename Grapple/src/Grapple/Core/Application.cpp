@@ -106,11 +106,7 @@ namespace Grapple
 		ScriptingEngine::Shutdown();
 
 		Renderer2D::Shutdown();
-		if (RendererAPI::GetAPI() != RendererAPI::API::Vulkan)
-		{
-			DebugRenderer::Shutdown();
-		}
-
+		DebugRenderer::Shutdown();
 		Renderer::Shutdown();
 		RendererPrimitives::Clear();
 		GraphicsContext::Shutdown();
@@ -122,12 +118,7 @@ namespace Grapple
 
 		RenderCommand::Initialize();
 		Renderer::Initialize();
-
-		if (RendererAPI::GetAPI() != RendererAPI::API::Vulkan)
-		{
-			DebugRenderer::Initialize();
-		}
-
+		DebugRenderer::Initialize();
 		Renderer2D::Initialize();
 
 		ScriptingEngine::Initialize();
