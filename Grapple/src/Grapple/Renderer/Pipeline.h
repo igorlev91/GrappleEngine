@@ -37,6 +37,12 @@ namespace Grapple
 		std::vector<PipelineInputLayoutElement> Elements;
 	};
 
+	enum class PrimitiveTopology
+	{
+		Triangles,
+		Lines,
+	};
+
 	struct PipelineSpecifications
 	{
 		PipelineInputLayout InputLayout;
@@ -44,6 +50,7 @@ namespace Grapple
 
 		CullingMode Culling = CullingMode::Back;
 		BlendMode Blending = BlendMode::Opaque;
+		PrimitiveTopology Topology = PrimitiveTopology::Triangles;
 		bool DepthTest = true;
 		bool DepthWrite = true;
 		DepthComparisonFunction DepthFunction = DepthComparisonFunction::Less;

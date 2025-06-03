@@ -43,15 +43,11 @@ namespace Grapple
 		{
 			scene->OnBeforeRender(m_Viewport);
 
-			m_Viewport.RenderTarget->Bind();
-
 			OnClear();
 
 			Renderer::BeginScene(m_Viewport);
 			scene->OnRender(m_Viewport);
 			Renderer::EndScene();
-
-			m_Viewport.RenderTarget->Unbind();
 
 			if (RendererAPI::GetAPI() == RendererAPI::API::Vulkan)
 			{
