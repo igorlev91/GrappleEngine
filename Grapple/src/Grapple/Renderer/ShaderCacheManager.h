@@ -5,13 +5,14 @@
 #include "Grapple/AssetManager/Asset.h"
 #include "Grapple/Renderer/RendererAPI.h"
 
-#include "Grapple/Renderer/Shader.h"
-
 #include <vector>
 #include <optional>
 
 namespace Grapple
 {
+	struct ShaderMetadata;
+	struct ComputeShaderMetadata;
+
 	class Grapple_API ShaderCacheManager
 	{
 	public:
@@ -25,6 +26,7 @@ namespace Grapple
 			ShaderStageType stageType) = 0;
 
 		virtual Ref<const ShaderMetadata> FindShaderMetadata(AssetHandle shaderHandle) = 0;
+		virtual Ref<const ComputeShaderMetadata> FindComputeShaderMetadata(AssetHandle shaderHandle) = 0;
 
 		virtual bool HasCache(AssetHandle shaderHandle,
 			ShaderTargetEnvironment targetEnvironment,

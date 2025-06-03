@@ -41,6 +41,7 @@ namespace Grapple
 		Sprite,
 		Prefab,
 		Shader,
+		ComputeShader,
 		Material,
 		Font,
 		Mesh,

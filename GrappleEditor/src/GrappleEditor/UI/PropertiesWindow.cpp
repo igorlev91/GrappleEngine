@@ -3,6 +3,7 @@
 #include "Grapple/Scene/Scene.h"
 #include "Grapple/Scripting/ScriptingEngine.h"
 
+#include "Grapple/Renderer/ComputeShader.h"
 #include "Grapple/Renderer/Material.h"
 #include "Grapple/Renderer/MaterialsTable.h"
 
@@ -115,8 +116,10 @@ namespace Grapple
 	void PropertiesWindow::RenderAssetProperties(AssetHandle handle)
 	{
 		Grapple_CORE_ASSERT(AssetManager::IsAssetHandleValid(handle));
+		const AssetMetadata* assetMetadata = AssetManager::GetAssetMetadata(handle);
+		Grapple_CORE_ASSERT(assetMetadata);
 
-		switch (AssetManager::GetAssetMetadata(handle)->Type)
+		switch (assetMetadata->Type)
 		{
 		case AssetType::Scene:
 			break;
@@ -173,6 +176,28 @@ namespace Grapple
 				EditorGUI::EndPropertyGrid();
 			}
 
+			break;
+		}
+		case AssetType::ComputeShader:
+		{
+			Ref<ComputeShader> computeShader = AssetManager::GetAsset<ComputeShader>(handle);
+			if (EditorGUI::BeginPropertyGrid())
+			{
+				const ImGuiStyle& style = ImGui::GetStyle();
+				EditorGUI::PropertyName("Name");
+
+				EditorGUI::MoveCursor(ImVec2(0, style.FramePadding.y));
+				ImGui::TextUnformatted(computeShader->GetMetadata()->Name.c_str());
+				EditorGUI::MoveCursor(ImVec2(0, style.FramePadding.y));
+
+				EditorGUI::PropertyName("Local Group Size");
+
+				EditorGUI::MoveCursor(ImVec2(0, style.FramePadding.y));
+				glm::uvec3 localGroupSize = computeShader->GetMetadata()->LocalGroupSize;
+				ImGui::Text("X: %u Y: %u Z: %u", localGroupSize.x, localGroupSize.y, localGroupSize.z);
+				EditorGUI::MoveCursor(ImVec2(0, style.FramePadding.y));
+				EditorGUI::EndPropertyGrid();
+			}
 			break;
 		}
 		case AssetType::Sprite:

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Grapple/AssetManager/Asset.h"
-#include "Grapple/Renderer/Shader.h"
 
 namespace Grapple
 {
@@ -9,5 +8,6 @@ namespace Grapple
 	{
 	public:
 		static Ref<Asset> ImportShader(const AssetMetadata& metadata);
+		static Ref<Asset> ImportComputeShader(const AssetMetadata& metadata);
 	};
 }

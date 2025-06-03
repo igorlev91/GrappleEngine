@@ -45,6 +45,8 @@ namespace Grapple
 			return "Prefab";
 		case AssetType::Shader:
 			return "Shader";
+		case AssetType::ComputeShader:
+			return "ComputeShader";
 		case AssetType::Material:
 			return "Material";
 		case AssetType::Font:
@@ -71,6 +73,8 @@ namespace Grapple
 			return AssetType::Prefab;
 		else if (string == "Shader")
 			return AssetType::Shader;
+		else if (string == "ComputeShader")
+			return AssetType::ComputeShader;
 		else if (string == "Material")
 			return AssetType::Material;
 		else if (string == "Font")
