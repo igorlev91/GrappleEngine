@@ -101,4 +101,20 @@ namespace Grapple
 
 		return {};
 	}
+
+	const char* ShaderStageTypeToString(ShaderStageType stage)
+	{
+		switch (stage)
+		{
+		case ShaderStageType::Vertex:
+			return "Vertex";
+		case ShaderStageType::Pixel:
+			return "Pixel";
+		case ShaderStageType::Compute:
+			return "Compute";
+		}
+
+		Grapple_CORE_ASSERT(false, "Unhandled ShaderStageType");
+		return nullptr;
+	}
 }

@@ -181,8 +181,11 @@ namespace Grapple
 	enum class ShaderStageType
 	{
 		Vertex,
-		Pixel
+		Pixel,
+		Compute,
 	};
+
+	Grapple_API const char* ShaderStageTypeToString(ShaderStageType stage);
 
 	struct ShaderFeatures
 	{
