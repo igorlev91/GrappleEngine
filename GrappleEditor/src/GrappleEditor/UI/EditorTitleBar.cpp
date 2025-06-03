@@ -11,6 +11,7 @@
 #include "GrappleEditor/UI/EditorGUI.h"
 #include "GrappleEditor/UI/ProjectSettingsWindow.h"
 #include "GrappleEditor/UI/ECS/ECSInspector.h"
+#include "GrappleEditor/UI/ShaderLibraryWindow.h"
 
 #include "GrappleEditor/UI/Profiler/ProfilerWindow.h"
 
@@ -115,6 +116,8 @@ namespace Grapple
 				ECSInspector::Show();
 			if (ImGui::MenuItem("Profiler"))
 				ProfilerWindow::GetInstance().ShowWindow();
+			if (ImGui::MenuItem("Shader Library"))
+				ShaderLibraryWindow::Show();
 
 			const auto& viewports = EditorLayer::GetInstance().GetViewportWindows();
 			for (const Ref<ViewportWindow>& viewportWindow : viewports)

@@ -35,6 +35,7 @@
 #include "GrappleEditor/UI/PrefabEditor.h"
 #include "GrappleEditor/UI/SceneViewportWindow.h"
 #include "GrappleEditor/UI/SerializablePropertyRenderer.h"
+#include "GrappleEditor/UI/ShaderLibraryWindow.h"
 
 #include "GrappleEditor/Scripting/BuildSystem/BuildSystem.h"
 
@@ -483,6 +484,7 @@ namespace Grapple
             Grapple_PROFILE_SCOPE("EditorWindowsUpdate");
             
             ProjectSettingsWindow::OnRenderImGui();
+            ShaderLibraryWindow::GetInstance().OnRenderImGui();
             m_SceneWindow.OnImGuiRender();
             m_PropertiesWindow.OnImGuiRender();
             m_AssetManagerWindow.OnImGuiRender();
