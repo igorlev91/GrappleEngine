@@ -19,6 +19,7 @@ namespace Grapple
 			Ref<DescriptorSet> primarySetWithoutShadows);
 
 		void OnRender(RenderingContext& context) override;
+		std::optional<float> GetElapsedTime() const;
 	private:
 		struct Batch
 		{

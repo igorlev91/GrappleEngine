@@ -134,6 +134,11 @@ namespace Grapple
 		commandBuffer->StopTimer(m_Timer);
 	}
 
+	std::optional<float> GeometryPass::GetElapsedTime() const
+	{
+		return m_Timer->GetElapsedTime();
+	}
+
 	void GeometryPass::CullObjects()
 	{
 		Grapple_PROFILE_FUNCTION();
