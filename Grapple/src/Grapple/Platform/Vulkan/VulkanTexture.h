@@ -12,7 +12,6 @@ namespace Grapple
 	class VulkanTexture : public Texture
 	{
 	public:
-		VulkanTexture();
 		VulkanTexture(uint32_t width, uint32_t height, const void* data, TextureFormat format, TextureFiltering filtering);
 		VulkanTexture(const TextureSpecifications& specifications, const void* data);
 		VulkanTexture(const TextureSpecifications& specifications, const TextureData& data);

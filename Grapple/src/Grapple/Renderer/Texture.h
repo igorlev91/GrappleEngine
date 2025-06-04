@@ -26,6 +26,8 @@ namespace Grapple
 		RGB8,
 		RGBA8,
 
+		R11G11B10,
+
 		R32G32B32,
 
 		RG8,
@@ -34,6 +36,9 @@ namespace Grapple
 		RF32,
 
 		R8,
+
+		Depth24Stencil8,
+		Depth32,
 
 		// Compressed formats at the end
 		BC1_RGB,
@@ -47,6 +52,8 @@ namespace Grapple
 
 	Grapple_API bool IsCompressedTextureFormat(TextureFormat format);
 	Grapple_API const char* TextureFormatToString(TextureFormat format);
+	Grapple_API bool IsDepthTextureFormat(TextureFormat format);
+	Grapple_API bool HasStencilComponent(TextureFormat format);
 
 	enum class TextureFiltering
 	{
