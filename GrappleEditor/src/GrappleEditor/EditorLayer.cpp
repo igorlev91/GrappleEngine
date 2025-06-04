@@ -485,7 +485,6 @@ namespace Grapple
             m_PropertiesWindow.OnImGuiRender();
             m_AssetManagerWindow.OnImGuiRender();
             m_QuickSearch.OnImGuiRender();
-            m_ProfilerWindow.OnImGuiRender();
 
             ECSInspector::GetInstance().OnImGuiRender();
 

@@ -13,8 +13,6 @@
 #include "GrappleEditor/UI/ECS/ECSInspector.h"
 #include "GrappleEditor/UI/ShaderLibraryWindow.h"
 
-#include "GrappleEditor/UI/Profiler/ProfilerWindow.h"
-
 #include <imgui_internal.h>
 
 namespace Grapple
@@ -114,8 +112,6 @@ namespace Grapple
 		{
 			if (ImGui::MenuItem("ECS Inspector"))
 				ECSInspector::Show();
-			if (ImGui::MenuItem("Profiler"))
-				ProfilerWindow::GetInstance().ShowWindow();
 			if (ImGui::MenuItem("Shader Library"))
 				ShaderLibraryWindow::Show();
 
