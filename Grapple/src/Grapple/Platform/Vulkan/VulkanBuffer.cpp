@@ -135,13 +135,17 @@ namespace Grapple
 
 	StagingBuffer VulkanBuffer::FillStagingBuffer(MemorySpan data)
 	{
+		Grapple_PROFILE_FUNCTION();
 		StagingBuffer stagingBuffer{};
 		stagingBuffer.Allocation = VulkanContext::GetInstance().CreateStagingBuffer(data.GetSize(), stagingBuffer.Buffer);
 
 		void* mapped = nullptr;
 		VK_CHECK_RESULT(vmaMapMemory(VulkanContext::GetInstance().GetMemoryAllocator(), stagingBuffer.Allocation.Handle, &mapped));
 
-		std::memcpy(mapped, data.GetBuffer(), data.GetSize());
+		{
+			Grapple_PROFILE_SCOPE("Copy");
+			std::memcpy(mapped, data.GetBuffer(), data.GetSize());
+		}
 
 		vmaUnmapMemory(VulkanContext::GetInstance().GetMemoryAllocator(), stagingBuffer.Allocation.Handle);
 

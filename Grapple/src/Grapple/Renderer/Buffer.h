@@ -72,6 +72,9 @@ namespace Grapple
 	public:
 		static Ref<VertexBuffer> Create(size_t size);
 		static Ref<VertexBuffer> Create(size_t size, const void* data);
+
+		// commandBuffer - a CommandBuffer used for submitting copy commands
+		static Ref<VertexBuffer> Create(size_t size, const void* data, Ref<CommandBuffer> commandBuffer);
 	};
 
 	class Grapple_API IndexBuffer
@@ -93,5 +96,8 @@ namespace Grapple
 		static size_t GetIndexFormatSize(IndexFormat format);
 		static Ref<IndexBuffer> Create(IndexFormat format, size_t size);
 		static Ref<IndexBuffer> Create(IndexFormat format, const MemorySpan& indices);
+
+		// commandBuffer - a CommandBuffer used for submitting copy commands
+		static Ref<IndexBuffer> Create(IndexFormat format, const MemorySpan& indices, Ref<CommandBuffer> commandBuffer);
 	};
 }
