@@ -70,6 +70,7 @@ namespace Grapple
 	void VulkanBuffer::SetData(MemorySpan data, size_t offset, Ref<CommandBuffer> commandBuffer)
 	{
 		Grapple_PROFILE_FUNCTION();
+		Grapple_CORE_ASSERT(m_Usage == GPUBufferUsage::Static);
 
 		if (data.GetSize() == 0)
 			return;

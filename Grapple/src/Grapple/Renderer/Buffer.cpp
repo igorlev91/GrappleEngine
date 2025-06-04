@@ -14,6 +14,19 @@ namespace Grapple
 			return CreateRef<VulkanVertexBuffer>(size);
 		}
 
+		Grapple_CORE_ASSERT(false);
+		return nullptr;
+	}
+
+	Ref<VertexBuffer> VertexBuffer::Create(size_t size, GPUBufferUsage usage)
+	{
+		switch (RendererAPI::GetAPI())
+		{
+		case RendererAPI::API::Vulkan:
+			return CreateRef<VulkanVertexBuffer>(size, usage);
+		}
+
+		Grapple_CORE_ASSERT(false);
 		return nullptr;
 	}
 
@@ -63,6 +76,19 @@ namespace Grapple
 			return CreateRef<VulkanIndexBuffer>(format, size);
 		}
 
+		Grapple_CORE_ASSERT(false);
+		return nullptr;
+	}
+
+	Ref<IndexBuffer> IndexBuffer::Create(IndexFormat format, size_t size, GPUBufferUsage usage)
+	{
+		switch (RendererAPI::GetAPI())
+		{
+		case RendererAPI::API::Vulkan:
+			return CreateRef<VulkanIndexBuffer>(format, size, usage);
+		}
+
+		Grapple_CORE_ASSERT(false);
 		return nullptr;
 	}
 	
