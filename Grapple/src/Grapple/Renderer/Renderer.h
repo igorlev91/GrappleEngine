@@ -185,6 +185,7 @@ namespace Grapple
 		static Ref<Texture> GetWhiteTexture();
 		static Ref<Texture> GetDefaultNormalMap();
 		static Ref<Material> GetErrorMaterial();
+		static Ref<Material> GetDepthOnlyMaterial();
 
 		static Ref<FrameBuffer> GetShadowsRenderTarget(size_t index);
 		static ShadowSettings& GetShadowSettings();
@@ -195,8 +196,6 @@ namespace Grapple
 		static void ExecuteGeomertyPass();
 		static void ExecuteDecalsPass();
 		static void ExecuteShadowPass();
-		static void FlushInstances(uint32_t instanceCount, uint32_t baseInstance);
-		static void FlushShadowPassInstances(uint32_t baseInstance);
 		static void ReloadShaders();
 		static void ExecuteRenderPasses(std::vector<Ref<RenderPass>>& passes);
 	};

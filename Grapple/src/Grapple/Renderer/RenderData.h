@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Grapple/Math/Math.h"
-#include "Grapple/Renderer/UniformBuffer.h"
 
 #include "GrappleCore/Core.h"
 #include "GrappleCore/Log.h"

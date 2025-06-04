@@ -16,6 +16,7 @@
 #include "Grapple/Renderer/DescriptorSet.h"
 
 #include "Grapple/Renderer/Passes/GeometryPass.h"
+#include "Grapple/Renderer/Passes/ShadowPass.h"
 
 #include "Grapple/Project/Project.h"
 
@@ -28,18 +29,12 @@
 
 namespace Grapple
 {
-#define FIXED_SHADOW_NEAR_AND_FAR 1
-
 	Grapple_IMPL_TYPE(ShadowSettings);
-
-	struct InstanceData
-	{
-		glm::vec4 PackedTransform[3];
-	};
 
 	struct RenderPasses
 	{
-		Ref<GeometryPass> Geometry;
+		Ref<GeometryPass> Geometry = nullptr;
+		Ref<ShadowPass> Shadow = nullptr;
 
 		std::vector<Ref<RenderPass>> BeforeShadowsPasses;
 		std::vector<Ref<RenderPass>> BeforeOpaqueGeometryPasses;
@@ -47,51 +42,11 @@ namespace Grapple
 		std::vector<Ref<RenderPass>> PostProcessingPasses;
 	};
 
-	struct ShadowData
-	{
-		float Bias;
-		float FrustumSize;
-		float LightSize;
-
-		int32_t MaxCascadeIndex;
-
-		float CascadeSplits[4] = { 0.0f };
-		float CascadeFilterWeights[4] = { 0.0f };
-
-		glm::mat4 LightProjection[4];
-
-		float Resolution;
-		float Softness;
-
-		float ShadowFadeStartDistance;
-		float MaxShadowDistance;
-
-		float NormalBias;
-	};
-
-	struct InstancingMesh
-	{
-		inline void Reset()
-		{
-			Mesh = nullptr;
-			SubMeshIndex = UINT32_MAX;
-		}
-
-		Ref<const Mesh> Mesh = nullptr;
-		uint32_t SubMeshIndex = UINT32_MAX;
-	};
-
 	struct DecalData
 	{
 		glm::mat4 Transform;
 		int32_t EntityIndex;
 		Ref<const Material> Material;
-	};
-
-	struct SubMeshDrawData
-	{
-		uint32_t SubMeshIndex = 0;
-		uint32_t InstanceCount = 0;
 	};
 
 	struct RendererData
@@ -112,38 +67,17 @@ namespace Grapple
 		RendererStatistics Statistics;
 
 		RendererSubmitionQueue OpaqueQueue;
-		std::vector<uint32_t> CulledObjectIndices;
 		std::vector<DecalData> Decals;
 
-		// Instancing
-
-		std::vector<InstanceData> InstanceDataBuffer;
-		uint32_t MaxInstances = 1024 * 24;
-
-		Ref<ShaderStorageBuffer> InstancesShaderBuffer = nullptr;
-		std::vector<SubMeshDrawData> IndirectDrawData;
-
 		// Shadows
-		InstancingMesh CurrentInstancingMesh;
-		Ref<FrameBuffer> ShadowsRenderTarget[ShadowSettings::MaxCascades] = { nullptr };
-		Ref<ShaderStorageBuffer> ShadowPassInstanceBuffers[ShadowSettings::MaxCascades] = { nullptr };
-		Ref<UniformBuffer> ShadowPassCameraBuffers[ShadowSettings::MaxCascades] = { nullptr };
 		Ref<DescriptorSet> PerCascadeDescriptorSets[ShadowSettings::MaxCascades] = { nullptr };
-
 		ShadowSettings ShadowMappingSettings;
-		Ref<UniformBuffer> ShadowDataBuffer = nullptr;
-
-		float CascadeFilterWeights[4] = { 0.0f };
 
 		// Lighting
-		
 		std::vector<PointLightData> PointLights;
 		Ref<ShaderStorageBuffer> PointLightsShaderBuffer = nullptr;
 		std::vector<SpotLightData> SpotLights;
 		Ref<ShaderStorageBuffer> SpotLightsShaderBuffer = nullptr;
-
-		Ref<GPUTimer> ShadowPassTimer = nullptr;
-		Ref<GPUTimer> GeometryPassTimer = nullptr;
 
 		Ref<DescriptorSet> PrimaryDescriptorSet = nullptr;
 		Ref<DescriptorSet> PrimaryDescriptorSetWithoutShadows = nullptr;
@@ -177,41 +111,12 @@ namespace Grapple
 
 		s_RendererData.CameraBuffer = UniformBuffer::Create(sizeof(RenderView), 0);
 		s_RendererData.LightBuffer = UniformBuffer::Create(sizeof(LightData), 1);
-		s_RendererData.ShadowDataBuffer = UniformBuffer::Create(sizeof(ShadowData), 2);
-
-		s_RendererData.InstancesShaderBuffer = ShaderStorageBuffer::Create(s_RendererData.MaxInstances * sizeof(InstanceData), 3);
-		s_RendererData.InstancesShaderBuffer->SetDebugName("InstanceDataBuffer");
 
 		s_RendererData.PointLightsShaderBuffer = ShaderStorageBuffer::Create(maxPointLights * sizeof(PointLightData), 4);
 		s_RendererData.PointLightsShaderBuffer->SetDebugName("PointLightsDataBuffer");
 
 		s_RendererData.SpotLightsShaderBuffer = ShaderStorageBuffer::Create(maxSpotLights * sizeof(SpotLightData), 5);
 		s_RendererData.SpotLightsShaderBuffer->SetDebugName("SpotLightsDataBuffer");
-
-		for (uint32_t i = 0; i < ShadowSettings::MaxCascades; i++)
-		{
-			s_RendererData.ShadowPassCameraBuffers[i] = UniformBuffer::Create(sizeof(RenderView), 0);
-		}
-
-		if (RendererAPI::GetAPI() == RendererAPI::API::Vulkan)
-		{
-			s_RendererData.ShadowPassInstanceBuffers[0] = s_RendererData.InstancesShaderBuffer;
-			for (uint32_t i = 0; i < ShadowSettings::MaxCascades; i++)
-			{
-				s_RendererData.ShadowPassInstanceBuffers[i] = ShaderStorageBuffer::Create(s_RendererData.MaxInstances * sizeof(InstanceData), 3);
-				s_RendererData.ShadowPassInstanceBuffers[i]->SetDebugName(fmt::format("Cascade{}.InstanceDataBuffer", i));
-			}
-		}
-		else
-		{
-			s_RendererData.ShadowPassInstanceBuffers[0] = s_RendererData.InstancesShaderBuffer;
-			s_RendererData.ShadowPassInstanceBuffers[1] = s_RendererData.InstancesShaderBuffer;
-			s_RendererData.ShadowPassInstanceBuffers[2] = s_RendererData.InstancesShaderBuffer;
-			s_RendererData.ShadowPassInstanceBuffers[3] = s_RendererData.InstancesShaderBuffer;
-		}
-
-		s_RendererData.ShadowPassTimer = GPUTimer::Create();
-		s_RendererData.GeometryPassTimer = GPUTimer::Create();
 
 		s_RendererData.ShadowMappingSettings.Quality = ShadowQuality::Medium;
 		s_RendererData.ShadowMappingSettings.Bias = 0.015f;
@@ -298,8 +203,6 @@ namespace Grapple
 			// Setup primary descriptor set
 			s_RendererData.PrimaryDescriptorSet->WriteUniformBuffer(s_RendererData.CameraBuffer, 0);
 			s_RendererData.PrimaryDescriptorSet->WriteUniformBuffer(s_RendererData.LightBuffer, 1);
-			s_RendererData.PrimaryDescriptorSet->WriteUniformBuffer(s_RendererData.ShadowDataBuffer, 2);
-			s_RendererData.PrimaryDescriptorSet->WriteStorageBuffer(s_RendererData.InstancesShaderBuffer, 3);
 			s_RendererData.PrimaryDescriptorSet->WriteStorageBuffer(s_RendererData.PointLightsShaderBuffer, 4);
 			s_RendererData.PrimaryDescriptorSet->WriteStorageBuffer(s_RendererData.SpotLightsShaderBuffer, 5);
 
@@ -313,8 +216,6 @@ namespace Grapple
 			// Setup primary descriptor set (without shadows)
 			s_RendererData.PrimaryDescriptorSetWithoutShadows->WriteUniformBuffer(s_RendererData.CameraBuffer, 0);
 			s_RendererData.PrimaryDescriptorSetWithoutShadows->WriteUniformBuffer(s_RendererData.LightBuffer, 1);
-			s_RendererData.PrimaryDescriptorSetWithoutShadows->WriteUniformBuffer(s_RendererData.ShadowDataBuffer, 2);
-			s_RendererData.PrimaryDescriptorSetWithoutShadows->WriteStorageBuffer(s_RendererData.InstancesShaderBuffer, 3);
 			s_RendererData.PrimaryDescriptorSetWithoutShadows->WriteStorageBuffer(s_RendererData.PointLightsShaderBuffer, 4);
 			s_RendererData.PrimaryDescriptorSetWithoutShadows->WriteStorageBuffer(s_RendererData.SpotLightsShaderBuffer, 5);
 
@@ -329,10 +230,7 @@ namespace Grapple
 			for (uint32_t i = 0; i < ShadowSettings::MaxCascades; i++)
 			{
 				Ref<DescriptorSet> set = s_RendererData.PrimaryDescriptorPool->AllocateSet();
-				set->WriteUniformBuffer(s_RendererData.ShadowPassCameraBuffers[i], 0);
 				set->WriteUniformBuffer(s_RendererData.LightBuffer, 1);
-				set->WriteUniformBuffer(s_RendererData.ShadowDataBuffer, 2);
-				set->WriteStorageBuffer(s_RendererData.ShadowPassInstanceBuffers[i], 3);
 				set->WriteStorageBuffer(s_RendererData.PointLightsShaderBuffer, 4);
 				set->WriteStorageBuffer(s_RendererData.SpotLightsShaderBuffer, 5);
 
@@ -350,6 +248,10 @@ namespace Grapple
 		s_RendererData.Passes.Geometry = CreateRef<GeometryPass>(s_RendererData.OpaqueQueue,
 			s_RendererData.PrimaryDescriptorSet,
 			s_RendererData.PrimaryDescriptorSetWithoutShadows);
+
+		s_RendererData.Passes.Shadow = CreateRef<ShadowPass>(s_RendererData.OpaqueQueue,
+			s_RendererData.PrimaryDescriptorSet,
+			s_RendererData.PerCascadeDescriptorSets);
 
 		Project::OnProjectOpen.Bind(ReloadShaders);
 	}
@@ -389,274 +291,6 @@ namespace Grapple
 		s_RendererData.CurrentViewport = &viewport;
 	}
 
-	struct ShadowMappingParams
-	{
-		glm::vec3 CameraFrustumCenter;
-		float BoundingSphereRadius;
-	};
-
-	static void CalculateShadowFrustumParamsAroundCamera(ShadowMappingParams& params,
-		glm::vec3 lightDirection,
-		const Viewport& viewport,
-		float nearPlaneDistance,
-		float farPlaneDistance)
-	{
-		const RenderView& camera = viewport.FrameData.Camera;
-
-		std::array<glm::vec4, 8> frustumCorners =
-		{
-			glm::vec4(-1.0f, -1.0f, 0.0f, 1.0f),
-			glm::vec4(1.0f, -1.0f, 0.0f, 1.0f),
-			glm::vec4(-1.0f,  1.0f, 0.0f, 1.0f),
-			glm::vec4(1.0f,  1.0f, 0.0f, 1.0f),
-			glm::vec4(-1.0f, -1.0f, 1.0f, 1.0f),
-			glm::vec4(1.0f, -1.0f, 1.0f, 1.0f),
-			glm::vec4(-1.0f,  1.0f, 1.0f, 1.0f),
-			glm::vec4(1.0f,  1.0f, 1.0f, 1.0f),
-		};
-
-		for (size_t i = 0; i < frustumCorners.size(); i++)
-		{
-			frustumCorners[i] = viewport.FrameData.Camera.InverseViewProjection * frustumCorners[i];
-			frustumCorners[i] /= frustumCorners[i].w;
-		}
-
-		Math::Plane farPlane = Math::Plane::TroughPoint(camera.Position + camera.ViewDirection * farPlaneDistance, camera.ViewDirection);
-		Math::Plane nearPlane = Math::Plane::TroughPoint(camera.Position + camera.ViewDirection * nearPlaneDistance, camera.ViewDirection);
-		for (size_t i = 0; i < frustumCorners.size() / 2; i++)
-		{
-			Math::Ray ray;
-			ray.Origin = frustumCorners[i];
-			ray.Direction = frustumCorners[i + 4] - frustumCorners[i];
-
-			frustumCorners[i + 4] = glm::vec4(ray.Origin + ray.Direction * Math::IntersectPlane(farPlane, ray), 0.0f);
-		}
-
-		for (size_t i = 0; i < frustumCorners.size() / 2; i++)
-		{
-			Math::Ray ray;
-			ray.Origin = frustumCorners[i + 4];
-			ray.Direction = frustumCorners[i] - frustumCorners[i + 4];
-
-			frustumCorners[i] = glm::vec4(ray.Origin + ray.Direction * Math::IntersectPlane(nearPlane, ray), 0.0f);
-		}
-
-		glm::vec3 frustumCenter = glm::vec3(0.0f);
-		for (size_t i = 0; i < frustumCorners.size(); i++)
-			frustumCenter += (glm::vec3)frustumCorners[i];
-		frustumCenter /= frustumCorners.size();
-
-		float boundingSphereRadius = 0.0f;
-		for (size_t i = 0; i < frustumCorners.size(); i++)
-			boundingSphereRadius = glm::max(boundingSphereRadius, glm::distance(frustumCenter, (glm::vec3)frustumCorners[i]));
-
-		params.CameraFrustumCenter = frustumCenter;
-		params.BoundingSphereRadius = boundingSphereRadius;
-	}
-
-	struct CascadeFrustum
-	{
-		static constexpr size_t LeftIndex = 0;
-		static constexpr size_t RightIndex = 1;
-		static constexpr size_t TopIndex = 2;
-		static constexpr size_t BottomIndex = 3;
-
-		Math::Plane Planes[4];
-	};
-
-	static void CalculateShadowProjectionFrustum(CascadeFrustum* outPlanes, const ShadowMappingParams& params, glm::vec3 lightDirection, const Math::Basis& lightBasis)
-	{
-		outPlanes->Planes[CascadeFrustum::LeftIndex] = Math::Plane::TroughPoint(
-			params.CameraFrustumCenter - lightBasis.Right * params.BoundingSphereRadius,
-			lightBasis.Right);
-
-		outPlanes->Planes[CascadeFrustum::RightIndex] = Math::Plane::TroughPoint(
-			params.CameraFrustumCenter + lightBasis.Right * params.BoundingSphereRadius,
-			-lightBasis.Right);
-
-		outPlanes->Planes[CascadeFrustum::TopIndex] = Math::Plane::TroughPoint(
-			params.CameraFrustumCenter + lightBasis.Up * params.BoundingSphereRadius,
-			-lightBasis.Up);
-
-		outPlanes->Planes[CascadeFrustum::BottomIndex] = Math::Plane::TroughPoint(
-			params.CameraFrustumCenter - lightBasis.Up * params.BoundingSphereRadius,
-			lightBasis.Up);
-	}
-
-	static void CalculateShadowProjections(std::vector<uint32_t> perCascadeObjects[ShadowSettings::MaxCascades])
-	{
-		Grapple_PROFILE_FUNCTION();
-
-		Viewport* viewport = s_RendererData.CurrentViewport;
-		glm::vec3 lightDirection = viewport->FrameData.Light.Direction;
-		const Math::Basis& lightBasis = viewport->FrameData.LightBasis;
-		const ShadowSettings& shadowSettings = Renderer::GetShadowSettings();
-
-		ShadowMappingParams perCascadeParams[ShadowSettings::MaxCascades];
-		CascadeFrustum cascadeFrustums[ShadowSettings::MaxCascades];
-
-		{
-			Grapple_PROFILE_SCOPE("CalculateCascadeFrustum");
-
-			float currentNearPlane = viewport->FrameData.Light.Near;
-			for (size_t i = 0; i < shadowSettings.Cascades; i++)
-			{
-				// 1. Calculate a fit frustum around camera's furstum
-				CalculateShadowFrustumParamsAroundCamera(perCascadeParams[i], lightDirection,
-					*viewport, currentNearPlane,
-					shadowSettings.CascadeSplits[i]);
-
-				// 2. Calculate projection frustum planes (except near and far)
-				CalculateShadowProjectionFrustum(
-					&cascadeFrustums[i],
-					perCascadeParams[i],
-					lightDirection,
-					lightBasis);
-
-				currentNearPlane = shadowSettings.CascadeSplits[i];
-			}
-		}
-
-		{
-			Grapple_PROFILE_SCOPE("DivideIntoGroups");
-			for (size_t objectIndex = 0; objectIndex < s_RendererData.OpaqueQueue.GetSize(); objectIndex++)
-			{
-				const auto& object = s_RendererData.OpaqueQueue[objectIndex];
-				if (HAS_BIT(object.Flags, MeshRenderFlags::DontCastShadows))
-					continue;
-
-				Math::AABB objectAABB = Math::SIMD::TransformAABB(object.Mesh->GetSubMeshes()[object.SubMeshIndex].Bounds, object.Transform.ToMatrix4x4());
-				for (size_t cascadeIndex = 0; cascadeIndex < shadowSettings.Cascades; cascadeIndex++)
-				{
-					bool intersects = true;
-					for (size_t i = 0; i < 4; i++)
-					{
-						if (!objectAABB.IntersectsOrInFrontOfPlane(cascadeFrustums[cascadeIndex].Planes[i]))
-						{
-							intersects = false;
-							break;
-						}
-					}
-
-					if (intersects)
-						perCascadeObjects[cascadeIndex].push_back((uint32_t)objectIndex);
-				}
-			}
-		}
-
-		{
-			Grapple_PROFILE_SCOPE("ExtendFrustums");
-			float currentNearPlane = viewport->FrameData.Light.Near;
-			for (size_t cascadeIndex = 0; cascadeIndex < shadowSettings.Cascades; cascadeIndex++)
-			{
-				ShadowMappingParams params = perCascadeParams[cascadeIndex];
-
-				float nearPlaneDistance = 0;
-				float farPlaneDistance = 0;
-#if !FIXED_SHADOW_NEAR_AND_FAR
-
-				// 3. Extend near and far planes
-
-				Math::Plane nearPlane = Math::Plane::TroughPoint(params.CameraFrustumCenter, -lightDirection);
-				Math::Plane farPlane = Math::Plane::TroughPoint(params.CameraFrustumCenter, lightDirection);
-
-
-				for (uint32_t objectIndex : perCascadeObjects[cascadeIndex])
-				{
-					const RenderableObject& object = s_RendererData.Queue[objectIndex];
-					Math::AABB objectAABB = object.Mesh->GetSubMeshes()[object.SubMeshIndex].Bounds.Transformed(object.Transform);
-
-					glm::vec3 center = objectAABB.GetCenter();
-					glm::vec3 extents = objectAABB.Max - center;
-
-					float projectedDistance = glm::dot(glm::abs(nearPlane.Normal), extents);
-					nearPlaneDistance = glm::max(nearPlaneDistance, nearPlane.Distance(center) + projectedDistance);
-					farPlaneDistance = glm::max(farPlaneDistance, farPlane.Distance(center) + projectedDistance);
-				}
-				
-				nearPlaneDistance = -nearPlaneDistance;
-				farPlaneDistance = farPlaneDistance;
-#else
-				const float fixedPlaneDistance = 500.0f;
-				nearPlaneDistance = -fixedPlaneDistance;
-				farPlaneDistance = fixedPlaneDistance;
-#endif
-
-				// Move shadow map in texel size increaments. in order ot avoid shadow edge swimming
-				// https://alextardif.com/shadowmapping.html
-				float texelsPerUnit = (float)GetShadowMapResolution(s_RendererData.ShadowMappingSettings.Quality) / (params.BoundingSphereRadius * 2.0f);
-
-				glm::mat4 view = glm::scale(
-					glm::lookAt(
-						params.CameraFrustumCenter + lightDirection * nearPlaneDistance,
-						params.CameraFrustumCenter, glm::vec3(0.0f, 1.0f, 0.0f)),
-					glm::vec3(texelsPerUnit));
-
-				glm::vec4 projectedCenter = view * glm::vec4(params.CameraFrustumCenter, 1.0f);
-				projectedCenter.x = glm::round(projectedCenter.x);
-				projectedCenter.y = glm::round(projectedCenter.y);
-
-				params.CameraFrustumCenter = glm::inverse(view) * glm::vec4((glm::vec3)projectedCenter, 1.0f);
-
-				view = glm::lookAt(
-					params.CameraFrustumCenter + lightDirection * nearPlaneDistance,
-					params.CameraFrustumCenter, glm::vec3(0.0f, 1.0f, 0.0f));
-
-				glm::mat4 projection;
-				
-				if (RendererAPI::GetAPI() == RendererAPI::API::Vulkan)
-				{
-					projection = glm::orthoRH_ZO(
-						-params.BoundingSphereRadius,
-						params.BoundingSphereRadius,
-						-params.BoundingSphereRadius,
-						params.BoundingSphereRadius,
-						viewport->FrameData.Light.Near,
-						farPlaneDistance - nearPlaneDistance);
-				}
-
-				s_RendererData.CascadeFilterWeights[cascadeIndex] = params.BoundingSphereRadius * 2.0f;
-
-				viewport->FrameData.LightView[cascadeIndex].SetViewAndProjection(projection, view);
-				currentNearPlane = shadowSettings.CascadeSplits[cascadeIndex];
-			}
-		}
-	}
-
-	static void CalculateShadowMappingParams()
-	{
-		Grapple_PROFILE_FUNCTION();
-
-		ShadowData shadowData;
-		shadowData.Bias = s_RendererData.ShadowMappingSettings.Bias;
-		shadowData.NormalBias = s_RendererData.ShadowMappingSettings.NormalBias;
-		shadowData.LightSize = s_RendererData.ShadowMappingSettings.LightSize;
-		shadowData.Resolution = (float)GetShadowMapResolution(s_RendererData.ShadowMappingSettings.Quality);
-		shadowData.Softness = s_RendererData.ShadowMappingSettings.Softness;
-
-		for (size_t i = 0; i < 4; i++)
-			shadowData.CascadeSplits[i] = s_RendererData.ShadowMappingSettings.CascadeSplits[i];
-
-		for (size_t i = 0; i < 4; i++)
-			shadowData.LightProjection[i] = s_RendererData.CurrentViewport->FrameData.LightView[i].ViewProjection;
-
-		shadowData.MaxCascadeIndex = s_RendererData.ShadowMappingSettings.Cascades - 1;
-		shadowData.FrustumSize = 2.0f * s_RendererData.CurrentViewport->FrameData.Camera.Near
-			* glm::tan(glm::radians(s_RendererData.CurrentViewport->FrameData.Camera.FOV / 2.0f))
-			* s_RendererData.CurrentViewport->GetAspectRatio();
-
-		shadowData.CascadeFilterWeights[0] = 1.0f;
-		for (uint32_t i = 1; i < 4; i++)
-		{
-			shadowData.CascadeFilterWeights[i] = 1.0f / (s_RendererData.CascadeFilterWeights[i] / s_RendererData.CascadeFilterWeights[0]);
-		}
-
-		shadowData.MaxShadowDistance = shadowData.CascadeSplits[s_RendererData.ShadowMappingSettings.Cascades - 1];
-		shadowData.ShadowFadeStartDistance = shadowData.MaxShadowDistance - s_RendererData.ShadowMappingSettings.FadeDistance;
-
-		s_RendererData.ShadowDataBuffer->SetData(&shadowData, sizeof(shadowData), 0);
-	}
-
 	void Renderer::BeginScene(Viewport& viewport)
 	{
 		Grapple_PROFILE_FUNCTION();
@@ -690,53 +324,6 @@ namespace Grapple
 			s_RendererData.SpotLightsShaderBuffer->SetData(MemorySpan::FromVector(s_RendererData.SpotLights), 0, commandBuffer);
 		}
 
-		if (s_RendererData.ShadowMappingSettings.Enabled)
-		{
-			Grapple_PROFILE_SCOPE("ResizeShadowBuffers");
-			uint32_t size = (uint32_t)GetShadowMapResolution(s_RendererData.ShadowMappingSettings.Quality);
-
-			bool rewriteDescriptorSet = !s_RendererData.ShadowMappingSettings.Enabled;
-			if (s_RendererData.ShadowsRenderTarget[0] == nullptr)
-			{
-				FrameBufferSpecifications shadowMapSpecs;
-				shadowMapSpecs.Width = size;
-				shadowMapSpecs.Height = size;
-				shadowMapSpecs.Attachments = { { TextureFormat::Depth24Stencil8, TextureWrap::Clamp, TextureFiltering::Closest } };
-
-				for (size_t i = 0; i < 4; i++)
-					s_RendererData.ShadowsRenderTarget[i] = FrameBuffer::Create(shadowMapSpecs);
-
-				rewriteDescriptorSet = true;
-			}
-			else
-			{
-				auto& shadowMapSpecs = s_RendererData.ShadowsRenderTarget[0]->GetSpecifications();
-				if (shadowMapSpecs.Width != size || shadowMapSpecs.Height != size)
-				{
-					for (size_t i = 0; i < 4; i++)
-						s_RendererData.ShadowsRenderTarget[i]->Resize(size, size);
-
-					rewriteDescriptorSet = true;
-				}
-			}
-
-			if (RendererAPI::GetAPI() == RendererAPI::API::Vulkan && rewriteDescriptorSet)
-			{
-				for (size_t i = 0; i < ShadowSettings::MaxCascades; i++)
-				{
-					s_RendererData.PrimaryDescriptorSet->WriteImage(s_RendererData.ShadowsRenderTarget[i], 0, (uint32_t)(28 + i));
-				}
-
-				s_RendererData.PrimaryDescriptorSet->FlushWrites();
-			}
-
-		}
-
-		for (size_t i = 0; i < s_RendererData.ShadowMappingSettings.Cascades; i++)
-		{
-			commandBuffer->ClearDepthAttachment(s_RendererData.ShadowsRenderTarget[i], 1.0f);
-		}
-
 		{
 			// Generate camera frustum planes
 			Grapple_PROFILE_SCOPE("CalculateFrustumPlanes");
@@ -756,62 +343,6 @@ namespace Grapple
 		commandBuffer->SetViewportAndScisors(Math::Rect(glm::vec2(0.0f), (glm::vec2)s_RendererData.CurrentViewport->RenderTarget->GetSize()));
 	}
 
-	static bool CompareRenderableObjects(uint32_t aIndex, uint32_t bIndex)
-	{
-		const auto& a = s_RendererData.OpaqueQueue[aIndex];
-		const auto& b = s_RendererData.OpaqueQueue[bIndex];
-
-		return a.SortKey < b.SortKey;
-
-		// TODO: group objects based on material and mesh, then sort by distance
-
-#if 0
-		if ((uint64_t)a.Material->Handle < (uint64_t)b.Material->Handle)
-			return true;
-
-		if (a.Material->Handle == b.Material->Handle)
-		{
-			if (a.Mesh->Handle == b.Mesh->Handle)
-			{
-			}
-
-			if ((uint64_t)a.Mesh->Handle < (uint64_t)b.Mesh->Handle)
-				return true;
-		}
-
-		return false;
-#endif
-	}
-
-	static void PerformFrustumCulling()
-	{
-		Grapple_PROFILE_FUNCTION();
-
-		Math::AABB objectAABB;
-
-		const FrustumPlanes& planes = s_RendererData.CurrentViewport->FrameData.CameraFrustumPlanes;
-		for (size_t i = 0; i < s_RendererData.OpaqueQueue.GetSize(); i++)
-		{
-			const auto& object = s_RendererData.OpaqueQueue[i];
-			objectAABB = Math::SIMD::TransformAABB(object.Mesh->GetSubMeshes()[object.SubMeshIndex].Bounds, object.Transform.ToMatrix4x4());
-
-			bool intersects = true;
-			for (size_t i = 0; i < planes.PlanesCount; i++)
-			{
-				if (!objectAABB.IntersectsOrInFrontOfPlane(planes.Planes[i]))
-				{
-					intersects = false;
-					break;
-				}
-			}
-
-			if (intersects)
-			{
-				s_RendererData.CulledObjectIndices.push_back((uint32_t)i);
-			}
-		}
-	}
-
 	void Renderer::Flush()
 	{
 		Grapple_PROFILE_FUNCTION();
@@ -823,30 +354,6 @@ namespace Grapple
 			ExecuteShadowPass();
 		}
 
-		if (RendererAPI::GetAPI() == RendererAPI::API::Vulkan)
-		{
-			Ref<VulkanCommandBuffer> commandBuffer = VulkanContext::GetInstance().GetPrimaryCommandBuffer();
-			VkImage images[4] = { VK_NULL_HANDLE };
-
-			for (int32_t i = 0; i < s_RendererData.ShadowMappingSettings.Cascades; i++)
-			{
-				images[i] = As<VulkanFrameBuffer>(s_RendererData.ShadowsRenderTarget[i])->GetAttachmentImage(0);
-			}
-
-			commandBuffer->DepthImagesBarrier(Span(images, s_RendererData.ShadowMappingSettings.Cascades), true,
-				VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
-				VK_ACCESS_NONE,
-				VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
-				VK_ACCESS_SHADER_READ_BIT,
-				VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
-				VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-		}
-
-		{
-			Grapple_PROFILE_SCOPE("PrepareViewport");
-			s_RendererData.CameraBuffer->Bind();
-		}
-
 		ExecuteGeomertyPass();
 
 #if 0
@@ -856,8 +363,6 @@ namespace Grapple
 		}
 #endif
 
-		s_RendererData.InstanceDataBuffer.clear();
-		s_RendererData.CulledObjectIndices.clear();
 		s_RendererData.OpaqueQueue.m_Buffer.clear();
 	}
 
@@ -948,184 +453,18 @@ namespace Grapple
 
 	void Renderer::ExecuteShadowPass()
 	{
+		Grapple_PROFILE_FUNCTION();
 		{
 			Grapple_PROFILE_SCOPE("BeforeShadowsPasses");
 			ExecuteRenderPasses(s_RendererData.Passes.BeforeShadowsPasses);
 		}
 
-		Grapple_PROFILE_FUNCTION();
-
-		Ref<CommandBuffer> commandBuffer = GraphicsContext::GetInstance().GetCommandBuffer();
-		commandBuffer->StartTimer(s_RendererData.ShadowPassTimer);
-
-		std::vector<uint32_t> perCascadeObjects[ShadowSettings::MaxCascades];
-
-		CalculateShadowProjections(perCascadeObjects);
-		CalculateShadowMappingParams();
-
-		for (size_t cascadeIndex = 0; cascadeIndex < s_RendererData.ShadowMappingSettings.Cascades; cascadeIndex++)
-		{
-			if (perCascadeObjects[cascadeIndex].size() == 0)
-			{
-				continue;
-			}
-
-			const FrameBufferSpecifications& shadowMapSpecs = s_RendererData.ShadowsRenderTarget[cascadeIndex]->GetSpecifications();
-
-			// Fill instancing buffer
-			Ref<ShaderStorageBuffer> instanceBuffer = s_RendererData.ShadowPassInstanceBuffers[cascadeIndex];
-
-			{
-				Grapple_PROFILE_SCOPE("GroupByMesh");
-
-				// Group objects with same meshes together
-				std::sort(perCascadeObjects[cascadeIndex].begin(), perCascadeObjects[cascadeIndex].end(), [](uint32_t aIndex, uint32_t bIndex) -> bool
-				{
-					const auto& a = s_RendererData.OpaqueQueue[aIndex];
-					const auto& b = s_RendererData.OpaqueQueue[bIndex];
-
-					if (a.Mesh.get() == a.Mesh.get())
-						return a.SubMeshIndex < b.SubMeshIndex;
-
-					return (uint64_t)a.Mesh.get() < (uint64_t)b.Mesh.get();
-				});
-			}
-
-			{
-				Grapple_PROFILE_SCOPE("FillInstanceData");
-
-				// Fill instances buffer
-				s_RendererData.InstanceDataBuffer.clear();
-				for (uint32_t i : perCascadeObjects[cascadeIndex])
-				{
-					auto& instanceData = s_RendererData.InstanceDataBuffer.emplace_back();
-					const auto& transform = s_RendererData.OpaqueQueue[i].Transform;
-					instanceData.PackedTransform[0] = glm::vec4(transform.RotationScale[0], transform.Translation.x);
-					instanceData.PackedTransform[1] = glm::vec4(transform.RotationScale[1], transform.Translation.y);
-					instanceData.PackedTransform[2] = glm::vec4(transform.RotationScale[2], transform.Translation.z);
-				}
-			}
-
-			{
-				Grapple_PROFILE_SCOPE("SetInstancesData");
-				instanceBuffer->SetData(MemorySpan::FromVector(s_RendererData.InstanceDataBuffer), 0, commandBuffer);
-			}
-
-			// Render
-
-			commandBuffer->BeginRenderTarget(s_RendererData.ShadowsRenderTarget[cascadeIndex]);
-
-			if (RendererAPI::GetAPI() == RendererAPI::API::Vulkan)
-			{
-				Ref<VulkanCommandBuffer> commandBuffer = VulkanContext::GetInstance().GetPrimaryCommandBuffer();
-
-				commandBuffer->SetPrimaryDescriptorSet(s_RendererData.PerCascadeDescriptorSets[cascadeIndex]);
-				commandBuffer->SetSecondaryDescriptorSet(nullptr);
-			}
-
-			commandBuffer->ApplyMaterial(s_RendererData.DepthOnlyMeshMaterial);
-			commandBuffer->SetViewportAndScisors(Math::Rect(0.0f, 0.0f, shadowMapSpecs.Width, shadowMapSpecs.Height));
-
-			s_RendererData.ShadowPassCameraBuffers[cascadeIndex]->SetData(
-				&s_RendererData.CurrentViewport->FrameData.LightView[cascadeIndex],
-				sizeof(s_RendererData.CurrentViewport->FrameData.LightView[cascadeIndex]), 0);
-
-			s_RendererData.ShadowPassCameraBuffers[cascadeIndex]->Bind();
-			s_RendererData.CurrentInstancingMesh.Reset();
-
-			s_RendererData.IndirectDrawData.clear();
-			s_RendererData.CurrentInstancingMesh.Reset();
-
-			{
-				Grapple_PROFILE_SCOPE("ExecuteDrawCalls");
-
-				uint32_t baseInstance = 0;
-				uint32_t currentInstance = 0;
-				for (uint32_t objectIndex : perCascadeObjects[cascadeIndex])
-				{
-					const auto& queued = s_RendererData.OpaqueQueue[objectIndex];
-					if (queued.Mesh.get() != s_RendererData.CurrentInstancingMesh.Mesh.get())
-					{
-						FlushShadowPassInstances(baseInstance);
-
-						baseInstance = currentInstance;
-
-						s_RendererData.CurrentInstancingMesh.Mesh = queued.Mesh;
-						auto& command = s_RendererData.IndirectDrawData.emplace_back();
-						command.InstanceCount = 1;
-						command.SubMeshIndex = queued.SubMeshIndex;
-					}
-					else
-					{
-						if (s_RendererData.IndirectDrawData.size() > 0 && s_RendererData.IndirectDrawData.back().SubMeshIndex == queued.SubMeshIndex)
-						{
-							s_RendererData.IndirectDrawData.back().InstanceCount++;
-						}
-						else
-						{
-							auto& command = s_RendererData.IndirectDrawData.emplace_back();
-							command.InstanceCount = 1;
-							command.SubMeshIndex = queued.SubMeshIndex;
-						}
-					}
-
-					currentInstance++;
-				}
-
-				FlushShadowPassInstances(baseInstance);
-			}
-
-			commandBuffer->EndRenderTarget();
-		}
-
-		commandBuffer->StopTimer(s_RendererData.ShadowPassTimer);
-
-		s_RendererData.CurrentInstancingMesh.Reset();
-		s_RendererData.InstanceDataBuffer.clear();
-	}
-
-	void Renderer::FlushInstances(uint32_t instanceCount, uint32_t baseInstance)
-	{
-		Grapple_PROFILE_FUNCTION();
-
-		if (instanceCount == 0 || s_RendererData.CurrentInstancingMesh.Mesh == nullptr)
-			return;
-
-		auto mesh = s_RendererData.CurrentInstancingMesh;
-		const SubMesh& subMesh = mesh.Mesh->GetSubMeshes()[mesh.SubMeshIndex];
-
-		Ref<CommandBuffer> commandBuffer = GraphicsContext::GetInstance().GetCommandBuffer();
-		commandBuffer->DrawIndexed(mesh.Mesh, mesh.SubMeshIndex, baseInstance, instanceCount);
-
-		s_RendererData.Statistics.DrawCallsCount++;
-		s_RendererData.Statistics.DrawCallsSavedByInstancing += instanceCount - 1;
-	}
-
-	void Renderer::FlushShadowPassInstances(uint32_t baseInstance)
-	{
-		Grapple_PROFILE_FUNCTION();
-
-		if (s_RendererData.CurrentInstancingMesh.Mesh == nullptr)
-			return;
-
-		Ref<CommandBuffer> commandBuffer = GraphicsContext::GetInstance().GetCommandBuffer();
-		for (const auto& drawCall : s_RendererData.IndirectDrawData)
-		{
-			commandBuffer->DrawIndexed(s_RendererData.CurrentInstancingMesh.Mesh, drawCall.SubMeshIndex, baseInstance, drawCall.InstanceCount);
-			baseInstance += drawCall.InstanceCount;
-
-			s_RendererData.Statistics.DrawCallsCount++;
-			s_RendererData.Statistics.DrawCallsSavedByInstancing += (uint32_t)drawCall.InstanceCount - 1;
-		}
-
-		s_RendererData.IndirectDrawData.clear();
+		RenderingContext context(s_RendererData.CurrentViewport->RenderTarget, s_RendererData.CurrentViewport->RTPool);
+		s_RendererData.Passes.Shadow->OnRender(context);
 	}
 
 	void Renderer::EndScene()
 	{
-		s_RendererData.Statistics.ShadowPassTime += s_RendererData.ShadowPassTimer->GetElapsedTime().value_or(0.0f);
-		s_RendererData.Statistics.GeometryPassTime += s_RendererData.GeometryPassTimer->GetElapsedTime().value_or(0.0f);
-
 		s_RendererData.PointLights.clear();
 		s_RendererData.SpotLights.clear();
 	}
@@ -1259,9 +598,14 @@ namespace Grapple
 		return s_RendererData.ErrorMaterial;
 	}
 
+	Ref<Material> Renderer::GetDepthOnlyMaterial()
+	{
+		return s_RendererData.DepthOnlyMeshMaterial;
+	}
+
 	Ref<FrameBuffer> Renderer::GetShadowsRenderTarget(size_t index)
 	{
-		return s_RendererData.ShadowsRenderTarget[index];
+		return s_RendererData.Passes.Shadow->GetShadowRenderTarget((uint32_t)index);
 	}
 
 	ShadowSettings& Renderer::GetShadowSettings()
