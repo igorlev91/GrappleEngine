@@ -15,6 +15,8 @@
 #include "Grapple/Renderer/GPUTimer.h"
 #include "Grapple/Renderer/DescriptorSet.h"
 
+#include "Grapple/Renderer/Passes/GeometryPass.h"
+
 #include "Grapple/Project/Project.h"
 
 #include "GrappleCore/Profiler/Profiler.h"
@@ -37,6 +39,8 @@ namespace Grapple
 
 	struct RenderPasses
 	{
+		Ref<GeometryPass> Geometry;
+
 		std::vector<Ref<RenderPass>> BeforeShadowsPasses;
 		std::vector<Ref<RenderPass>> BeforeOpaqueGeometryPasses;
 		std::vector<Ref<RenderPass>> AfterOpaqueGeometryPasses;
@@ -342,6 +346,10 @@ namespace Grapple
 				s_RendererData.PerCascadeDescriptorSets[i] = set;
 			}
 		}
+
+		s_RendererData.Passes.Geometry = CreateRef<GeometryPass>(s_RendererData.OpaqueQueue,
+			s_RendererData.PrimaryDescriptorSet,
+			s_RendererData.PrimaryDescriptorSetWithoutShadows);
 
 		Project::OnProjectOpen.Bind(ReloadShaders);
 	}
@@ -860,91 +868,8 @@ namespace Grapple
 			ExecuteRenderPasses(s_RendererData.Passes.BeforeOpaqueGeometryPasses);
 		}
 
-		Grapple_PROFILE_FUNCTION();
-
-		Ref<CommandBuffer> commandBuffer = GraphicsContext::GetInstance().GetCommandBuffer();
-
-		if (RendererAPI::GetAPI() == RendererAPI::API::Vulkan)
-		{
-			Ref<VulkanCommandBuffer> commandBuffer = VulkanContext::GetInstance().GetPrimaryCommandBuffer();
-			Ref<VulkanFrameBuffer> renderTarget = As<VulkanFrameBuffer>(s_RendererData.CurrentViewport->RenderTarget);
-			
-			if (s_RendererData.ShadowMappingSettings.Enabled)
-			{
-				commandBuffer->SetPrimaryDescriptorSet(s_RendererData.PrimaryDescriptorSet);
-			}
-			else
-			{
-				commandBuffer->SetPrimaryDescriptorSet(s_RendererData.PrimaryDescriptorSetWithoutShadows);
-			}
-
-			commandBuffer->SetSecondaryDescriptorSet(nullptr);
-		}
-
-		s_RendererData.CulledObjectIndices.clear();
-		PerformFrustumCulling();
-		s_RendererData.Statistics.ObjectsCulled += (uint32_t)(s_RendererData.OpaqueQueue.GetSize() - s_RendererData.CulledObjectIndices.size());
-
-		{
-			Grapple_PROFILE_SCOPE("Sort");
-			std::sort(s_RendererData.CulledObjectIndices.begin(), s_RendererData.CulledObjectIndices.end(), CompareRenderableObjects);
-		}
-
-		Ref<const Material> currentMaterial = nullptr;
-		s_RendererData.InstanceDataBuffer.clear();
-
-		{
-			Grapple_PROFILE_SCOPE("FillInstacesData");
-			for (uint32_t objectIndex : s_RendererData.CulledObjectIndices)
-			{
-				auto& instanceData = s_RendererData.InstanceDataBuffer.emplace_back();
-				const auto& transform = s_RendererData.OpaqueQueue[objectIndex].Transform;
-				instanceData.PackedTransform[0] = glm::vec4(transform.RotationScale[0], transform.Translation.x);
-				instanceData.PackedTransform[1] = glm::vec4(transform.RotationScale[1], transform.Translation.y);
-				instanceData.PackedTransform[2] = glm::vec4(transform.RotationScale[2], transform.Translation.z);
-			}
-		}
-
-		{
-			Grapple_PROFILE_SCOPE("SetIntancesData");
-			s_RendererData.InstancesShaderBuffer->SetData(MemorySpan::FromVector(s_RendererData.InstanceDataBuffer), 0, commandBuffer);
-		}
-
-		commandBuffer->StartTimer(s_RendererData.GeometryPassTimer);
-		commandBuffer->BeginRenderTarget(s_RendererData.CurrentViewport->RenderTarget);
-
-		uint32_t baseInstance = 0;
-		for (uint32_t currentInstance = 0; currentInstance < (uint32_t)s_RendererData.CulledObjectIndices.size(); currentInstance++)
-		{
-			uint32_t objectIndex = s_RendererData.CulledObjectIndices[currentInstance];
-			const auto& object = s_RendererData.OpaqueQueue[objectIndex];
-
-			if (s_RendererData.CurrentInstancingMesh.Mesh.get() != object.Mesh.get()
-				|| s_RendererData.CurrentInstancingMesh.SubMeshIndex != object.SubMeshIndex)
-			{
-				FlushInstances(currentInstance - baseInstance, baseInstance);
-				baseInstance = currentInstance;
-
-				s_RendererData.CurrentInstancingMesh.Mesh = object.Mesh;
-				s_RendererData.CurrentInstancingMesh.SubMeshIndex = object.SubMeshIndex;
-			}
-
-			if (object.Material.get() != currentMaterial.get())
-			{
-				FlushInstances(currentInstance - baseInstance, baseInstance);
-				baseInstance = currentInstance;
-
-				currentMaterial = object.Material;
-
-				ApplyMaterial(object.Material);
-			}
-		}
-
-		FlushInstances((uint32_t)s_RendererData.CulledObjectIndices.size() - baseInstance, baseInstance);
-		s_RendererData.CurrentInstancingMesh.Reset();
-
-		commandBuffer->EndRenderTarget();
-		commandBuffer->StopTimer(s_RendererData.GeometryPassTimer);
+		RenderingContext context(s_RendererData.CurrentViewport->RenderTarget, s_RendererData.CurrentViewport->RTPool);
+		s_RendererData.Passes.Geometry->OnRender(context);
 		
 		{
 			Grapple_PROFILE_SCOPE("AfterGeometryPasses");
