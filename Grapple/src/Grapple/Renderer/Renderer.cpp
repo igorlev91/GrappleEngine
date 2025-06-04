@@ -562,11 +562,16 @@ namespace Grapple
 
 	void Renderer::ExecutePostProcessingPasses()
 	{
+		Grapple_PROFILE_FUNCTION();
+
+		s_RendererData.CurrentViewport->Graph.Execute(GraphicsContext::GetInstance().GetCommandBuffer());
+
+#if 0
 		if (!s_RendererData.CurrentViewport->PostProcessingEnabled)
 			return;
 
-		Grapple_PROFILE_FUNCTION();
 		ExecuteRenderPasses(s_RendererData.Passes.PostProcessingPasses);
+#endif
 	}
 
 	RendererSubmitionQueue& Renderer::GetOpaqueSubmitionQueue()

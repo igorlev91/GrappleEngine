@@ -48,7 +48,9 @@ namespace Grapple
 
 		virtual void CreateFrameBuffer();
 		virtual void OnClear();
-		virtual void OnViewportChanged() {}
+		virtual void OnViewportChanged();
+	private:
+		void BuildRenderGraph();
 	public:
 		bool ShowWindow;
 	protected:

@@ -5,6 +5,8 @@
 #include "Grapple/Renderer/RenderData.h"
 #include "Grapple/Renderer/RenderTargetsPool.h"
 
+#include "Grapple/Renderer/RenderGraph/RenderGraph.h"
+
 #include <vector>
 #include <glm/glm.hpp>
 
@@ -29,6 +31,8 @@ namespace Grapple
 		RenderData FrameData;
 		Ref<FrameBuffer> RenderTarget;
 		RenderTargetsPool RTPool;
+
+		RenderGraph Graph;
 
 		uint32_t ColorAttachmentIndex = UINT32_MAX;
 		uint32_t NormalsAttachmentIndex = UINT32_MAX;
