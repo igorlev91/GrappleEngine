@@ -10,7 +10,6 @@ local vulkan_lib = vulkan_sdk .. "/lib/"
 local assimp_path = "%{wks.location}/Grapple/vendor/assimp/assimp/"
 
 INCLUDE_DIRS = {
-	GLAD = "%{wks.location}/Grapple/vendor/GLAD/include",
 	dds = "%{wks.location}/Grapple/vendor/dds-ktx/",
 	GLFW = "%{wks.location}/Grapple/vendor/GLFW/include",
 	glm = "%{wks.location}/Grapple/vendor/glm/",

@@ -7,7 +7,6 @@
 
 #include "Grapple/AssetManager/AssetManager.h"
 
-#include "Grapple/Renderer/RenderCommand.h"
 #include "Grapple/Renderer/Viewport.h"
 #include "Grapple/Renderer/Renderer.h"
 #include "Grapple/Renderer/ShaderLibrary.h"
@@ -91,12 +90,10 @@ namespace Grapple
 
 		std::vector<QuadVertex> Vertices;
 
-		Ref<VertexArray> QuadsMesh = nullptr;
 		Ref<VertexBuffer> QuadsVertexBuffer = nullptr;
 		Ref<IndexBuffer> IndexBuffer = nullptr;
 
 		std::vector<TextVertex> TextVertices;
-		Ref<VertexArray> TextMesh = nullptr;
 		Ref<VertexBuffer> TextVertexBuffer = nullptr;
 
 		size_t TextQuadIndex = 0;
@@ -145,37 +142,11 @@ namespace Grapple
 			indices[quadIndex * 6 + 5] = (uint32_t)(quadIndex * 4 + 3);
 		}
 
-		s_Renderer2DData.QuadsMesh = VertexArray::Create();
 		s_Renderer2DData.QuadsVertexBuffer = VertexBuffer::Create(maxQuads * 4 * sizeof(QuadVertex));
 		s_Renderer2DData.IndexBuffer = IndexBuffer::Create(IndexBuffer::IndexFormat::UInt32, MemorySpan::FromVector(indices));
 
-		s_Renderer2DData.QuadsVertexBuffer->SetLayout({
-			BufferLayoutElement("i_Position", ShaderDataType::Float3),
-			BufferLayoutElement("i_Color", ShaderDataType::Float4),
-			BufferLayoutElement("i_UV", ShaderDataType::Float2),
-			BufferLayoutElement("i_TextureIndex", ShaderDataType::Float),
-			BufferLayoutElement("i_EntityIndex", ShaderDataType::Int),
-		});
-
-		s_Renderer2DData.QuadsMesh->SetIndexBuffer(s_Renderer2DData.IndexBuffer);
-		s_Renderer2DData.QuadsMesh->AddVertexBuffer(s_Renderer2DData.QuadsVertexBuffer);
-
-		s_Renderer2DData.QuadsMesh->Unbind();
-
 		// Text
-		s_Renderer2DData.TextMesh = VertexArray::Create();
 		s_Renderer2DData.TextVertexBuffer = VertexBuffer::Create(maxQuads * 4 * sizeof(TextVertex));
-		s_Renderer2DData.TextVertexBuffer->SetLayout({
-			BufferLayoutElement("i_Position", ShaderDataType::Float3),
-			BufferLayoutElement("i_Color", ShaderDataType::Float4),
-			BufferLayoutElement("i_UV", ShaderDataType::Float2),
-			BufferLayoutElement("i_EntityIndex", ShaderDataType::Int),
-		});
-
-		s_Renderer2DData.TextMesh->SetIndexBuffer(s_Renderer2DData.IndexBuffer);
-		s_Renderer2DData.TextMesh->AddVertexBuffer(s_Renderer2DData.TextVertexBuffer);
-
-		s_Renderer2DData.TextMesh->Unbind();
 
 		s_Renderer2DData.QuadVertices[0] = glm::vec3(-0.5f, -0.5f, 0.0f);
 		s_Renderer2DData.QuadVertices[1] = glm::vec3(-0.5f, 0.5f, 0.0f);
@@ -642,31 +613,8 @@ namespace Grapple
 			commandBuffer->BindIndexBuffer(s_Renderer2DData.IndexBuffer);
 			commandBuffer->DrawIndexed(batch.Start * 6, batch.Count * 6);
 
-			return;
+			s_Renderer2DData.Stats.DrawCalls++;
 		}
-
-		int32_t slots[MaxTexturesCount];
-		for (uint32_t i = 0; i < MaxTexturesCount; i++)
-			slots[i] = (int32_t)i;
-
-		for (uint32_t i = 0; i < batch.TexturesCount; i++)
-			batch.Textures[i]->Bind(i);
-
-		Ref<Shader> shader = batch.Material->GetShader();
-		Grapple_CORE_ASSERT(shader);
-
-		std::optional<uint32_t> texturesParameterIndex = shader->GetPropertyIndex("u_Textures");
-
-		if (texturesParameterIndex.has_value())
-			batch.Material->SetIntArray(texturesParameterIndex.value(), slots, batch.TexturesCount);
-
-		{
-			Grapple_PROFILE_SCOPE("Draw");
-			RenderCommand::ApplyMaterial(batch.Material);
-			RenderCommand::DrawIndexed(s_Renderer2DData.QuadsMesh, batch.Start * 6, batch.Count * 6);
-		}
-
-		s_Renderer2DData.Stats.DrawCalls++;
 	}
 
 	void Renderer2D::FlushQuadBatches()
@@ -732,7 +680,7 @@ namespace Grapple
 					{ 0, 1, ShaderDataType::Float4 }, // COlor
 					{ 0, 2, ShaderDataType::Float2 }, // UV
 					{ 0, 3, ShaderDataType::Int }, // Entity index
-				});
+					});
 
 				Ref<const DescriptorSetLayout> layouts[] = { Renderer::GetPrimaryDescriptorSetLayout(), s_Renderer2DData.TextDescriptorPool->GetLayout() };
 
@@ -759,20 +707,6 @@ namespace Grapple
 			commandBuffer->BindVertexBuffers(Span((Ref<const VertexBuffer>)s_Renderer2DData.TextVertexBuffer));
 			commandBuffer->BindIndexBuffer(s_Renderer2DData.IndexBuffer);
 			commandBuffer->DrawIndexed((uint32_t)(s_Renderer2DData.TextQuadIndex * 6));
-
-			s_Renderer2DData.TextQuadIndex = 0;
-
-			return;
-		}
-
-		if (s_Renderer2DData.TextQuadIndex != 0 && s_Renderer2DData.CurrentFont)
-		{
-			s_Renderer2DData.TextVertexBuffer->SetData(s_Renderer2DData.TextVertices.data(), s_Renderer2DData.TextQuadIndex * sizeof(TextVertex) * 4);
-
-			auto& fontAtlas = s_Renderer2DData.TextMaterial->GetPropertyValue<TexturePropertyValue>(*s_Renderer2DData.FontAtlasPropertyIndex);
-			fontAtlas.SetTexture(s_Renderer2DData.CurrentFont->GetAtlas());
-
-			Renderer::DrawMesh(s_Renderer2DData.TextMesh, s_Renderer2DData.TextMaterial, s_Renderer2DData.TextQuadIndex * 6);
 		}
 
 		s_Renderer2DData.TextQuadIndex = 0;

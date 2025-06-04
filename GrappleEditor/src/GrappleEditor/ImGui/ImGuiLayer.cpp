@@ -7,7 +7,6 @@
 
 #include "GrapplePlatform/Window.h"
 
-#include "GrappleEditor/ImGui/ImGuiLayerOpenGL.h"
 #include "GrappleEditor/ImGui/ImGuiLayerVulkan.h"
 
 #include <imgui_internal.h>
@@ -165,9 +164,6 @@ namespace Grapple
 	{
 		switch (RendererAPI::GetAPI())
 		{
-		case RendererAPI::API::OpenGL:
-			s_Instance = CreateRef<ImGuiLayerOpenGL>();
-			break;
 		case RendererAPI::API::Vulkan:
 			s_Instance = CreateRef<ImGuiLayerVulkan>();
 			break;

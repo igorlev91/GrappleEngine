@@ -35,7 +35,6 @@ project "Grapple"
 		INCLUDE_DIRS.msdf_gen,
 		INCLUDE_DIRS.msdf_atlas_gen,
 
-		INCLUDE_DIRS.GLAD,
 		INCLUDE_DIRS.GLFW,
 		INCLUDE_DIRS.glm,
 		INCLUDE_DIRS.stb_image,
@@ -53,7 +52,6 @@ project "Grapple"
 
 	links
 	{
-		"GLAD",
 		"GLFW",
 		"ImGUI",
 		"GrappleECS",

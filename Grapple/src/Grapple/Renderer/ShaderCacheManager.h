@@ -3,7 +3,7 @@
 #include "GrappleCore/Core.h"
 
 #include "Grapple/AssetManager/Asset.h"
-#include "Grapple/Renderer/RendererAPI.h"
+#include "Grapple/Renderer/ShaderMetadata.h"
 
 #include <vector>
 #include <optional>

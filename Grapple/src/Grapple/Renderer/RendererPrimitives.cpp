@@ -5,7 +5,6 @@ namespace Grapple
 	struct RendererPrimitivesData
 	{
 		Ref<Mesh> Cube = nullptr;
-		Ref<VertexArray> FullscreenQuad = nullptr;
 		Ref<Mesh> FullscreenQuadMesh = nullptr;
 	};
 
@@ -82,7 +81,7 @@ namespace Grapple
 			6, 7, 2
 		};
 
-		s_Primitives.Cube = Mesh::Create(MeshTopology::Triangles, 8, IndexBuffer::IndexFormat::UInt16, sizeof(cubeIndices) / sizeof(uint16_t));
+		s_Primitives.Cube = Mesh::Create(8, IndexBuffer::IndexFormat::UInt16, sizeof(cubeIndices) / sizeof(uint16_t));
 		s_Primitives.Cube->AddSubMesh(
 			Span(cubeVertices, 8),
 			MemorySpan(cubeIndices, sizeof(cubeIndices) / 2),
@@ -91,36 +90,6 @@ namespace Grapple
 			Span(cubeUVs, 8));
 
 		return s_Primitives.Cube;
-	}
-
-	Ref<const VertexArray> RendererPrimitives::GetFullscreenQuad()
-	{
-		if (s_Primitives.FullscreenQuad)
-			return s_Primitives.FullscreenQuad;
-
-		float vertices[] =
-		{
-			-1, -1,
-			-1,  1,
-			 1,  1,
-			 1, -1,
-		};
-
-		uint16_t indices[] =
-		{
-			0, 1, 2,
-			0, 2, 3,
-		};
-
-		Ref<VertexBuffer> vertexBuffer = VertexBuffer::Create(sizeof(vertices), (const void*)vertices);
-		vertexBuffer->SetLayout({ BufferLayoutElement("i_Position", ShaderDataType::Float2) });
-
-		s_Primitives.FullscreenQuad = VertexArray::Create();
-		s_Primitives.FullscreenQuad->SetIndexBuffer(IndexBuffer::Create(IndexBuffer::IndexFormat::UInt16, MemorySpan(indices, 6)));
-		s_Primitives.FullscreenQuad->AddVertexBuffer(vertexBuffer);
-		s_Primitives.FullscreenQuad->Unbind();
-
-		return s_Primitives.FullscreenQuad;
 	}
 
 	Ref<const Mesh> RendererPrimitives::GetFullscreenQuadMesh()
@@ -158,7 +127,7 @@ namespace Grapple
 			0, 2, 3,
 		};
 
-		s_Primitives.FullscreenQuadMesh = Mesh::Create(MeshTopology::Triangles, sizeof(vertices), IndexBuffer::IndexFormat::UInt16, 6);
+		s_Primitives.FullscreenQuadMesh = Mesh::Create(sizeof(vertices), IndexBuffer::IndexFormat::UInt16, 6);
 		s_Primitives.FullscreenQuadMesh->AddSubMesh(Span(vertices, 4), MemorySpan(indices, 6), Span(normals, 4), Span(normals, 4), Span(uvs, 4));
 		return s_Primitives.FullscreenQuadMesh;
 	}

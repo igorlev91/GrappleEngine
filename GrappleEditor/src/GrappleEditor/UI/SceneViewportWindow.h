@@ -3,7 +3,6 @@
 #include "Grapple/Scene/Scene.h"
 #include "Grapple/Renderer/Shader.h"
 #include "Grapple/Renderer/Material.h"
-#include "Grapple/Renderer/VertexArray.h"
 
 #include "GrappleECS/Entity/Entity.h"
 

@@ -3,6 +3,7 @@
 #include "GrappleCore/Core.h"
 
 #include "Grapple/AssetManager/AssetManager.h"
+#include "Grapple/Renderer/RendererAPI.h"
 #include "GrappleEditor/AssetManager/EditorAssetManager.h"
 
 #include <fstream>
@@ -116,9 +117,6 @@ namespace Grapple
         std::string_view apiName = "";
         switch (RendererAPI::GetAPI())
         {
-        case RendererAPI::API::OpenGL:
-            apiName = "OpenGL";
-            break;
         case RendererAPI::API::Vulkan:
             apiName = "Vulkan";
             break;

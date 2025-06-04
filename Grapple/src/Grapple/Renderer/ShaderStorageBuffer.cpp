@@ -1,7 +1,6 @@
 #include "ShaderStorageBuffer.h"
 
 #include "Grapple/Renderer/RendererAPI.h"
-#include "Grapple/Platform/OpenGL/OpenGLShaderStorageBuffer.h"
 #include "Grapple/Platform/Vulkan/VulkanShaderStorageBuffer.h"
 
 namespace Grapple
@@ -10,8 +9,6 @@ namespace Grapple
 	{
         switch (RendererAPI::GetAPI())
         {
-        case RendererAPI::API::OpenGL:
-            return CreateRef<OpenGLShaderStorageBuffer>(binding);
         case RendererAPI::API::Vulkan:
             return CreateRef<VulkanShaderStorageBuffer>(size);
         }

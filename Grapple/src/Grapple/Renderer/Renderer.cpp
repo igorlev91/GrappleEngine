@@ -84,6 +84,12 @@ namespace Grapple
 		Ref<const Material> Material;
 	};
 
+	struct SubMeshDrawData
+	{
+		uint32_t SubMeshIndex = 0;
+		uint32_t InstanceCount = 0;
+	};
+
 	struct RendererData
 	{
 		Viewport* MainViewport = nullptr;
@@ -111,7 +117,7 @@ namespace Grapple
 		uint32_t MaxInstances = 1024 * 24;
 
 		Ref<ShaderStorageBuffer> InstancesShaderBuffer = nullptr;
-		std::vector<DrawIndirectCommandSubMeshData> IndirectDrawData;
+		std::vector<SubMeshDrawData> IndirectDrawData;
 
 		// Shadows
 		InstancingMesh CurrentInstancingMesh;
@@ -590,17 +596,7 @@ namespace Grapple
 
 				glm::mat4 projection;
 				
-				if (RendererAPI::GetAPI() == RendererAPI::API::OpenGL)
-				{
-					projection = glm::ortho(
-						-params.BoundingSphereRadius,
-						params.BoundingSphereRadius,
-						-params.BoundingSphereRadius,
-						params.BoundingSphereRadius,
-						viewport->FrameData.Light.Near,
-						farPlaneDistance - nearPlaneDistance);
-				}
-				else
+				if (RendererAPI::GetAPI() == RendererAPI::API::Vulkan)
 				{
 					projection = glm::orthoRH_ZO(
 						-params.BoundingSphereRadius,
@@ -894,20 +890,6 @@ namespace Grapple
 			std::sort(s_RendererData.CulledObjectIndices.begin(), s_RendererData.CulledObjectIndices.end(), CompareRenderableObjects);
 		}
 
-		if (RendererAPI::GetAPI() == RendererAPI::API::OpenGL)
-		{
-			if (s_RendererData.ShadowMappingSettings.Enabled)
-			{
-				for (size_t i = 0; i < 4; i++)
-					s_RendererData.ShadowsRenderTarget[i]->BindAttachmentTexture(0, 28 + (uint32_t)i);
-			}
-			else
-			{
-				for (size_t i = 0; i < 4; i++)
-					s_RendererData.WhiteTexture->Bind(28 + (uint32_t)i);
-			}
-		}
-
 		Ref<const Material> currentMaterial = nullptr;
 		s_RendererData.InstanceDataBuffer.clear();
 
@@ -972,6 +954,7 @@ namespace Grapple
 
 	void Renderer::ExecuteDecalsPass()
 	{
+#if 0
 		Grapple_PROFILE_FUNCTION();
 		if (s_RendererData.Decals.size() == 0)
 			return;
@@ -1035,6 +1018,7 @@ namespace Grapple
 
 		s_RendererData.Decals.clear();
 		s_RendererData.InstanceDataBuffer.clear();
+#endif
 	}
 
 	void Renderer::ExecuteShadowPass()
@@ -1143,19 +1127,19 @@ namespace Grapple
 
 						s_RendererData.CurrentInstancingMesh.Mesh = queued.Mesh;
 						auto& command = s_RendererData.IndirectDrawData.emplace_back();
-						command.InstancesCount = 1;
+						command.InstanceCount = 1;
 						command.SubMeshIndex = queued.SubMeshIndex;
 					}
 					else
 					{
 						if (s_RendererData.IndirectDrawData.size() > 0 && s_RendererData.IndirectDrawData.back().SubMeshIndex == queued.SubMeshIndex)
 						{
-							s_RendererData.IndirectDrawData.back().InstancesCount++;
+							s_RendererData.IndirectDrawData.back().InstanceCount++;
 						}
 						else
 						{
 							auto& command = s_RendererData.IndirectDrawData.emplace_back();
-							command.InstancesCount = 1;
+							command.InstanceCount = 1;
 							command.SubMeshIndex = queued.SubMeshIndex;
 						}
 					}
@@ -1202,11 +1186,11 @@ namespace Grapple
 		Ref<CommandBuffer> commandBuffer = GraphicsContext::GetInstance().GetCommandBuffer();
 		for (const auto& drawCall : s_RendererData.IndirectDrawData)
 		{
-			commandBuffer->DrawIndexed(s_RendererData.CurrentInstancingMesh.Mesh, drawCall.SubMeshIndex, baseInstance, drawCall.InstancesCount);
-			baseInstance += drawCall.InstancesCount;
+			commandBuffer->DrawIndexed(s_RendererData.CurrentInstancingMesh.Mesh, drawCall.SubMeshIndex, baseInstance, drawCall.InstanceCount);
+			baseInstance += drawCall.InstanceCount;
 
 			s_RendererData.Statistics.DrawCallsCount++;
-			s_RendererData.Statistics.DrawCallsSavedByInstancing += (uint32_t)drawCall.InstancesCount - 1;
+			s_RendererData.Statistics.DrawCallsSavedByInstancing += (uint32_t)drawCall.InstanceCount - 1;
 		}
 
 		s_RendererData.IndirectDrawData.clear();
@@ -1229,30 +1213,6 @@ namespace Grapple
 	void Renderer::SubmitSpotLight(const SpotLightData& light)
 	{
 		s_RendererData.SpotLights.push_back(light);
-	}
-
-	void Renderer::DrawFullscreenQuad(const Ref<Material>& material)
-	{
-		Grapple_PROFILE_FUNCTION();
-
-		if (!material || !material->GetShader())
-			return;
-
-		ApplyMaterial(material);
-
-		RenderCommand::DrawIndexed(RendererPrimitives::GetFullscreenQuad());
-		s_RendererData.Statistics.DrawCallsCount++;
-	}
-
-	void Renderer::DrawMesh(const Ref<VertexArray>& mesh, const Ref<Material>& material, size_t indicesCount)
-	{
-		Grapple_PROFILE_FUNCTION();
-
-		ApplyMaterial(material);
-
-		RenderCommand::DrawIndexed(mesh, indicesCount == SIZE_MAX ? mesh->GetIndexBuffer()->GetCount() : indicesCount);
-
-		s_RendererData.Statistics.DrawCallsCount++;
 	}
 
 	void Renderer::DrawMesh(const Ref<Mesh>& mesh, uint32_t subMesh, const Ref<Material>& material, const glm::mat4& transform, MeshRenderFlags flags, int32_t entityIndex)

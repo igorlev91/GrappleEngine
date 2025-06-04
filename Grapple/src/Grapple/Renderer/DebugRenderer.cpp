@@ -8,9 +8,7 @@
 #include "Grapple/Renderer/CommandBuffer.h"
 #include "Grapple/Renderer/GraphicsContext.h"
 
-#include "Grapple/Renderer/VertexArray.h"
 #include "Grapple/Renderer/Buffer.h"
-#include "Grapple/Renderer/RenderCommand.h"
 #include "Grapple/Renderer/ShaderLibrary.h"
 #include "Grapple/Renderer/Shader.h"
 
@@ -53,11 +51,9 @@ namespace Grapple
 		Ref<VertexBuffer> LinesVertexBuffer = nullptr;
 		Ref<VertexBuffer> RaysVertexBuffer = nullptr;
 		Ref<IndexBuffer> RaysIndexBuffer = nullptr;
-		Ref<VertexArray> LinesMesh;
 
 		Ref<Pipeline> LinePipeline = nullptr;
 		Ref<Pipeline> RayPipeline = nullptr;
-		Ref<VertexArray> RaysMesh;
 	};
 
 	DebugRendererData s_DebugRendererData;
@@ -86,26 +82,7 @@ namespace Grapple
 		s_DebugRendererData.MaxRaysCount = 10000;
 		s_DebugRendererData.RayThickness = 0.07f;
 
-		Ref<VertexBuffer> vertexBuffer = VertexBuffer::Create(sizeof(Vertex) * VerticesPerLine * maxLinesCount);
-		vertexBuffer->SetLayout({
-			{ "i_Position", ShaderDataType::Float3, false },
-			{ "i_Color", ShaderDataType::Float4, false },
-		});
-
-		Ref<VertexArray> mesh = VertexArray::Create();
-		mesh->AddVertexBuffer(vertexBuffer);
-		mesh->Unbind();
-
-		s_DebugRendererData.LinesVertexBuffer = vertexBuffer;
-		s_DebugRendererData.LinesMesh = mesh;
-
-		Ref<VertexBuffer> rayVertexBuffer = VertexBuffer::Create(sizeof(Vertex) * VerticesPerRay * s_DebugRendererData.MaxRaysCount);
-		rayVertexBuffer->SetLayout({
-			{ "i_Position", ShaderDataType::Float3, false },
-			{ "i_Color", ShaderDataType::Float4, false },
-		});
-		Ref<VertexArray> raysMesh = VertexArray::Create();
-		raysMesh->AddVertexBuffer(rayVertexBuffer);
+		s_DebugRendererData.LinesVertexBuffer = VertexBuffer::Create(sizeof(Vertex) * VerticesPerLine * maxLinesCount);
 
 		uint32_t* indices = new uint32_t[s_DebugRendererData.MaxRaysCount * IndicesPerRay];
 		uint32_t vertexIndex = 0;
@@ -127,11 +104,7 @@ namespace Grapple
 		}
 
 		s_DebugRendererData.RaysIndexBuffer = IndexBuffer::Create(IndexBuffer::IndexFormat::UInt32, MemorySpan(indices, s_DebugRendererData.MaxRaysCount * IndicesPerRay));
-		raysMesh->SetIndexBuffer(s_DebugRendererData.RaysIndexBuffer);
-		raysMesh->Unbind();
-
-		s_DebugRendererData.RaysVertexBuffer = rayVertexBuffer;
-		s_DebugRendererData.RaysMesh = raysMesh;
+		s_DebugRendererData.RaysVertexBuffer = VertexBuffer::Create(sizeof(Vertex) * VerticesPerRay * s_DebugRendererData.MaxRaysCount);
 
 		delete[] indices;
 
@@ -324,14 +297,7 @@ namespace Grapple
 		{
 			s_DebugRendererData.LinesVertexBuffer->SetData(s_DebugRendererData.LinesBufferBase, sizeof(Vertex) * VerticesPerLine * s_DebugRendererData.LinesCount);
 
-			if (RendererAPI::GetAPI() == RendererAPI::API::OpenGL)
-			{
-				s_DebugRendererData.DebugShader->Bind();
-
-				RenderCommand::SetDepthTestEnabled(true);
-				RenderCommand::DrawLines(s_DebugRendererData.LinesMesh, s_DebugRendererData.LinesCount * VerticesPerLine);
-			}
-			else
+			if (RendererAPI::GetAPI() == RendererAPI::API::Vulkan)
 			{
 				if (s_DebugRendererData.LinePipeline == nullptr)
 				{
@@ -444,13 +410,6 @@ namespace Grapple
 				commandBuffer->DrawIndexed(0, s_DebugRendererData.RaysCount * IndicesPerRay, 0, 1);
 
 				commandBuffer->EndRenderTarget();
-			}
-			else
-			{
-				s_DebugRendererData.DebugShader->Bind();
-
-				RenderCommand::SetDepthTestEnabled(true);
-				RenderCommand::DrawIndexed(s_DebugRendererData.RaysMesh, s_DebugRendererData.RaysCount * IndicesPerRay);
 			}
 		}
 

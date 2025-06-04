@@ -1,6 +1,5 @@
 #include "ViewportWindow.h"
 
-#include "Grapple/Renderer/RenderCommand.h"
 #include "Grapple/Renderer/Renderer.h"
 
 #include "Grapple/Platform/Vulkan/VulkanContext.h"
@@ -74,7 +73,6 @@ namespace Grapple
 			}
 
 			m_Viewport.RTPool.SetRenderTargetsSize(m_Viewport.GetSize());
-			RenderCommand::SetViewport(0, 0, m_Viewport.GetSize().x, m_Viewport.GetSize().y);
 		}
 	}
 

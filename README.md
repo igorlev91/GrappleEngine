@@ -1,5 +1,16 @@
 # Grapple Game Engine
 
+## About
+The project started as a way to learn how internal systems of a game engine work.
+
+## Rendering Features
+ The 3D rendering is done by a forward renderer, which supports HRD, directional, point and spotlights. It also implements GPU instancing and frustum culling to reduce the number draw calls. There are 4 post processing effects available in total: Vignette, Tone mapping, Screen Space Ambient Occlusion, Atmosphere. 
+
+Manually writing down all the pipeline barriers in Vulkan, is a rather error-prone process. In order to reduce the possibility of error and simplify the process of implementing new features into the rendering pipeline, I made a decision to implement a simple render graph, which is able to automatically generate pipeline barriers.
+
+## Other features
+Archetype based ECS. Allows for cache friendly access of entity components, by storing all entities of the same archetype sequentially in memory. Supports querying for existing entities and entities created or deleted during the frame. Includes support for adding system execution dependencies.
+
 ## Building
 
 Run `/scripts/Windows_GenerateProjects.bat` to generate a Visual Studio 2022 solution.

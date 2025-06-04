@@ -10,7 +10,6 @@
 #include "Grapple/Renderer/RendererPrimitives.h"
 #include "Grapple/Renderer2D/Renderer2D.h"
 #include "Grapple/Renderer/DebugRenderer.h"
-#include "Grapple/Renderer/RenderCommand.h"
 
 #include "Grapple/Scripting/ScriptingEngine.h"
 #include "Grapple/Input/InputManager.h"
@@ -36,7 +35,7 @@ namespace Grapple
 		properties.CustomTitleBar = true;
 
 		const std::string_view apiArgument = "--api=";
-		RendererAPI::API rendererApi = RendererAPI::API::OpenGL;
+		RendererAPI::API rendererApi = RendererAPI::API::Vulkan;
 		for (uint32_t i = 0; i < m_CommandLineArguments.ArgumentsCount; i++)
 		{
 			std::string_view argument = m_CommandLineArguments.Arguments[i];
@@ -45,11 +44,7 @@ namespace Grapple
 			{
 				std::string_view apiName = argument.substr(apiArgument.size());
 
-				if (apiName == "opengl")
-				{
-					rendererApi = RendererAPI::API::OpenGL;
-				}
-				else if (apiName == "vulkan")
+				if (apiName == "vulkan")
 				{
 					rendererApi = RendererAPI::API::Vulkan;
 				}
@@ -61,9 +56,6 @@ namespace Grapple
 		m_Window = Window::Create(properties);
 		switch (RendererAPI::GetAPI())
 		{
-		case RendererAPI::API::OpenGL:
-			As<WindowsWindow>(m_Window)->SetUsesOpenGL();
-			break;
 		case RendererAPI::API::Vulkan:
 			As<WindowsWindow>(m_Window)->SetUsesVulkan();
 			break;
@@ -79,12 +71,6 @@ namespace Grapple
 			dispatcher.Dispatch<WindowCloseEvent>([this](WindowCloseEvent& event) -> bool
 			{
 				Close();
-				return true;
-			});
-
-			dispatcher.Dispatch<WindowResizeEvent>([this](WindowResizeEvent& event) -> bool
-			{
-				RenderCommand::SetViewport(0, 0, event.GetWidth(), event.GetHeight());
 				return true;
 			});
 
@@ -116,13 +102,11 @@ namespace Grapple
 	{
 		InputManager::Initialize();
 
-		RenderCommand::Initialize();
 		Renderer::Initialize();
 		DebugRenderer::Initialize();
 		Renderer2D::Initialize();
 
 		ScriptingEngine::Initialize();
-		RenderCommand::SetLineWidth(1.2f);
 
 		for (const Ref<Layer>& layer : m_LayersStack.GetLayers())
 			layer->OnAttach();

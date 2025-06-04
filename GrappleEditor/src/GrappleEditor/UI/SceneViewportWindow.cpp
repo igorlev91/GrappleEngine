@@ -1,12 +1,10 @@
 #include "SceneViewportWindow.h"
 
 #include "Grapple/Renderer/Renderer.h"
-#include "Grapple/Renderer/RenderCommand.h"
 #include "Grapple/Renderer/DebugRenderer.h"
 #include "Grapple/Renderer/ShaderLibrary.h"
 
 #include "Grapple/Platform/Vulkan/VulkanContext.h"
-#include "Grapple/Platform/OpenGL/OpenGLFrameBuffer.h"
 
 #include "Grapple/Scene/Components.h"
 #include "Grapple/Scene/Scene.h"
@@ -183,7 +181,7 @@ namespace Grapple
 					*thicknessPropertyIndex,
 					glm::vec2(4.0f) / (glm::vec2)m_Viewport.GetSize() / 2.0f);
 
-				Renderer::DrawFullscreenQuad(m_SelectionOutlineMaterial);
+				// TODO: also implement
 			}
 		}
 
@@ -566,7 +564,8 @@ namespace Grapple
 		m_GridMaterial->WritePropertyValue(s_GridPropertyIndices.CellScale, 1.0f / cellScale);
 		m_GridMaterial->WritePropertyValue(s_GridPropertyIndices.Color, gridColor);
 		m_GridMaterial->WritePropertyValue(s_GridPropertyIndices.FallOffThreshold, 0.8f);
-		Renderer::DrawFullscreenQuad(m_GridMaterial);
+
+		// TOOD: implement
 	}
 
 	void SceneViewportWindow::HandleAssetDragAndDrop(AssetHandle handle)
@@ -622,21 +621,6 @@ namespace Grapple
 
 	std::optional<Entity> SceneViewportWindow::GetEntityUnderCursor() const
 	{
-		if (RendererAPI::GetAPI() == RendererAPI::API::OpenGL)
-		{
-			Ref<OpenGLFrameBuffer> frameBuffer = As<OpenGLFrameBuffer>(m_Viewport.RenderTarget);
-			frameBuffer->Bind();
-
-			int32_t entityIndex;
-			frameBuffer->ReadPixel(2, m_RelativeMousePosition.x, m_RelativeMousePosition.y, &entityIndex);
-
-			std::optional<Entity> entity = GetScene()->GetECSWorld().Entities.FindEntityByIndex(entityIndex);
-
-			frameBuffer->Unbind();
-
-			return entity;
-		}
-
 		return {};
 	}
 }

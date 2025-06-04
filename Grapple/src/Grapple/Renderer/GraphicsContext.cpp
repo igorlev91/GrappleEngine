@@ -1,6 +1,5 @@
 #include "GraphicsContext.h"
 
-#include "Grapple/Platform/OpenGL/OpenGLGraphicsContext.h"
 #include "Grapple/Platform/Vulkan/VulkanContext.h"
 #include "Grapple/Renderer/RendererAPI.h"
 
@@ -22,9 +21,6 @@ namespace Grapple
 	{
 		switch (RendererAPI::GetAPI())
 		{
-		case RendererAPI::API::OpenGL:
-			s_Instance = CreateScope<OpenGLGraphicsContext>((GLFWwindow*)window->GetNativeWindow());
-			break;
 		case RendererAPI::API::Vulkan:
 			s_Instance = CreateScope<VulkanContext>(window);
 			break;

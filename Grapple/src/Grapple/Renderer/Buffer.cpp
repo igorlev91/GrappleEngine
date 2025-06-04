@@ -1,7 +1,6 @@
 #include "Buffer.h"
 
 #include "Grapple/Renderer/RendererAPI.h"
-#include "Grapple/Platform/OpenGL/OpenGLBuffer.h"
 #include "Grapple/Platform/Vulkan/VulkanVertexBuffer.h"
 #include "Grapple/Platform/Vulkan/VulkanIndexBuffer.h"
 
@@ -11,8 +10,6 @@ namespace Grapple
 	{
 		switch (RendererAPI::GetAPI())
 		{
-		case RendererAPI::API::OpenGL:
-			return CreateRef<OpenGLVertexBuffer>(size);
 		case RendererAPI::API::Vulkan:
 			return CreateRef<VulkanVertexBuffer>(size);
 		}
@@ -24,12 +21,6 @@ namespace Grapple
 	{
 		switch (RendererAPI::GetAPI())
 		{
-		case RendererAPI::API::OpenGL:
-		{
-			Ref<VertexBuffer> vertexBuffer = CreateRef<OpenGLVertexBuffer>(size, data);
-			vertexBuffer->SetData(data, size);
-			return vertexBuffer;
-		}
 		case RendererAPI::API::Vulkan:
 			return CreateRef<VulkanVertexBuffer>(data, size);
 		}
@@ -42,12 +33,6 @@ namespace Grapple
 	{
 		switch (RendererAPI::GetAPI())
 		{
-		case RendererAPI::API::OpenGL:
-		{
-			Ref<VertexBuffer> vertexBuffer = CreateRef<OpenGLVertexBuffer>(size, data);
-			vertexBuffer->SetData(MemorySpan::FromRawBytes(const_cast<void*>(data), size), 0, commandBuffer);
-			return vertexBuffer;
-		}
 		case RendererAPI::API::Vulkan:
 			return CreateRef<VulkanVertexBuffer>(data, size, commandBuffer);
 		}
@@ -74,8 +59,6 @@ namespace Grapple
 	{
 		switch (RendererAPI::GetAPI())
 		{
-		case RendererAPI::API::OpenGL:
-			return CreateRef<OpenGLIndexBuffer>(format, size);
 		case RendererAPI::API::Vulkan:
 			return CreateRef<VulkanIndexBuffer>(format, size);
 		}
@@ -87,8 +70,6 @@ namespace Grapple
 	{
 		switch (RendererAPI::GetAPI())
 		{
-		case RendererAPI::API::OpenGL:
-			return CreateRef<OpenGLIndexBuffer>(format, indices);
 		case RendererAPI::API::Vulkan:
 			return CreateRef<VulkanIndexBuffer>(format, indices);
 		}
@@ -101,8 +82,6 @@ namespace Grapple
 	{
 		switch (RendererAPI::GetAPI())
 		{
-		case RendererAPI::API::OpenGL:
-			return CreateRef<OpenGLIndexBuffer>(format, indices);
 		case RendererAPI::API::Vulkan:
 			return CreateRef<VulkanIndexBuffer>(format, indices, commandBuffer);
 		}
