@@ -7,6 +7,7 @@
 
 #include "Grapple/Platform/Vulkan/VulkanContext.h"
 #include "Grapple/Platform/Vulkan/VulkanDescriptorSet.h"
+#include "Grapple/Platform/Vulkan/VulkanPipeline.h"
 
 namespace Grapple
 {

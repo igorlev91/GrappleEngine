@@ -106,9 +106,9 @@ namespace Grapple
 		};
 
 		BoundDescriptorSet m_CurrentDescriptorSets[4] = { nullptr };
+		Ref<const Pipeline> m_CurrentGraphicsPipeline = nullptr;
 
 		VkCommandBuffer m_CommandBuffer = VK_NULL_HANDLE;
 		Ref<VulkanRenderPass> m_CurrentRenderPass = nullptr;
-		Ref<const VulkanPipeline> m_CurrentPipeline = nullptr;
 	};
 }

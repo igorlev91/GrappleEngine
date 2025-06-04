@@ -1,5 +1,7 @@
 #include "VulkanPipeline.h"
 
+#include "GrappleCore/Profiler/Profiler.h"
+
 #include "Grapple/Platform/Vulkan/VulkanContext.h"
 #include "Grapple/Platform/Vulkan/VulkanShader.h"
 
@@ -43,6 +45,8 @@ namespace Grapple
 
 	void VulkanPipeline::CreatePipelineLayout(const Span<Ref<const DescriptorSetLayout>>& layouts, const Span<ShaderPushConstantsRange>& pushConstantsRanges)
 	{
+		Grapple_PROFILE_FUNCTION();
+
 		VkPipelineLayoutCreateInfo layoutInfo{};
 		layoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 		layoutInfo.flags = 0;
@@ -81,6 +85,7 @@ namespace Grapple
 
 	void VulkanPipeline::Create()
 	{
+		Grapple_PROFILE_FUNCTION();
 		Grapple_CORE_ASSERT(m_CompatbileRenderPass);
 		Grapple_CORE_ASSERT(m_PipelineLayout);
 
