@@ -143,13 +143,15 @@ namespace Grapple
 			Culling(CullingMode::Back),
 			DepthFunction(DepthComparisonFunction::Less),
 			DepthTesting(true),
-			DepthWrite(true) {}
+			DepthWrite(true),
+			DepthBiasEnabled(false) {}
 
 		BlendMode Blending;
 		CullingMode Culling;
 		DepthComparisonFunction DepthFunction;
 		bool DepthTesting;
 		bool DepthWrite;
+		bool DepthBiasEnabled;
 	};
 
 	struct ShaderPushConstantsRange

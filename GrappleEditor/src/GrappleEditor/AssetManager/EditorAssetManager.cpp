@@ -157,9 +157,11 @@ namespace Grapple
 
         if (extension == ".png")
             type = AssetType::Texture;
-        if (extension == ".dds")
+        else if (extension == ".dds")
             type = AssetType::Texture;
-        if (extension == ".jpg")
+        else if (extension == ".jpg")
+            type = AssetType::Texture;
+        else if (extension == ".jpeg")
             type = AssetType::Texture;
         else if (extension == ".Grapple")
             type = AssetType::Scene;
@@ -177,7 +179,7 @@ namespace Grapple
 
             if (position == std::string::npos)
             {
-				type = AssetType::Shader;
+                type = AssetType::Shader;
             }
             else
             {
@@ -188,6 +190,8 @@ namespace Grapple
             type = AssetType::Font;
         else if (extension == ".fbx" || extension == ".gltf")
             type = AssetType::Mesh;
+        else
+            return NULL_ASSET_HANDLE;
 
         AssetHandle handle;
 
