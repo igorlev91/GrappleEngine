@@ -1,5 +1,6 @@
 #include "SpriteImporter.h"
 
+#include "GrappleCore/Profiler/Profiler.h"
 #include "GrappleEditor/Serialization/YAMLSerialization.h"
 
 #include <fstream>
@@ -8,6 +9,7 @@ namespace Grapple
 {
 	bool SpriteImporter::SerializeSprite(const Ref<Sprite>& sprite, const std::filesystem::path& path)
 	{
+		Grapple_PROFILE_FUNCTION();
 		YAML::Emitter emitter;
 		YAMLSerializer serializer(emitter, nullptr);
 
@@ -28,6 +30,7 @@ namespace Grapple
 
 	bool SpriteImporter::DeserializeSprite(const Ref<Sprite>& sprite, const std::filesystem::path& path)
 	{
+		Grapple_PROFILE_FUNCTION();
 		if (!std::filesystem::exists(path))
 			return false;
 
@@ -41,6 +44,7 @@ namespace Grapple
 	
 	Ref<Asset> SpriteImporter::ImportSprite(const AssetMetadata& metadata)
 	{
+		Grapple_PROFILE_FUNCTION();
 		Ref<Sprite> sprite = CreateRef<Sprite>();
 		if (!DeserializeSprite(sprite, metadata.Path))
 			return nullptr;

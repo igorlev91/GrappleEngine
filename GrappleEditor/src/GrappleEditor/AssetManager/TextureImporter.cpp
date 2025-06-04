@@ -1,5 +1,7 @@
 #include "TextureImporter.h"
 
+#include "GrappleCore/Profiler/Profiler.h"
+
 #include "GrappleEditor/AssetManager/EditorAssetManager.h"
 
 #include <fstream>
@@ -19,6 +21,7 @@ namespace Grapple
 
 	bool TextureImporter::SerialiazeImportSettings(AssetHandle assetHandle, const TextureImportSettings& settings)
 	{
+		Grapple_PROFILE_FUNCTION();
 		Grapple_CORE_ASSERT(AssetManager::IsAssetHandleValid(assetHandle));
 		std::filesystem::path importSettingsPath = GetImportSettingsPath(assetHandle);
 		
@@ -44,6 +47,7 @@ namespace Grapple
 
 	bool TextureImporter::DeserializeImportSettings(AssetHandle assetHandle, TextureImportSettings& settings)
 	{
+		Grapple_PROFILE_FUNCTION();
 		Grapple_CORE_ASSERT(AssetManager::IsAssetHandleValid(assetHandle));
 		std::filesystem::path importSettingsPath = GetImportSettingsPath(assetHandle);
 
@@ -79,6 +83,7 @@ namespace Grapple
 
 	Ref<Asset> TextureImporter::ImportTexture(const AssetMetadata& metadata)
 	{
+		Grapple_PROFILE_FUNCTION();
 		std::filesystem::path importSettingsPath = GetImportSettingsPath(metadata.Handle);
 
 		TextureImportSettings importSettings;

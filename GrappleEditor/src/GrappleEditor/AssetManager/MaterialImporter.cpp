@@ -1,5 +1,7 @@
 #include "MaterialImporter.h"
 
+#include "GrappleCore/Profiler/Profiler.h"
+
 #include "Grapple/AssetManager/AssetManager.h"
 #include "Grapple/Renderer/Shader.h"
 
@@ -14,6 +16,7 @@ namespace Grapple
 {
 	void MaterialImporter::SerializeMaterial(Ref<Material> material, const std::filesystem::path& path)
 	{
+		Grapple_PROFILE_FUNCTION();
 		Ref<Shader> shader = material->GetShader();
 
 		YAML::Emitter emitter;
@@ -92,6 +95,7 @@ namespace Grapple
 
 	Ref<Material> MaterialImporter::ImportMaterial(const AssetMetadata& metadata)
 	{
+		Grapple_PROFILE_FUNCTION();
 		if (metadata.Source == AssetSource::Memory)
 		{
 			As<EditorAssetManager>(AssetManager::GetInstance())->LoadAsset(metadata.Parent);

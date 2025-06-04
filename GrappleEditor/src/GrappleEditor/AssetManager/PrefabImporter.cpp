@@ -17,6 +17,7 @@ namespace Grapple
 {
     void PrefabImporter::SerializePrefab(AssetHandle prefab, World& world, Entity entity)
     {
+		Grapple_PROFILE_FUNCTION();
         Grapple_CORE_ASSERT(AssetManager::IsAssetHandleValid(prefab));
 
         if (!world.IsEntityAlive(entity))
@@ -37,6 +38,8 @@ namespace Grapple
 
     Ref<Asset> PrefabImporter::ImportPrefab(const AssetMetadata& metadata)
     {
+		Grapple_PROFILE_FUNCTION();
+
         try
         {
             YAML::Node node = YAML::LoadFile(metadata.Path.generic_string());

@@ -1,5 +1,7 @@
 #include "YAMLSerialization.h"
 
+#include "GrappleCore/Profiler/Profiler.h"
+
 #include "Grapple/AssetManager/AssetManager.h"
 #include "Grapple/Serialization/Serialization.h"
 
@@ -463,6 +465,8 @@ namespace Grapple
 
     void YAMLDeserializer::SerializeObject(const SerializableObjectDescriptor& descriptor, void* objectData, bool isArray, size_t arraySize)
     {
+        Grapple_PROFILE_FUNCTION();
+
         try
         {
             if (&descriptor == &Grapple_SERIALIZATION_DESCRIPTOR_OF(AssetHandle))
@@ -556,6 +560,8 @@ namespace Grapple
 
     void YAMLDeserializer::SerializeReference(const SerializableObjectDescriptor& valueDescriptor, void* referenceData, void* valueData)
     {
+        Grapple_PROFILE_FUNCTION();
+
         const AssetDescriptor* assetDescriptor = AssetDescriptor::FindBySerializationDescriptor(valueDescriptor);
         if (assetDescriptor)
         {

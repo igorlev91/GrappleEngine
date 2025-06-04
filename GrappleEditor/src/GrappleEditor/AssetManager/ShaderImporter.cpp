@@ -1,5 +1,7 @@
 #include "ShaderImporter.h"
 
+#include "GrappleCore/Profiler/Profiler.h"
+
 #include "Grapple/Renderer/Shader.h"
 #include "Grapple/Renderer/ComputeShader.h"
 
@@ -9,6 +11,7 @@ namespace Grapple
 {
 	Ref<Asset> ShaderImporter::ImportShader(const AssetMetadata& metadata)
 	{
+		Grapple_PROFILE_FUNCTION();
 		if (!ShaderCompiler::Compile(metadata.Handle))
 			return false;
 
@@ -21,6 +24,7 @@ namespace Grapple
 
 	Ref<Asset> ShaderImporter::ImportComputeShader(const AssetMetadata& metadata)
 	{
+		Grapple_PROFILE_FUNCTION();
 		if (!ShaderCompiler::Compile(metadata.Handle))
 			return false;
 
