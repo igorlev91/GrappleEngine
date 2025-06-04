@@ -80,6 +80,5 @@ namespace Grapple
 		LightData Light;
 		Math::Basis LightBasis;
 		RenderView LightView[4];
-		bool IsEditorCamera = false;
 	};
 }

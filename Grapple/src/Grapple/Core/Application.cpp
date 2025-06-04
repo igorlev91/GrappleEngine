@@ -113,7 +113,6 @@ namespace Grapple
 
 		while (m_Running)
 		{
-			Profiler::BeginFrame();
 			Grapple_PROFILE_BEGIN_FRAME("Main");
 
 			{
@@ -163,7 +162,6 @@ namespace Grapple
 			}
 
 			Grapple_PROFILE_END_FRAME("Main");
-			Profiler::EndFrame();
 		}
 
 		GraphicsContext::GetInstance().WaitForDevice();
