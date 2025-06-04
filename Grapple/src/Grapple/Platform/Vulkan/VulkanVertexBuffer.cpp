@@ -34,4 +34,9 @@ namespace Grapple
 	{
 		m_Buffer.SetData(data, size, offset);
 	}
+
+	void VulkanVertexBuffer::SetData(MemorySpan data, size_t offset, Ref<CommandBuffer> commandBuffer)
+	{
+		m_Buffer.SetData(data, offset, commandBuffer);
+	}
 }

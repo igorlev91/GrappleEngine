@@ -41,6 +41,7 @@ project "GrappleEditor"
 		INCLUDE_DIRS.yaml_cpp,
 
 		INCLUDE_DIRS.vulkan_sdk,
+		INCLUDE_DIRS.vma,
 		INCLUDE_DIRS.tracy,
     }
 
@@ -53,6 +54,8 @@ project "GrappleEditor"
 		"GrapplePlatform",
 		"GrappleECS",
 		"yaml-cpp",
+
+		LIBRARIES.vulkan,
 	}
 
 	defines
