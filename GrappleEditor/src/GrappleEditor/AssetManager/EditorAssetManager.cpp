@@ -88,7 +88,7 @@ namespace Grapple
                     AssetRegistrySerializer::Deserialize(m_Registry, internalPackagesLocation / package.Name, id);
 
                     for (const auto& [handle, entry] : m_Registry)
-                        m_FilepathToAssetHandle.emplace(entry.Metadata.Path, handle);
+                        m_FilepathToAssetHandle.emplace(std::filesystem::absolute(entry.Metadata.Path), handle);
                 }
             }
         }
@@ -144,7 +144,7 @@ namespace Grapple
     std::optional<AssetHandle> EditorAssetManager::FindAssetByPath(const std::filesystem::path& path)
     {
         Grapple_PROFILE_FUNCTION();
-        auto it = m_FilepathToAssetHandle.find(path);
+        auto it = m_FilepathToAssetHandle.find(std::filesystem::absolute(path));
         if (it == m_FilepathToAssetHandle.end())
             return {};
         return it->second;
@@ -212,7 +212,7 @@ namespace Grapple
         m_Registry.emplace(handle, entry);
 
         if (parentAsset != NULL_ASSET_HANDLE)
-            m_FilepathToAssetHandle.emplace(path, handle);
+            m_FilepathToAssetHandle.emplace(std::filesystem::absolute(path), handle);
         else
         {
             auto it = m_Registry.find(parentAsset);
@@ -247,7 +247,7 @@ namespace Grapple
         asset->Handle = handle;
 
         if (parentAsset != NULL_ASSET_HANDLE)
-            m_FilepathToAssetHandle.emplace(path, handle);
+            m_FilepathToAssetHandle.emplace(std::filesystem::absolute(path), handle);
         else
         {
             auto it = m_Registry.find(parentAsset);
@@ -464,6 +464,6 @@ namespace Grapple
         AssetRegistrySerializer::Deserialize(m_Registry, Project::GetActive()->Location);
 
         for (const auto& [handle, entry] : m_Registry)
-            m_FilepathToAssetHandle.emplace(entry.Metadata.Path, handle);
+            m_FilepathToAssetHandle.emplace(std::filesystem::absolute(entry.Metadata.Path), handle);
     }
 }

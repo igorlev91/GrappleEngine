@@ -1,6 +1,6 @@
 [submodule ".\\Grapple\\vendor\\GLFW"]
 	path = .\\Grapple\\vendor\\GLFW
-	url = https://github.com/igorlev91/glfw.git
+	url = https://github.com/glfw/glfw
 [submodule ".\\Grapple\\vendor\\glm"]
 	path = .\\Grapple\\vendor\\glm
 	url = https://github.com/g-truc/glm
@@ -9,10 +9,10 @@
 	url = https://github.com/gabime/spdlog
 [submodule ".\\Grapple\\vendor\\ImGUI"]
 	path = .\\Grapple\\vendor\\ImGUI
-	url = https://github.com/igorlev91/imgui.git
+	url = git@github.com/ocornut/imgui.git
 [submodule "Grapple/vendor/yaml-cpp"]
 	path = Grapple/vendor/yaml-cpp
-	url = git@github.com:igorlev91/yaml-cpp.git
+	url = git@github.com/jbeder/yaml-cpp.git
 [submodule "Grapple/vendor/ImGuizmo"]
 	path = Grapple/vendor/ImGuizmo
 	url = git@github.com:CedricGuillemet/ImGuizmo.git
