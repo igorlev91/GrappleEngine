@@ -29,7 +29,7 @@ namespace Grapple
 		bool ShadowMappingEnabled = true;
 
 		RenderData FrameData;
-		Ref<FrameBuffer> RenderTarget;
+		Ref<FrameBuffer> RenderTarget = nullptr;
 		RenderTargetsPool RTPool;
 
 		RenderGraph Graph;
@@ -42,7 +42,7 @@ namespace Grapple
 		Ref<Texture> NormalsTexture = nullptr;
 		Ref<Texture> DepthTexture = nullptr;
 	private:
-		glm::ivec2 m_Position;
-		glm::ivec2 m_Size;
+		glm::ivec2 m_Position = glm::ivec2(0, 0);
+		glm::ivec2 m_Size = glm::ivec2(0, 0);
 	};
 }

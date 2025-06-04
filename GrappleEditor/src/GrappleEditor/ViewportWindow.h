@@ -58,6 +58,8 @@ namespace Grapple
 		Ref<Scene> m_Scene;
 		Viewport m_Viewport;
 
+		bool m_ShouldRebuildRenderGraph = false;
+
 		bool m_PreviousFocusState;
 		bool m_IsFocused;
 		bool m_IsHovered;
