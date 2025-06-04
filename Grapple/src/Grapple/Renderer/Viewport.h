@@ -10,6 +10,7 @@
 
 namespace Grapple
 {
+	class Texture;
 	class Grapple_API Viewport
 	{
 	public:
@@ -32,6 +33,10 @@ namespace Grapple
 		uint32_t ColorAttachmentIndex = UINT32_MAX;
 		uint32_t NormalsAttachmentIndex = UINT32_MAX;
 		uint32_t DepthAttachmentIndex = UINT32_MAX;
+
+		Ref<Texture> ColorTexture = nullptr;
+		Ref<Texture> NormalsTexture = nullptr;
+		Ref<Texture> DepthTexture = nullptr;
 	private:
 		glm::ivec2 m_Position;
 		glm::ivec2 m_Size;

@@ -6,6 +6,7 @@
 #include "Grapple/Renderer/GraphicsContext.h"
 #include "Grapple/Platform/Vulkan/VulkanCommandBuffer.h"
 #include "Grapple/Platform/Vulkan/VulkanFrameBuffer.h"
+#include "Grapple/Platform/Vulkan/VulkanTexture.h"
 #include "Grapple/Platform/Vulkan/VulkanAllocation.h"
 
 #include <vulkan/vulkan.h>
@@ -40,7 +41,7 @@ namespace Grapple
 			return !operator==(other);
 		}
 
-		std::vector<FrameBufferTextureFormat> Formats;
+		std::vector<TextureFormat> Formats;
 	};
 }
 
@@ -49,7 +50,7 @@ struct std::hash<Grapple::RenderPassKey>
 {
 	size_t operator()(const Grapple::RenderPassKey& key) const
 	{
-		using FormatIntType = std::underlying_type_t<Grapple::FrameBufferTextureFormat>;
+		using FormatIntType = std::underlying_type_t<Grapple::TextureFormat>;
 		size_t hash = std::hash<FormatIntType>()((FormatIntType)key.Formats[0]);
 
 		for (size_t i = 0; i < key.Formats.size(); i++)
@@ -100,7 +101,7 @@ namespace Grapple
 		VkPhysicalDevice GetPhysicalDevice() const { return m_PhysicalDevice; }
 		VkQueue GetGraphicsQueue() const { return m_GraphicsQueue; }
 
-		Ref<VulkanRenderPass> FindOrCreateRenderPass(Span<FrameBufferTextureFormat> formats);
+		Ref<VulkanRenderPass> FindOrCreateRenderPass(Span<TextureFormat> formats);
 
 		VmaAllocator GetMemoryAllocator() const { return m_Allocator; }
 
@@ -179,6 +180,7 @@ namespace Grapple
 
 		// Swap chain
 		VkSwapchainKHR m_SwapChain = VK_NULL_HANDLE;
+
 		std::vector<VkImage> m_SwapChainImages;
 		std::vector<VkImageView> m_SwapChainImageViews;
 		std::vector<Ref<VulkanFrameBuffer>> m_SwapChainFrameBuffers;

@@ -7,52 +7,9 @@
 
 namespace Grapple
 {
-	enum class FrameBufferTextureFormat
-	{
-		RGB8,
-		RGBA8,
-		R11G11B10,
-		R32G32B32A32,
-
-		RedInteger,
-		RF32,
-
-		Depth24Stencil8,
-
-		Depth = Depth24Stencil8
-	};
-
-	constexpr bool IsDepthFormat(FrameBufferTextureFormat format)
-	{
-		switch (format)
-		{
-		case FrameBufferTextureFormat::RGB8:
-		case FrameBufferTextureFormat::RGBA8:
-		case FrameBufferTextureFormat::R11G11B10:
-		case FrameBufferTextureFormat::RedInteger:
-		case FrameBufferTextureFormat::R32G32B32A32:
-			return false;
-		case FrameBufferTextureFormat::Depth24Stencil8:
-			return true;
-		}
-
-		return false;
-	}
-
-	constexpr bool HasStencilCompomnent(FrameBufferTextureFormat format)
-	{
-		switch (format)
-		{
-		case FrameBufferTextureFormat::Depth24Stencil8:
-			return true;
-		}
-
-		return false;
-	}
-
 	struct FrameBufferAttachmentSpecifications
 	{
-		FrameBufferTextureFormat Format;
+		TextureFormat Format;
 		TextureWrap Wrap;
 		TextureFiltering Filtering;
 	};
@@ -83,10 +40,7 @@ namespace Grapple
 		virtual uint32_t GetColorAttachmentsCount() const = 0;
 		virtual std::optional<uint32_t> GetDepthAttachmentIndex() const = 0;
 
-		virtual void ClearAttachment(uint32_t index, const void* value) = 0;
-		virtual void ReadPixel(uint32_t attachmentIndex, uint32_t x, uint32_t y, void* pixelOutput) = 0;
-		virtual void BindAttachmentTexture(uint32_t attachment, uint32_t slot = 0) = 0;
-
+		virtual Ref<Texture> GetAttachment(uint32_t index) const = 0;
 		virtual const FrameBufferSpecifications& GetSpecifications() const = 0;
 
 		inline glm::uvec2 GetSize() const
@@ -95,6 +49,7 @@ namespace Grapple
 			return glm::uvec2(specifications.Width, specifications.Height);
 		}
 	public:
+		static Ref<FrameBuffer> Create(Span<Ref<Texture>> attachmentTextures);
 		static Ref<FrameBuffer> Create(const FrameBufferSpecifications& specifications);
 	};
 }
