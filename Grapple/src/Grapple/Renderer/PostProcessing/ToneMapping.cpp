@@ -20,7 +20,6 @@ namespace Grapple
 	Grapple_IMPL_TYPE(ToneMapping);
 
 	ToneMapping::ToneMapping()
-		: Enabled(false)
 	{
 	}
 
@@ -28,7 +27,7 @@ namespace Grapple
 	{
 		Grapple_PROFILE_FUNCTION();
 
-		if (!Enabled)
+		if (!IsEnabled())
 			return;
 
 		TextureSpecifications colorTextureSpecifications{};
@@ -60,6 +59,7 @@ namespace Grapple
 	{
 		return Grapple_SERIALIZATION_DESCRIPTOR_OF(ToneMapping);
 	}
+
 
 
 	ToneMappingPass::ToneMappingPass(Ref<Texture> colorTexture)
