@@ -5,6 +5,7 @@
 
 namespace Grapple
 {
+	class Viewport;
 	class FrameBuffer;
 	class VulkanRenderPass;
 	class Grapple_API RenderGraph
