@@ -3,7 +3,6 @@
 #include "GrappleCore/Core.h"
 #include "Grapple/Renderer/FrameBuffer.h"
 #include "Grapple/Renderer/RenderData.h"
-#include "Grapple/Renderer/RenderTargetsPool.h"
 
 #include "Grapple/Renderer/RenderGraph/RenderGraph.h"
 
@@ -16,8 +15,6 @@ namespace Grapple
 	class Grapple_API Viewport
 	{
 	public:
-		Viewport();
-
 		inline glm::ivec2 GetPosition() const { return m_Position; }
 		inline glm::ivec2 GetSize() const { return m_Size; }
 
@@ -30,7 +27,6 @@ namespace Grapple
 
 		RenderData FrameData;
 		Ref<FrameBuffer> RenderTarget = nullptr;
-		RenderTargetsPool RTPool;
 
 		RenderGraph Graph;
 
