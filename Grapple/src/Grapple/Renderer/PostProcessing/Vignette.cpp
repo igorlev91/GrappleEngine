@@ -10,8 +10,6 @@
 #include "Grapple/Renderer/CommandBuffer.h"
 #include "Grapple/Renderer/RendererPrimitives.h"
 
-#include "Grapple/Platform/Vulkan/VulkanCommandBuffer.h"
-
 #include "GrappleCore/Profiler/Profiler.h"
 
 namespace Grapple
