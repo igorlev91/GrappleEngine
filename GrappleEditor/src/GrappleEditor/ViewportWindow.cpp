@@ -42,9 +42,6 @@ namespace Grapple
 		if (scene == nullptr)
 			return;
 
-		if (scene->GetPostProcessingManager().IsDirty())
-			m_ShouldRebuildRenderGraph = true;
-
 		PrepareViewport();
 
 		if (m_Viewport.GetSize() != glm::ivec2(0))
@@ -71,6 +68,9 @@ namespace Grapple
 
 	void ViewportWindow::PrepareViewport()
 	{
+		if (GetScene()->GetPostProcessingManager().IsDirty())
+			m_ShouldRebuildRenderGraph = true;
+
 		if (m_Viewport.GetSize() != glm::ivec2(0))
 		{
 			const FrameBufferSpecifications frameBufferSpecs = m_Viewport.RenderTarget->GetSpecifications();
@@ -80,8 +80,6 @@ namespace Grapple
 				m_Viewport.RenderTarget->Resize(m_Viewport.GetSize().x, m_Viewport.GetSize().y);
 				OnViewportChanged();
 			}
-
-			m_Viewport.RTPool.SetRenderTargetsSize(m_Viewport.GetSize());
 
 			if (m_ShouldRebuildRenderGraph)
 			{
@@ -220,9 +218,24 @@ namespace Grapple
 		m_Viewport.DepthAttachmentIndex = 2;
 		m_Viewport.RenderTarget = FrameBuffer::Create(Span(attachmentTextures, 3));
 
-		m_Viewport.Graph.AddFinalTransition(m_Viewport.ColorTexture, ImageLayout::AttachmentOutput);
-		m_Viewport.Graph.AddFinalTransition(m_Viewport.NormalsTexture, ImageLayout::AttachmentOutput);
-		m_Viewport.Graph.AddFinalTransition(m_Viewport.DepthTexture, ImageLayout::AttachmentOutput);
+		ExternalRenderGraphResource colorTextureResource{};
+		colorTextureResource.InitialLayout = ImageLayout::AttachmentOutput;
+		colorTextureResource.FinalLayout = ImageLayout::AttachmentOutput;
+		colorTextureResource.TextureHandle = m_Viewport.ColorTexture;
+
+		ExternalRenderGraphResource normalsTextureResource{};
+		normalsTextureResource.InitialLayout = ImageLayout::AttachmentOutput;
+		normalsTextureResource.FinalLayout = ImageLayout::AttachmentOutput;
+		normalsTextureResource.TextureHandle = m_Viewport.NormalsTexture;
+
+		ExternalRenderGraphResource depthTextureResource{};
+		depthTextureResource.InitialLayout = ImageLayout::AttachmentOutput;
+		depthTextureResource.FinalLayout = ImageLayout::AttachmentOutput;
+		depthTextureResource.TextureHandle = m_Viewport.DepthTexture;
+
+		m_Viewport.Graph.AddExternalResource(colorTextureResource);
+		m_Viewport.Graph.AddExternalResource(normalsTextureResource);
+		m_Viewport.Graph.AddExternalResource(depthTextureResource);
 	}
 
 	void ViewportWindow::OnClear()

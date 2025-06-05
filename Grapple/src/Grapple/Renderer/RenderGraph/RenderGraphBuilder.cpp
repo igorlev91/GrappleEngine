@@ -9,8 +9,8 @@
 
 namespace Grapple
 {
-	RenderGraphBuilder::RenderGraphBuilder(Span<RenderPassNode> nodes, Span<LayoutTransition> finalTransitions)
-		: m_Nodes(nodes), m_FinalTransitions(finalTransitions)
+	RenderGraphBuilder::RenderGraphBuilder(CompiledRenderGraph& result, Span<RenderPassNode> nodes, Span<ExternalRenderGraphResource> externalResources)
+		: m_Result(result), m_Nodes(nodes), m_ExternalResources(externalResources)
 	{
 	}
 
@@ -18,17 +18,29 @@ namespace Grapple
 	{
 		Grapple_PROFILE_FUNCTION();
 
+		// Setup initial state for external resources
+		for (const auto& resource : m_ExternalResources)
+		{
+			if (resource.InitialLayout == ImageLayout::Undefined)
+				continue;
+
+			ResourceState& state = m_States[GetResoureId(resource.TextureHandle)];
+			state.Layout = resource.InitialLayout;
+		}
+
 		m_RenderPassTransitions.reserve(m_Nodes.GetSize());
 
 		for (size_t nodeIndex = 0; nodeIndex < m_Nodes.GetSize(); nodeIndex++)
 		{
+			m_Nodes[nodeIndex].Transitions = LayoutTransitionsRange((uint32_t)m_Result.LayoutTransitions.size());
 			GenerateInputTransitions(nodeIndex);
 			GenerateOutputTransitions(nodeIndex);
 		}
 
-		for (LayoutTransition& finalTransition : m_FinalTransitions)
+		m_Result.ExternalResourceFinalTransitions = LayoutTransitionsRange((uint32_t)m_Result.LayoutTransitions.size());
+		for (const auto& resource : m_ExternalResources)
 		{
-			finalTransition.InitialLayout = GetCurrentLayout(finalTransition.TextureHandle);
+			AddTransition(resource.TextureHandle, resource.FinalLayout, m_Result.ExternalResourceFinalTransitions);
 		}
 
 		CreateRenderTargets();
@@ -147,13 +159,13 @@ namespace Grapple
 				attachmentTextures[0]->GetHeight(),
 				compatibleRenderPass,
 				Span<Ref<Texture>>::FromVector(attachmentTextures),
-				true);
+				false);
 
 			node.RenderTarget->SetDebugName(node.Specifications.GetDebugName());
 		}
 	}
 
-	void RenderGraphBuilder::AddExplicitTransition(Ref<Texture> texture, ImageLayout layout, std::vector<LayoutTransition>& transitions)
+	void RenderGraphBuilder::AddExplicitTransition(Ref<Texture> texture, ImageLayout layout, LayoutTransitionsRange& transitions)
 	{
 		Grapple_PROFILE_FUNCTION();
 
@@ -173,7 +185,8 @@ namespace Grapple
 		if (initialLayout == layout)
 			return;
 
-		auto& transition = transitions.emplace_back();
+		transitions.End++;
+		auto& transition = m_Result.LayoutTransitions.emplace_back();
 		transition.TextureHandle = texture;
 		transition.InitialLayout = initialLayout;
 		transition.FinalLayout = layout;
@@ -181,7 +194,7 @@ namespace Grapple
 		m_States[id] = { layout, {} };
 	}
 
-	void RenderGraphBuilder::AddTransition(Ref<Texture> texture, ImageLayout layout, std::vector<LayoutTransition>& transitions)
+	void RenderGraphBuilder::AddTransition(Ref<Texture> texture, ImageLayout layout, LayoutTransitionsRange& transitions)
 	{
 		Grapple_PROFILE_FUNCTION();
 

@@ -17,14 +17,11 @@ namespace Grapple
 		node.Specifications = specifications;
 	}
 
-	void RenderGraph::AddFinalTransition(Ref<Texture> texture, ImageLayout finalLayout)
+	void RenderGraph::AddExternalResource(const ExternalRenderGraphResource& resource)
 	{
-		Grapple_CORE_ASSERT(texture != nullptr);
-
-		LayoutTransition& transition = m_FinalTransitions.emplace_back();
-		transition.TextureHandle = texture;
-		transition.InitialLayout = ImageLayout::Undefined;
-		transition.FinalLayout = finalLayout;
+		Grapple_CORE_ASSERT(resource.TextureHandle);
+		Grapple_CORE_ASSERT(resource.FinalLayout != ImageLayout::Undefined);
+		m_ExternalResources.push_back(resource);
 	}
 
 	void RenderGraph::Execute(Ref<CommandBuffer> commandBuffer)
@@ -40,12 +37,15 @@ namespace Grapple
 			node.Pass->OnRender(context, commandBuffer);
 		}
 
-		ExecuteLayoutTransitions(commandBuffer, m_FinalTransitions);
+		ExecuteLayoutTransitions(commandBuffer, m_CompiledRenderGraph.ExternalResourceFinalTransitions);
 	}
 
 	void RenderGraph::Build()
 	{
-		RenderGraphBuilder builder(Span<RenderPassNode>::FromVector(m_Nodes), Span<LayoutTransition>::FromVector(m_FinalTransitions));
+		RenderGraphBuilder builder(m_CompiledRenderGraph,
+			Span<RenderPassNode>::FromVector(m_Nodes),
+			Span<ExternalRenderGraphResource>::FromVector(m_ExternalResources));
+
 		builder.Build();
 	}
 
@@ -54,12 +54,13 @@ namespace Grapple
 		m_Nodes.clear();
 	}
 
-	void RenderGraph::ExecuteLayoutTransitions(Ref<CommandBuffer> commandBuffer, const std::vector<LayoutTransition>& transitions)
+	void RenderGraph::ExecuteLayoutTransitions(Ref<CommandBuffer> commandBuffer, LayoutTransitionsRange range)
 	{
 		Ref<VulkanCommandBuffer> vulkanCommandBuffer = As<VulkanCommandBuffer>(commandBuffer);
 
-		for (const LayoutTransition& transition : transitions)
+		for (uint32_t i = range.Start; i < range.End; i++)
 		{
+			const LayoutTransition& transition = m_CompiledRenderGraph.LayoutTransitions[i];
 			VkImage image = As<VulkanTexture>(transition.TextureHandle)->GetImageHandle();
 
 			TextureFormat format = transition.TextureHandle->GetFormat();
