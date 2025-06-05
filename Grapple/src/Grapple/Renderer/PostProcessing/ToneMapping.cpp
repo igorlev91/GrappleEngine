@@ -48,8 +48,8 @@ namespace Grapple
 
 		RenderGraphPassSpecifications blitPass{};
 		blitPass.SetDebugName("ToneMappingBlit");
-		blitPass.AddInput(intermediateTexture);
-		blitPass.AddOutput(viewport.ColorTexture, 0);
+		blitPass.AddInput(intermediateTexture, ImageLayout::TransferSource);
+		blitPass.AddOutput(viewport.ColorTexture, 0, ImageLayout::TransferDestination);
 
 		renderGraph.AddPass(toneMappingPass, CreateRef<ToneMappingPass>(viewport.ColorTexture));
 		renderGraph.AddPass(blitPass, CreateRef<BlitPass>(intermediateTexture, TextureFiltering::Closest));
