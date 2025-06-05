@@ -82,6 +82,8 @@ namespace Grapple
 	private:
 		void UpdateWindowTitle();
 		void OnOpenProject();
+
+		void ResetViewportRenderGraphs();
 	private:
 		bool m_UpdateCursorModeNextFrame = false;
 		bool m_ExitPlayModeRequested = false;

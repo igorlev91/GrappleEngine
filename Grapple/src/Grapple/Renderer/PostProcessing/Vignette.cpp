@@ -2,6 +2,8 @@
 
 #include "Grapple/AssetManager/AssetManager.h"
 
+#include "Grapple/Scene/Scene.h"
+
 #include "Grapple/Renderer/Renderer.h"
 #include "Grapple/Renderer/ShaderLibrary.h"
 #include "Grapple/Renderer/GraphicsContext.h"
@@ -21,53 +23,24 @@ namespace Grapple
 	static uint32_t s_SmoothnessPropertyIndex = UINT32_MAX;
 
 	Vignette::Vignette()
-		: RenderPass(RenderPassQueue::PostProcessing), Enabled(false), Color(0.0f, 0.0f, 0.0f, 0.5f), Radius(1.0f), Smoothness(1.0f)
+		: Enabled(false), Color(0.0f, 0.0f, 0.0f, 0.5f), Radius(1.0f), Smoothness(1.0f)
 	{
-		std::optional<AssetHandle> shaderHandle = ShaderLibrary::FindShader("Vignette");
-		if (!shaderHandle || !AssetManager::IsAssetHandleValid(shaderHandle.value()))
-		{
-			Grapple_CORE_ERROR("Vignette: Failed to find Vignette shader");
-			return;
-		}
-
-		Ref<Shader> shader = AssetManager::GetAsset<Shader>(shaderHandle.value());
-		m_Material = Material::Create(shader);
-
-		s_ColorPropertyIndex = shader->GetPropertyIndex("u_Params.Color").value_or(UINT32_MAX);
-		s_RadiusPropertyIndex = shader->GetPropertyIndex("u_Params.Radius").value_or(UINT32_MAX);
-		s_SmoothnessPropertyIndex = shader->GetPropertyIndex("u_Params.Smoothness").value_or(UINT32_MAX);
 	}
 
-	void Vignette::OnRender(RenderingContext& context)
+	void Vignette::RegisterRenderPasses(RenderGraph& renderGraph, const Viewport& viewport)
 	{
 		Grapple_PROFILE_FUNCTION();
+		
+		RenderGraphPassSpecifications specifications{};
+		specifications.AddInput(viewport.ColorTexture);
+		specifications.AddOutput(viewport.ColorTexture, 0);
 
-		if (!Enabled || !Renderer::GetCurrentViewport().PostProcessingEnabled)
-			return;
+		renderGraph.AddPass(specifications, CreateRef<VignettePass>());
+	}
 
-		m_Material->WritePropertyValue(s_ColorPropertyIndex, Color);
-		m_Material->WritePropertyValue(s_RadiusPropertyIndex, Radius);
-		m_Material->WritePropertyValue(s_SmoothnessPropertyIndex, Smoothness);
-
-		Ref<CommandBuffer> commandBuffer = GraphicsContext::GetInstance().GetCommandBuffer();
-		commandBuffer->BeginRenderTarget(context.RenderTarget);
-
-		if (RendererAPI::GetAPI() == RendererAPI::API::Vulkan)
-		{
-			Ref<VulkanCommandBuffer> vulkanCommandBuffer = As<VulkanCommandBuffer>(commandBuffer);
-
-			vulkanCommandBuffer->SetPrimaryDescriptorSet(nullptr);
-			vulkanCommandBuffer->SetSecondaryDescriptorSet(nullptr);
-		}
-
-		commandBuffer->ApplyMaterial(m_Material);
-
-		const auto& frameBufferSpec = context.RenderTarget->GetSpecifications();
-		commandBuffer->SetViewportAndScisors(Math::Rect(0.0f, 0.0f, (float)frameBufferSpec.Width, (float)frameBufferSpec.Height));
-
-		commandBuffer->DrawIndexed(RendererPrimitives::GetFullscreenQuadMesh(), 0, 0, 1);
-
-		commandBuffer->EndRenderTarget();
+	const SerializableObjectDescriptor& Vignette::GetSerializationDescriptor() const
+	{
+		return Grapple_SERIALIZATION_DESCRIPTOR_OF(Vignette);
 	}
 
 	void TypeSerializer<Vignette>::OnSerialize(Vignette& vignette, SerializationStream& stream)
@@ -82,6 +55,11 @@ namespace Grapple
 
 	VignettePass::VignettePass()
 	{
+		auto vignette = Scene::GetActive()->GetPostProcessingManager().GetEffect<Vignette>();
+		Grapple_CORE_ASSERT(vignette);
+
+		m_Parameters = *vignette;
+
 		std::optional<AssetHandle> shaderHandle = ShaderLibrary::FindShader("Vignette");
 		if (!shaderHandle || !AssetManager::IsAssetHandleValid(shaderHandle.value()))
 		{
@@ -104,11 +82,11 @@ namespace Grapple
 		auto smoothnessPropertyIndex = shader->GetPropertyIndex("u_Params.Smoothness");
 
 		if (colorPropertyIndex)
-			m_Material->WritePropertyValue(*colorPropertyIndex, m_Color);
+			m_Material->WritePropertyValue(*colorPropertyIndex, m_Parameters->Color);
 		if (radiusPropertyIndex)
-			m_Material->WritePropertyValue(*radiusPropertyIndex, m_Radius);
+			m_Material->WritePropertyValue(*radiusPropertyIndex, m_Parameters->Radius);
 		if (smoothnessPropertyIndex)
-			m_Material->WritePropertyValue(*smoothnessPropertyIndex, m_Smoothness);
+			m_Material->WritePropertyValue(*smoothnessPropertyIndex, m_Parameters->Smoothness);
 
 		commandBuffer->ApplyMaterial(m_Material);
 		commandBuffer->DrawIndexed(RendererPrimitives::GetFullscreenQuadMesh(), 0, 0, 1);

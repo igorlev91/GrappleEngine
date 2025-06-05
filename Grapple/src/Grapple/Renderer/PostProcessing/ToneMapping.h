@@ -6,23 +6,22 @@
 #include "Grapple/Renderer/RenderPass.h"
 #include "Grapple/Renderer/Material.h"
 
+#include "Grapple/Renderer/PostProcessing/PostProcessingEffect.h"
 #include "Grapple/Renderer/RenderGraph/RenderGraphPass.h"
 
 namespace Grapple
 {
-	class Grapple_API ToneMapping : public RenderPass
+	class Grapple_API ToneMapping : public PostProcessingEffect
 	{
 	public:
 		Grapple_TYPE;
 
 		ToneMapping();
 
-		void OnRender(RenderingContext& context) override;
+		void RegisterRenderPasses(RenderGraph& renderGraph, const Viewport& viewport) override;
+		const SerializableObjectDescriptor& GetSerializationDescriptor() const override;
 	public:
 		bool Enabled;
-	private:
-		std::optional<uint32_t> m_ColorTexture;
-		Ref<Material> m_Material;
 	};
 
 	template<>

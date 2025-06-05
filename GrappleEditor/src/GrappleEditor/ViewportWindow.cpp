@@ -3,6 +3,11 @@
 #include "Grapple/Renderer/Renderer.h"
 #include "Grapple/Renderer/Passes/BlitPass.h"
 
+#include "Grapple/Renderer/PostProcessing/SSAO.h"
+#include "Grapple/Renderer/PostProcessing/ToneMapping.h"
+#include "Grapple/Renderer/PostProcessing/Vignette.h"
+#include "Grapple/Renderer/PostProcessing/AtmospherePass.h"
+
 #include "Grapple/Platform/Vulkan/VulkanContext.h"
 
 #include "Grapple/Scene/Scene.h"
@@ -81,6 +86,11 @@ namespace Grapple
 				m_ShouldRebuildRenderGraph = false;
 			}
 		}
+	}
+
+	void ViewportWindow::RequestRenderGraphRebuild()
+	{
+		m_ShouldRebuildRenderGraph = true;
 	}
 
 	void ViewportWindow::BeginImGui()
@@ -262,40 +272,9 @@ namespace Grapple
 			m_Viewport.Graph.AddPass(ssaoBlitPass, CreateRef<SSAOBlitPass>(intermediateColorTexture));
 		}
 
-		{
-			TextureSpecifications colorTextureSpecifications{};
-			colorTextureSpecifications.Filtering = TextureFiltering::Closest;
-			colorTextureSpecifications.Format = TextureFormat::R11G11B10;
-			colorTextureSpecifications.Wrap = TextureWrap::Clamp;
-			colorTextureSpecifications.GenerateMipMaps = false;
-			colorTextureSpecifications.Width = m_Viewport.GetSize().x;
-			colorTextureSpecifications.Height = m_Viewport.GetSize().y;
-			colorTextureSpecifications.Usage = TextureUsage::RenderTarget | TextureUsage::Sampling;
+		GetScene()->GetPostProcessingManager().RegisterRenderPasses(m_Viewport.Graph, m_Viewport);
 
-			Ref<Texture> intermediateTexture = Texture::Create(colorTextureSpecifications);
-
-			RenderGraphPassSpecifications toneMappingPass{};
-			toneMappingPass.SetDebugName("ToneMapping");
-			toneMappingPass.AddInput(m_Viewport.ColorTexture);
-			toneMappingPass.AddOutput(intermediateTexture, 0);
-
-			RenderGraphPassSpecifications blitPass{};
-			blitPass.SetDebugName("ToneMappingBlit");
-			blitPass.AddInput(intermediateTexture);
-			blitPass.AddOutput(m_Viewport.ColorTexture, 0);
-
-			m_Viewport.Graph.AddPass(toneMappingPass, CreateRef<ToneMappingPass>(m_Viewport.ColorTexture));
-			m_Viewport.Graph.AddPass(blitPass, CreateRef<BlitPass>(intermediateTexture, TextureFiltering::Closest));
-		}
-
-		{
-			RenderGraphPassSpecifications specifications{};
-			specifications.AddInput(m_Viewport.ColorTexture);
-			specifications.AddOutput(m_Viewport.ColorTexture, 0);
-
-			m_Viewport.Graph.AddPass(specifications, CreateRef<VignettePass>());
-			m_Viewport.Graph.Build();
-		}
+		m_Viewport.Graph.Build();
 	}
 
 	void ViewportWindow::OnAttach()

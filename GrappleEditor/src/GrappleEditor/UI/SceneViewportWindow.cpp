@@ -196,6 +196,7 @@ namespace Grapple
 
 	void SceneViewportWindow::OnViewportChanged()
 	{
+		ViewportWindow::OnViewportChanged();
 		m_Camera.OnViewportChanged(m_Viewport.GetSize(), m_Viewport.GetPosition());
 	}
 

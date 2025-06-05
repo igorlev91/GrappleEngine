@@ -6,6 +6,9 @@
 #include "Grapple/Renderer2D/Renderer2D.h"
 #include "Grapple/Renderer/DebugRenderer.h"
 
+#include "Grapple/Renderer/PostProcessing/ToneMapping.h"
+#include "Grapple/Renderer/PostProcessing/Vignette.h"
+
 #include "Grapple/AssetManager/AssetManager.h"
 
 #include "Grapple/Math/Math.h"
@@ -26,11 +29,6 @@ namespace Grapple
 	Scene::Scene(ECSContext& context)
 		: Asset(AssetType::Scene), m_World(context)
 	{
-		m_PostProcessingManager.SSAOPass = CreateRef<SSAO>();
-		m_PostProcessingManager.VignettePass = CreateRef<Vignette>();
-		m_PostProcessingManager.Atmosphere = CreateRef<AtmospherePass>();
-		m_PostProcessingManager.ToneMappingPass = CreateRef<ToneMapping>();
-
 		m_World.MakeCurrent();
 		Initialize();
 	}
@@ -63,28 +61,15 @@ namespace Grapple
 
 		systemsManager.RegisterSystem("Sprites Renderer", m_2DRenderingGroup, new SpritesRendererSystem());
 		systemsManager.RegisterSystem("Meshes Renderer", m_2DRenderingGroup, new MeshesRendererSystem());
+
+		m_PostProcessingManager.AddEffect(CreateRef<ToneMapping>());
+		m_PostProcessingManager.AddEffect(CreateRef<Vignette>());
 	}
 
 	void Scene::InitializeRuntime()
 	{
 		ScriptingEngine::RegisterSystems();
 		m_World.GetSystemsManager().RebuildExecutionGraphs();
-	}
-
-	void Scene::InitializePostProcessing()
-	{
-		Renderer::AddRenderPass(m_PostProcessingManager.SSAOPass);
-		Renderer::AddRenderPass(m_PostProcessingManager.Atmosphere);
-		Renderer::AddRenderPass(m_PostProcessingManager.VignettePass);
-		Renderer::AddRenderPass(m_PostProcessingManager.ToneMappingPass);
-	}
-
-	void Scene::UninitializePostProcessing()
-	{
-		Renderer::RemoveRenderPass(m_PostProcessingManager.VignettePass);
-		Renderer::RemoveRenderPass(m_PostProcessingManager.SSAOPass);
-		Renderer::RemoveRenderPass(m_PostProcessingManager.ToneMappingPass);
-		Renderer::RemoveRenderPass(m_PostProcessingManager.Atmosphere);
 	}
 
 	void Scene::OnRuntimeStart()
