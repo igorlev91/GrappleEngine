@@ -70,6 +70,8 @@ namespace Grapple
 		VulkanAllocation Allocation;
 	};
 
+	Grapple_API VkImageLayout ImageLayoutToVulkanImageLayout(ImageLayout layout, TextureFormat format);
+
 	class Grapple_API VulkanContext : public GraphicsContext
 	{
 	public:
