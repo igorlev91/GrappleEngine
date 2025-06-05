@@ -2,22 +2,16 @@
 
 #include "Grapple/Renderer/Texture.h"
 #include "Grapple/Renderer/RenderGraph/RenderGraphPass.h"
+#include "Grapple/Renderer/RenderGraph/RenderPassNode.h"
+
+#include <optional>
 
 namespace Grapple
 {
-	class Viewport;
 	class FrameBuffer;
-	class VulkanRenderPass;
 	class Grapple_API RenderGraph
 	{
 	public:
-		struct LayoutTransition
-		{
-			Ref<Texture> TextureHandle = nullptr;
-			ImageLayout InitialLayout = ImageLayout::Undefined;
-			ImageLayout FinalLayout = ImageLayout::Undefined;
-		};
-
 		using ResourceId = uint64_t;
 
 		void AddPass(const RenderGraphPassSpecifications& specifications, Ref<RenderGraphPass> pass);
@@ -30,19 +24,9 @@ namespace Grapple
 		void Execute(Ref<CommandBuffer> commandBuffer);
 		void Build();
 		void Clear();
-
-		void GenerateLayoutTransitions();
 	private:
-		void TransitionLayouts(Ref<CommandBuffer> commandBuffer, const std::vector<LayoutTransition>& transitions);
+		void ExecuteLayoutTransitions(Ref<CommandBuffer> commandBuffer, const std::vector<LayoutTransition>& transitions);
 	private:
-		struct RenderPassNode
-		{
-			RenderGraphPassSpecifications Specifications;
-			Ref<RenderGraphPass> Pass = nullptr;
-			Ref<FrameBuffer> RenderTarget = nullptr;
-			std::vector<LayoutTransition> Transitions;
-		};
-
 		std::vector<RenderPassNode> m_Nodes;
 		std::vector<LayoutTransition> m_FinalTransitions;
 	};
