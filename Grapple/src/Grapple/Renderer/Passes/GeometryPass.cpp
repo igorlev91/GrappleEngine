@@ -6,6 +6,8 @@
 #include "Grapple/Renderer/ShaderStorageBuffer.h"
 #include "Grapple/Renderer/GPUTimer.h"
 
+#include "Grapple/Renderer2D/Renderer2D.h"
+
 #include "Grapple/Math/SIMD.h"
 
 #include "Grapple/Platform/Vulkan/VulkanCommandBuffer.h"
