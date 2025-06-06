@@ -90,8 +90,6 @@ namespace Grapple
 			{
 				AddExplicitTransition(output.AttachmentTexture, output.Layout, node.Transitions);
 			}
-
-			outputIndex++;
 		}
 	}
 

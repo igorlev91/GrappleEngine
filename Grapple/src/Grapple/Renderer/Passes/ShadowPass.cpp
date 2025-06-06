@@ -127,7 +127,7 @@ namespace Grapple
 
 	Ref<FrameBuffer> ShadowPass::GetShadowRenderTarget(uint32_t index)
 	{
-		Grapple_CORE_ASSERT(index < Renderer::GetShadowSettings().Cascades);
+		Grapple_CORE_ASSERT(index < (uint32_t)Renderer::GetShadowSettings().Cascades);
 		return m_Cascades[index];
 	}
 
