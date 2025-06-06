@@ -298,6 +298,8 @@ namespace Grapple
 		Grapple_PROFILE_FUNCTION();
 		Grapple_CORE_ASSERT(m_CurrentRenderPass == nullptr);
 
+		const auto& defaultClearValues = renderPass->GetDefaultClearValues();
+
 		VkRenderPassBeginInfo info{};
 		info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 		info.framebuffer = frameBuffer->GetHandle();
@@ -305,7 +307,8 @@ namespace Grapple
 		info.renderArea.offset = { 0, 0 };
 		info.renderArea.extent.width = frameBuffer->GetSize().x;
 		info.renderArea.extent.height = frameBuffer->GetSize().y;
-		info.pClearValues = nullptr;
+		info.clearValueCount = (uint32_t)defaultClearValues.size();
+		info.pClearValues = defaultClearValues.data();
 
 		const FrameBufferSpecifications& specifications = frameBuffer->GetSpecifications();
 
