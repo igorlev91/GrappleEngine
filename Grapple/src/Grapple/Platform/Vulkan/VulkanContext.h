@@ -80,6 +80,7 @@ namespace Grapple
 	};
 
 	Grapple_API VkImageLayout ImageLayoutToVulkanImageLayout(ImageLayout layout, TextureFormat format);
+	Grapple_API VkCompareOp DepthComparisonFunctionToVulkanCompareOp(DepthComparisonFunction function);
 
 	class Grapple_API VulkanContext : public GraphicsContext
 	{
