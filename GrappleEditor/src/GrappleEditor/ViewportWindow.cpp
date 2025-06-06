@@ -252,8 +252,9 @@ namespace Grapple
 	{
 		m_Viewport.Graph.Clear();
 
-
 		Ref<Scene> scene = GetScene();
+
+		Renderer2D::ConfigurePasses(m_Viewport);
 
 		if (scene)
 		{
