@@ -6,7 +6,7 @@
 
 namespace Grapple
 {
-    Ref<UniformBuffer> Grapple::UniformBuffer::Create(size_t size, uint32_t binding)
+    Ref<UniformBuffer> Grapple::UniformBuffer::Create(size_t size)
     {
         switch (RendererAPI::GetAPI())
         {

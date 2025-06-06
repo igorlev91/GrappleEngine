@@ -5,6 +5,8 @@
 #include "Grapple/Renderer/RendererSubmitionQueue.h"
 #include "Grapple/Renderer/RenderData.h"
 
+#include "Grapple/Renderer/RenderGraph/RenderGraphPass.h"
+
 #ifndef FIXED_SHADOW_NEAR_AND_FAR
 	#define FIXED_SHADOW_NEAR_AND_FAR 1
 #endif
@@ -20,33 +22,29 @@ namespace Grapple
 	class Material;
 	class Mesh;
 
-	class Grapple_API ShadowPass : public RenderPass
+	class Grapple_API ShadowPass : public RenderGraphPass
 	{
 	public:
 		static constexpr size_t MaxCascades = 4;
 
-		ShadowPass(const RendererSubmitionQueue& opaqueObjects,
-			Ref<DescriptorSet> primarySet,
-			Ref<DescriptorSet> descriptorSets[MaxCascades]);
+		ShadowPass(const RendererSubmitionQueue& opaqueObjects);
 
-		void OnRender(RenderingContext& context) override;
+		void OnRender(const RenderGraphContext& context, Ref<CommandBuffer> commandBuffer) override;
 
-		Ref<FrameBuffer> GetShadowRenderTarget(uint32_t index);
-		std::optional<float> GetElapsedTime() const;
+		inline const std::vector<uint32_t>& GetVisibleObjects(size_t cascadeIndex) const
+		{
+			Grapple_CORE_ASSERT(cascadeIndex < MaxCascades);
+			return m_VisibleObjects[cascadeIndex];
+		}
+
+		inline const RenderView& GetLightView(size_t cascadeIndex) const
+		{
+			Grapple_CORE_ASSERT(cascadeIndex < MaxCascades);
+			return m_LightViews[cascadeIndex];
+		}
+
+		inline Ref<UniformBuffer> GetShadowDataBuffer() const { return m_ShadowDataBuffer; }
 	private:
-		struct InstanceData
-		{
-			glm::vec4 PackedTransform[3];
-		};
-
-		struct Batch
-		{
-			Ref<const Mesh> Mesh = nullptr;
-			uint32_t SubMesh = 0;
-			uint32_t BaseInstance = 0;
-			uint32_t InstanceCount = 0;
-		};
-
 		struct ShadowData
 		{
 			float FrustumSize = 0.0f;
@@ -74,25 +72,15 @@ namespace Grapple
 
 		};
 
-		void PrepareRenderTargets(const Ref<CommandBuffer>& commandBuffer);
-		void CalculateShadowMappingParameters();
-		void ComputeShaderProjectionsAndCullObjects(std::vector<uint32_t>* perCascadeObjects);
-		void DrawCascade(uint32_t cascadeIndex, const Ref<CommandBuffer>& commandBuffer, const std::vector<uint32_t>& visibleObjects);
-		void FlushBatch(const Ref<CommandBuffer>& commandBuffer, const Batch& batch);
-		void TransitionLayouts(const Ref<CommandBuffer>& commandBuffer);
+		void CalculateShadowMappingParameters(const RenderGraphContext& context);
+		void ComputeShaderProjectionsAndCullObjects(const RenderGraphContext& context);
 	private:
-		Ref<GPUTimer> m_Timer = nullptr;
-		Ref<DescriptorSet> m_PrimarySet = nullptr;
+		const RendererSubmitionQueue& m_OpaqueObjects;
 
 		ShadowData m_ShadowData;
 		Ref<UniformBuffer> m_ShadowDataBuffer = nullptr;
 
-		std::vector<InstanceData> m_InstanceDataBuffer;
-
-		const RendererSubmitionQueue& m_OpaqueObjects;
-		Ref<FrameBuffer> m_Cascades[MaxCascades] = { nullptr };
-		Ref<ShaderStorageBuffer> m_InstanceBuffers[MaxCascades] = { nullptr };
-		Ref<UniformBuffer> m_CameraBuffers[MaxCascades] = { nullptr };
-		Ref<DescriptorSet> m_DescriptorSets[MaxCascades] = { nullptr };
+		RenderView m_LightViews[MaxCascades];
+		std::vector<uint32_t> m_VisibleObjects[MaxCascades];
 	};
 }
