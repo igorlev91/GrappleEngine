@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Grapple/Renderer/Sampler.h"
+#include "Flare/Renderer/Sampler.h"
 
 #include <vulkan/vulkan.h>
 
-namespace Grapple
+namespace Flare
 {
 	class VulkanSampler : public Sampler
 	{
