@@ -52,5 +52,3 @@ namespace Grapple
 		return sprite;
 	}
 }
-
-
