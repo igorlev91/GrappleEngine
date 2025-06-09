@@ -1,5 +1,7 @@
 #pragma once
 
+#include "GrappleCore/Core.h"
+
 #include "Grapple/Renderer/Texture.h"
 
 #include <stdint.h>
@@ -34,8 +36,10 @@ namespace Grapple
 		uint32_t End = UINT32_MAX;
 	};
 
-	struct CompiledRenderGraph
+	struct Grapple_API CompiledRenderGraph
 	{
+		void Reset();
+
 		std::vector<LayoutTransition> LayoutTransitions;
 		LayoutTransitionsRange ExternalResourceFinalTransitions;
 	};
