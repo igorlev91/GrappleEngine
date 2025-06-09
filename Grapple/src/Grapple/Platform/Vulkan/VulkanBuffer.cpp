@@ -78,6 +78,7 @@ namespace Grapple
 		if (m_Size == 0)
 			m_Size = data.GetSize();
 
+		Grapple_CORE_ASSERT(data.GetSize() + offset <= m_Size);
 		Grapple_CORE_ASSERT(data.GetSize() <= m_Size);
 
 		EnsureAllocated();

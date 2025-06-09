@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Flare/Renderer/Texture.h"
-#include "Flare/Renderer/ShaderMetadata.h"
+#include "Grapple/Renderer/Texture.h"
+#include "Grapple/Renderer/ShaderMetadata.h"
 
-namespace Flare
+namespace Grapple
 {
 	struct SamplerSpecifications
 	{

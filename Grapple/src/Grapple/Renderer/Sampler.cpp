@@ -1,9 +1,9 @@
 #include "Sampler.h"
 
-#include "Flare/Renderer/RendererAPI.h"
-#include "Flare/Platform/Vulkan/VulkanSampler.h"
+#include "Grapple/Renderer/RendererAPI.h"
+#include "Grapple/Platform/Vulkan/VulkanSampler.h"
 
-namespace Flare
+namespace Grapple
 {
 	Ref<Sampler> Sampler::Create(const SamplerSpecifications& specifications)
 	{
@@ -13,7 +13,7 @@ namespace Flare
 			return CreateRef<VulkanSampler>(specifications);
 		}
 
-		FLARE_CORE_ASSERT(false);
+		Grapple_CORE_ASSERT(false);
 		return nullptr;
 	}
 }

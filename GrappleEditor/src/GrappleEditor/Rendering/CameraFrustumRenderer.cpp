@@ -3,8 +3,7 @@
 #include "Grapple/Scene/Components.h"
 #include "Grapple/Scene/Transform.h"
 
-#include "Grapple/Renderer/DebugRenderer.h"
-#include "Grapple/Renderer/Renderer.h"
+#include "Grapple/DebugRenderer/DebugRenderer.h"
 
 #include "GrappleECS/World.h"
 

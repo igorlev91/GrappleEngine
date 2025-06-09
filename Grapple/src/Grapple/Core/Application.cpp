@@ -9,7 +9,7 @@
 #include "Grapple/Renderer/Renderer.h"
 #include "Grapple/Renderer/RendererPrimitives.h"
 #include "Grapple/Renderer2D/Renderer2D.h"
-#include "Grapple/Renderer/DebugRenderer.h"
+#include "Grapple/DebugRenderer/DebugRenderer.h"
 
 #include "Grapple/Scripting/ScriptingEngine.h"
 #include "Grapple/Input/InputManager.h"

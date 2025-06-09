@@ -8,6 +8,8 @@
 #include "Grapple/Renderer/PostProcessing/Vignette.h"
 #include "Grapple/Renderer/PostProcessing/AtmospherePass.h"
 
+#include "Grapple/DebugRenderer/DebugRenderer.h"
+
 #include "Grapple/Platform/Vulkan/VulkanContext.h"
 
 #include "Grapple/Scene/Scene.h"
@@ -271,6 +273,7 @@ namespace Grapple
 
 		Renderer::ConfigurePasses(m_Viewport);
 		Renderer2D::ConfigurePasses(m_Viewport);
+		DebugRenderer::ConfigurePasses(m_Viewport);
 
 		if (scene)
 		{

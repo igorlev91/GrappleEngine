@@ -1,8 +1,9 @@
 #include "SceneViewportWindow.h"
 
 #include "Grapple/Renderer/Renderer.h"
-#include "Grapple/Renderer/DebugRenderer.h"
 #include "Grapple/Renderer/ShaderLibrary.h"
+
+#include "Grapple/DebugRenderer/DebugRenderer.h"
 
 #include "Grapple/Platform/Vulkan/VulkanContext.h"
 

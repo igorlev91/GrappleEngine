@@ -4,7 +4,8 @@
 #include "Grapple/AssetManager/AssetManager.h"
 
 #include "Grapple/Renderer/RendererPrimitives.h"
-#include "Grapple/Renderer/DebugRenderer.h"
+
+#include "Grapple/DebugRenderer/DebugRenderer.h"
 
 #include "GrappleECS/World.h"
 
