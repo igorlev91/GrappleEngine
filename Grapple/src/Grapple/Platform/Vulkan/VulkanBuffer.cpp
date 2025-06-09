@@ -97,6 +97,12 @@ namespace Grapple
 		Create();
 	}
 
+	void VulkanBuffer::SetDebugName(std::string_view name)
+	{
+		m_DebugName = name;
+		VulkanContext::GetInstance().SetDebugName(VK_OBJECT_TYPE_BUFFER, (uint64_t)m_Buffer, m_DebugName.c_str());
+	}
+
 	void VulkanBuffer::Create()
 	{
 		Grapple_PROFILE_FUNCTION();
