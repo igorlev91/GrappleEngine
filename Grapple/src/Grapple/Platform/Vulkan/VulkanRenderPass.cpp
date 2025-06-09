@@ -38,6 +38,18 @@ namespace Grapple
 		}
 	}
 
+	void VulkanRenderPass::SetDebugName(std::string_view debugName)
+	{
+		m_DebugName = debugName;
+
+		VulkanContext::GetInstance().SetDebugName(VK_OBJECT_TYPE_RENDER_PASS, (uint64_t)m_RenderPass, m_DebugName.c_str());
+	}
+
+	const std::string& VulkanRenderPass::GetDebugName() const
+	{
+		return m_DebugName;
+	}
+
 	void VulkanRenderPass::Create(const Span<VkAttachmentDescription>& attachments, std::optional<uint32_t> depthAttachmentIndex)
 	{
 		Grapple_CORE_ASSERT(!depthAttachmentIndex || depthAttachmentIndex && *depthAttachmentIndex < (uint32_t)attachments.GetSize());
