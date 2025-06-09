@@ -103,6 +103,7 @@ namespace Grapple
 
 	void ViewportWindow::BeginImGui()
 	{
+		Grapple_PROFILE_FUNCTION();
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
 		m_IsVisible = ImGui::Begin(m_Name.c_str(), &ShowWindow, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 
@@ -158,20 +159,25 @@ namespace Grapple
 			changed = true;
 		}
 
-		if (changed)
+		bool shouldResizeViewport = viewportSize != m_Viewport.GetSize();
+		if (shouldResizeViewport)
 		{
 			bool shouldCreateFrameBuffers = m_Viewport.GetSize() == glm::ivec2(0);
 			m_Viewport.Resize(viewportPosition, viewportSize);
 
 			if (shouldCreateFrameBuffers)
 				CreateFrameBuffer();
+		}
 
+		if (changed)
+		{
 			OnViewportChanged();
 		}
 	}
 
 	void ViewportWindow::RenderViewportBuffer(const Ref<Texture>& texture)
 	{
+		Grapple_PROFILE_FUNCTION();
 		ImVec2 windowSize = ImGui::GetContentRegionAvail();
 
 		if (m_Viewport.RenderTarget != nullptr)
@@ -184,12 +190,15 @@ namespace Grapple
 
 	void ViewportWindow::EndImGui()
 	{
+		Grapple_PROFILE_FUNCTION();
 		ImGui::End();
 		ImGui::PopStyleVar(); // Pop window padding
 	}
 
 	void ViewportWindow::CreateFrameBuffer()
 	{
+		Grapple_PROFILE_FUNCTION();
+
 		TextureSpecifications specifications{};
 		specifications.Width = m_Viewport.GetSize().x;
 		specifications.Height = m_Viewport.GetSize().y;
@@ -241,6 +250,7 @@ namespace Grapple
 
 	void ViewportWindow::OnClear()
 	{
+		Grapple_PROFILE_FUNCTION();
 		Ref<CommandBuffer> commandBuffer = GraphicsContext::GetInstance().GetCommandBuffer();
 		commandBuffer->ClearColor(m_Viewport.ColorTexture, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 		commandBuffer->ClearColor(m_Viewport.NormalsTexture, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
@@ -254,6 +264,7 @@ namespace Grapple
 
 	void ViewportWindow::BuildRenderGraph()
 	{
+		Grapple_PROFILE_FUNCTION();
 		m_Viewport.Graph.Clear();
 
 		Ref<Scene> scene = GetScene();
@@ -277,6 +288,7 @@ namespace Grapple
 
 	void ViewportWindow::OnRenderImGui()
 	{
+		Grapple_PROFILE_FUNCTION();
 		if (!ShowWindow)
 			return;
 
