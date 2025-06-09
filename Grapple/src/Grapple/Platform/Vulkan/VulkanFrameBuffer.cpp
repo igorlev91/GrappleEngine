@@ -91,6 +91,7 @@ namespace Grapple
 
 	void VulkanFrameBuffer::Resize(uint32_t width, uint32_t height)
 	{
+		Grapple_PROFILE_FUNCTION();
 		Grapple_CORE_ASSERT(width > 0 && height > 0);
 
 		for (const auto& attachment : m_Attachments)

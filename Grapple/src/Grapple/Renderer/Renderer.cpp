@@ -567,6 +567,8 @@ namespace Grapple
 
 	static Ref<ShadowPass> ConfigureShadowPass(Viewport& viewport, std::array<Ref<Texture>, ShadowSettings::MaxCascades>& cascadeTextures)
 	{
+		Grapple_PROFILE_FUNCTION();
+
 		RenderGraphPassSpecifications shadowPassSpec{};
 		shadowPassSpec.SetDebugName("ShadowPass");
 
@@ -624,6 +626,7 @@ namespace Grapple
 
 	void Renderer::ConfigurePasses(Viewport& viewport)
 	{
+		Grapple_PROFILE_FUNCTION();
 		std::array<Ref<Texture>, ShadowSettings::MaxCascades> cascadeTextures = { nullptr };
 		Ref<ShadowPass> shadowPass = ConfigureShadowPass(viewport, cascadeTextures);
 		Ref<UniformBuffer> shadowDataBuffer = shadowPass->GetShadowDataBuffer();

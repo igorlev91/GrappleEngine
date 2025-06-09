@@ -1,6 +1,7 @@
 #include "PostProcessingManager.h"
 
 #include "GrappleCore/Assert.h"
+#include "GrappleCore/Profiler/Profiler.h"
 
 namespace Grapple
 {
@@ -18,6 +19,7 @@ namespace Grapple
 
 	void PostProcessingManager::RegisterRenderPasses(RenderGraph& renderGraph, const Viewport& viewport)
 	{
+		Grapple_PROFILE_FUNCTION();
 		Grapple_CORE_ASSERT(!m_Initialized || m_IsDirty);
 
 		for (const auto& entry : m_Entries)

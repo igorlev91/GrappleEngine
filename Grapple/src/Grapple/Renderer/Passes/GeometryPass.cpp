@@ -24,6 +24,7 @@ namespace Grapple
 		m_PrimaryDescriptorSetWithoutShadows(primarySetWithoutShadows),
 		m_Pool(pool)
 	{
+		Grapple_PROFILE_FUNCTION();
 		constexpr size_t maxInstances = 1000;
 		m_InstanceStorageBuffer = ShaderStorageBuffer::Create(maxInstances * sizeof(InstanceData));
 

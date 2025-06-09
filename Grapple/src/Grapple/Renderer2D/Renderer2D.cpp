@@ -187,6 +187,7 @@ namespace Grapple
 
 	void Renderer2D::ConfigurePasses(Viewport& viewport)
 	{
+		Grapple_PROFILE_FUNCTION();
 		RenderGraphPassSpecifications geometryPass{};
 		geometryPass.SetDebugName("2DGeometryPass");
 		geometryPass.SetType(RenderGraphPassType::Graphics);

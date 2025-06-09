@@ -51,6 +51,7 @@ namespace Grapple
 
 	void RenderGraph::Clear()
 	{
+		Grapple_PROFILE_FUNCTION();
 		m_Nodes.clear();
 		m_CompiledRenderGraph.Reset();
 	}
