@@ -2,6 +2,8 @@
 
 #include "GrappleCore/Collections/Span.h"
 
+#include "Grapple/Math/Math.h"
+
 #include <vector>
 #include <glm/glm.hpp>
 
@@ -19,7 +21,14 @@ namespace Grapple
 		float RayThickness = 0.0f;
 	};
 
-	struct DebugRenderFrameData
+	struct DebugRayData
+	{
+		glm::vec3 Origin = glm::vec3(0.0f);
+		glm::vec3 Direction = glm::vec3(0.0f);
+		glm::vec4 Color = glm::vec4(1.0f);
+	};
+
+	struct DebugRendererFrameData
 	{
 		struct Vertex
 		{
@@ -28,5 +37,6 @@ namespace Grapple
 		};
 
 		Span<Vertex> LineVertices;
+		std::vector<DebugRayData> Rays;
 	};
 }
