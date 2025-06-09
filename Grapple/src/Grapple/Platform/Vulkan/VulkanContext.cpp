@@ -145,15 +145,23 @@ namespace Grapple
 			VkAttachmentDescription attachment{};
 			attachment.flags = 0;
 			attachment.format = m_SwapChainImageFormat;
-			attachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 			attachment.samples = VK_SAMPLE_COUNT_1_BIT;
-			attachment.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+			attachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
 			attachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
 			attachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 			attachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+			attachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 			attachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
 
 			m_ColorOnlyPass = CreateRef<VulkanRenderPass>(Span<VkAttachmentDescription>(attachment));
+			
+			VkClearValue clearValue{};
+			clearValue.color.float32[0] = 0.0f;
+			clearValue.color.float32[1] = 0.0f;
+			clearValue.color.float32[2] = 0.0f;
+			clearValue.color.float32[3] = 0.0f;
+
+			m_ColorOnlyPass->SetDefaultClearValues(Span(&clearValue, 1));
 		}
 
 		CreateSyncObjects();
@@ -566,6 +574,107 @@ namespace Grapple
 		Ref<Pipeline> pipeline = As<Pipeline>(CreateRef<VulkanPipeline>(specifications, renderPass));
 		m_DefaultPipelines.emplace(key, pipeline);
 		return pipeline;
+	}
+
+	void VulkanContext::GetSourcePipelineStagesAndAccessFlags(VkImageLayout imageLayout, VkPipelineStageFlags& stages, VkAccessFlags& access)
+	{
+		switch (imageLayout)
+		{
+		case VK_IMAGE_LAYOUT_UNDEFINED:
+			stages |= VK_PIPELINE_STAGE_NONE;
+			access |= VK_ACCESS_NONE;
+			break;
+		case VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL:
+			// NOTE: Includes all posible stages that could read an image.
+			//       It might not give the most optimal result in some specific situations
+			stages |= VK_PIPELINE_STAGE_VERTEX_SHADER_BIT
+				| VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT
+				| VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT;
+			access |= VK_ACCESS_SHADER_READ_BIT;
+			break;
+		case VK_IMAGE_LAYOUT_GENERAL:
+			// NOTE: Same thing here, includes all possible stages & also access flags
+			stages |= VK_PIPELINE_STAGE_VERTEX_SHADER_BIT
+				| VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT
+				| VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT;
+			access |= VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_SHADER_WRITE_BIT;
+			break;
+		case VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL:
+			stages |= VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+			access |= VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+			break;
+		case VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL:
+			stages |= VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+			access |= VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+			break;
+		case VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL:
+			stages |= VK_PIPELINE_STAGE_TRANSFER_BIT;
+			access |= VK_ACCESS_TRANSFER_READ_BIT;
+			break;
+		case VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL:
+			stages |= VK_PIPELINE_STAGE_TRANSFER_BIT;
+			access |= VK_ACCESS_TRANSFER_WRITE_BIT;
+			break;
+		default:
+			Grapple_CORE_ASSERT(false);
+			break;
+		}
+	}
+
+	void VulkanContext::GetDestinationPipelineStagesAndAccessFlags(VkImageLayout imageLayout, VkPipelineStageFlags& stages, VkAccessFlags& access)
+	{
+		Grapple_CORE_ASSERT(imageLayout != VK_IMAGE_LAYOUT_UNDEFINED);
+		switch (imageLayout)
+		{
+		case VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL:
+			// NOTE: Includes all posible stages that could read an image.
+			//       It might not give the most optimal result in some specific situations
+			stages |= VK_PIPELINE_STAGE_VERTEX_SHADER_BIT
+				| VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT
+				| VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT;
+			access |= VK_ACCESS_SHADER_READ_BIT;
+			break;
+		case VK_IMAGE_LAYOUT_GENERAL:
+			stages |= VK_PIPELINE_STAGE_VERTEX_SHADER_BIT
+				| VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT
+				| VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT;
+			access |= VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_SHADER_WRITE_BIT;
+			break;
+		case VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL:
+			stages |= VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+			access |= VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+			break;
+		case VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL:
+			stages |= VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+			access |= VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+			break;
+		case VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL:
+			stages |= VK_PIPELINE_STAGE_TRANSFER_BIT;
+			access |= VK_ACCESS_TRANSFER_READ_BIT;
+			break;
+		case VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL:
+			stages |= VK_PIPELINE_STAGE_TRANSFER_BIT;
+			access |= VK_ACCESS_TRANSFER_WRITE_BIT;
+			break;
+		case VK_IMAGE_LAYOUT_PRESENT_SRC_KHR:
+			stages |= VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+			access |= VK_ACCESS_NONE;
+			break;
+		default:
+			Grapple_CORE_ASSERT(false);
+			break;
+		}
+	}
+
+	void VulkanContext::FillPipelineStagesAndAccessMasks(VkImageLayout oldLayout,
+		VkImageLayout newLayout,
+		VkPipelineStageFlags& sourceStages,
+		VkPipelineStageFlags& destinationStages,
+		VkAccessFlags& sourceAccess,
+		VkAccessFlags& destinationAccess)
+	{
+		GetSourcePipelineStagesAndAccessFlags(oldLayout, sourceStages, sourceAccess);
+		GetDestinationPipelineStagesAndAccessFlags(newLayout, destinationStages, destinationAccess);
 	}
 
 	void VulkanContext::CreateInstance(const Span<const char*>& enabledLayers)
