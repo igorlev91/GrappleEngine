@@ -9,6 +9,8 @@
 #include "Grapple/Renderer/GraphicsContext.h"
 #include "Grapple/Renderer/Passes/BlitPass.h"
 
+#include "Grapple/Platform/Vulkan/VulkanCommandBuffer.h"
+
 #include "Grapple/AssetManager/AssetManager.h"
 
 #include "GrappleCore/Profiler/Profiler.h"
@@ -98,6 +100,12 @@ namespace Grapple
 
 	void SSAOMainPass::OnRender(const RenderGraphContext& context, Ref<CommandBuffer> commandBuffer)
 	{
+		if (RendererAPI::GetAPI() == RendererAPI::API::Vulkan)
+		{
+			Ref<VulkanCommandBuffer> vulkanCommandBuffer = As<VulkanCommandBuffer>(commandBuffer);
+			vulkanCommandBuffer->SetPrimaryDescriptorSet(Renderer::GetPrimaryDescriptorSet());
+		}
+
 		commandBuffer->BeginRenderTarget(context.GetRenderTarget());
 
 		auto biasIndex = m_Material->GetShader()->GetPropertyIndex("u_Params.Bias");
