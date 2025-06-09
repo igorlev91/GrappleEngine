@@ -26,6 +26,7 @@ namespace Grapple
 
 	void RenderGraph::Execute(Ref<CommandBuffer> commandBuffer)
 	{
+		Grapple_PROFILE_FUNCTION();
 		Ref<VulkanCommandBuffer> vulkanCommandBuffer = As<VulkanCommandBuffer>(commandBuffer);
 
 		for (const auto& node : m_Nodes)
@@ -42,11 +43,14 @@ namespace Grapple
 
 	void RenderGraph::Build()
 	{
+		Grapple_PROFILE_FUNCTION();
 		RenderGraphBuilder builder(m_CompiledRenderGraph,
 			Span<RenderPassNode>::FromVector(m_Nodes),
 			Span<ExternalRenderGraphResource>::FromVector(m_ExternalResources));
 
 		builder.Build();
+
+		m_NeedsRebuilding = false;
 	}
 
 	void RenderGraph::Clear()
@@ -58,6 +62,7 @@ namespace Grapple
 
 	void RenderGraph::ExecuteLayoutTransitions(Ref<CommandBuffer> commandBuffer, LayoutTransitionsRange range)
 	{
+		Grapple_PROFILE_FUNCTION();
 		Ref<VulkanCommandBuffer> vulkanCommandBuffer = As<VulkanCommandBuffer>(commandBuffer);
 
 		for (uint32_t i = range.Start; i < range.End; i++)
