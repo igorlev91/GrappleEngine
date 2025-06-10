@@ -676,6 +676,7 @@ namespace Grapple
 			access |= VK_ACCESS_NONE;
 			break;
 		default:
+			Grapple_CORE_ERROR("{}", (int64_t)imageLayout);
 			Grapple_CORE_ASSERT(false);
 			break;
 		}
@@ -1155,7 +1156,7 @@ namespace Grapple
 		{
 			if (IsDepthTextureFormat(format))
 			{
-				if (HasStencilComponent(format))
+				//if (HasStencilComponent(format))
 				{
 					return VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 				}
