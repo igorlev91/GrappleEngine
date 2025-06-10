@@ -6,6 +6,7 @@
 #include "Grapple/Renderer/FrameBuffer.h"
 #include "Grapple/Renderer/UniformBuffer.h"
 #include "Grapple/Renderer/ShaderStorageBuffer.h"
+#include "Grapple/Renderer/Sampler.h"
 #include "Grapple/Renderer/GPUTimer.h"
 
 #include "Grapple/Math/SIMD.h"
@@ -23,6 +24,14 @@ namespace Grapple
 		Grapple_PROFILE_FUNCTION();
 
 		m_ShadowDataBuffer = UniformBuffer::Create(sizeof(ShadowData));
+
+		SamplerSpecifications samplerSpecifications{};
+		samplerSpecifications.ComparisonEnabled = true;
+		samplerSpecifications.ComparisonFunction = DepthComparisonFunction::Less;
+		samplerSpecifications.Filter = TextureFiltering::Linear;
+		samplerSpecifications.WrapMode = TextureWrap::Clamp;
+
+		m_CompareSampler = Sampler::Create(samplerSpecifications);
 	}
 
 	void ShadowPass::OnRender(const RenderGraphContext& context, Ref<CommandBuffer> commandBuffer)
