@@ -2,6 +2,7 @@
 
 #include "Grapple/Renderer/RendererSubmitionQueue.h"
 #include "Grapple/Renderer/RenderGraph/RenderGraphPass.h"
+#include "Grapple/Renderer/RendererStatistics.h"
 
 #ifndef FIXED_SHADOW_NEAR_AND_FAR
 	#define FIXED_SHADOW_NEAR_AND_FAR 1
@@ -14,12 +15,14 @@ namespace Grapple
 	class DescriptorSetPool;
 	class UniformBuffer;
 	class ShaderStorageBuffer;
+	class GPUTimer;
 	class ShadowCascadePass : public RenderGraphPass
 	{
 	public:
 		static constexpr size_t MaxCascades = 4;
 
 		ShadowCascadePass(const RendererSubmitionQueue& opaqueObjects,
+			RendererStatistics& statistics,
 			const RenderView& lightView,
 			const std::vector<uint32_t>& visibleObjects,
 			Ref<Texture> cascadeTexture,
@@ -48,7 +51,9 @@ namespace Grapple
 		void FlushBatch(const Ref<CommandBuffer>& commandBuffer, const Batch& batch);
 	private:
 		const RendererSubmitionQueue& m_OpaqueObjects;
+		RendererStatistics& m_Statistics;
 
+		Ref<GPUTimer> m_Timer = nullptr;
 		Ref<Texture> m_CascadeTexture = nullptr;
 
 		Ref<UniformBuffer> m_ShadowDataBuffer = nullptr;

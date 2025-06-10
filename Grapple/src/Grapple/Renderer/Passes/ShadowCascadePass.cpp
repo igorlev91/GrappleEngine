@@ -6,6 +6,7 @@
 #include "Grapple/Renderer/UniformBuffer.h"
 #include "Grapple/Renderer/ShaderStorageBuffer.h"
 #include "Grapple/Renderer/CommandBuffer.h"
+#include "Grapple/Renderer/GPUTimer.h"
 
 #include "Grapple/Math/Math.h"
 #include "Grapple/Math/SIMD.h"
@@ -16,6 +17,7 @@
 namespace Grapple
 {
 	ShadowCascadePass::ShadowCascadePass(const RendererSubmitionQueue& opaqueObjects,
+		RendererStatistics& statistics,
 		const RenderView& lightView,
 		const std::vector<uint32_t>& visibleObjects,
 		Ref<Texture> cascadeTexture,
@@ -23,6 +25,7 @@ namespace Grapple
 		Ref<DescriptorSet> set,
 		Ref<DescriptorSetPool> pool)
 		: m_OpaqueObjects(opaqueObjects),
+		m_Statistics(statistics),
 		m_LightView(lightView),
 		m_VisibleObjects(visibleObjects),
 		m_CascadeTexture(cascadeTexture),
@@ -37,6 +40,7 @@ namespace Grapple
 		constexpr size_t maxInstanceCount = 1000;
 
 		m_InstanceBuffer = ShaderStorageBuffer::Create(maxInstanceCount * sizeof(InstanceData));
+		m_Timer = GPUTimer::Create();
 
 		m_Set->WriteUniformBuffer(m_CameraBuffer, 0);
 		m_Set->WriteUniformBuffer(m_ShadowDataBuffer, 2);
@@ -64,6 +68,8 @@ namespace Grapple
 		}
 
 		m_CameraBuffer->SetData(&m_LightView, sizeof(m_LightView), 0);
+
+		m_Statistics.ShadowPassTime += m_Timer->GetElapsedTime().value_or(0.0f);
 
 #if 0
 		{
@@ -101,6 +107,8 @@ namespace Grapple
 
 		m_InstanceBuffer->SetData(MemorySpan::FromVector(m_InstanceDataBuffer), 0, commandBuffer);
 
+		commandBuffer->StartTimer(m_Timer);
+
 		commandBuffer->BeginRenderTarget(context.GetRenderTarget());
 		uint32_t shadowMapResolution = GetShadowMapResolution(shadowSettings.Quality);
 		commandBuffer->SetViewportAndScisors(Math::Rect(0.0f, 0.0f, (float)shadowMapResolution, (float)shadowMapResolution));
@@ -108,6 +116,8 @@ namespace Grapple
 		DrawCascade(commandBuffer);
 
 		commandBuffer->EndRenderTarget();
+
+		commandBuffer->StopTimer(m_Timer);
 	}
 
 	void ShadowCascadePass::DrawCascade(const Ref<CommandBuffer>& commandBuffer)
@@ -152,6 +162,9 @@ namespace Grapple
 
 		if (batch.InstanceCount == 0)
 			return;
+
+		m_Statistics.DrawCallCount++;
+		m_Statistics.DrawCallsSavedByInstancing += batch.InstanceCount - 1;
 
 		commandBuffer->DrawIndexed(batch.Mesh, batch.SubMesh, batch.BaseInstance, batch.InstanceCount);
 	}
