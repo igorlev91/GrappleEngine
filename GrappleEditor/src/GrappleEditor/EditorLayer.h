@@ -18,6 +18,7 @@
 #include "GrappleEditor/UI/PrefabEditor.h"
 #include "GrappleEditor/UI/SpriteEditor.h"
 #include "GrappleEditor/UI/QuickSearch/QuickSearch.h"
+#include "GrappleEditor/UI/PostProcessingWindow.h"
 
 #include "GrappleEditor/ViewportWindow.h"
 #include "GrappleEditor/EditorCamera.h"
@@ -104,6 +105,7 @@ namespace Grapple
 		SceneWindow m_SceneWindow;
 		PropertiesWindow m_PropertiesWindow;
 		AssetManagerWindow m_AssetManagerWindow;
+		PostProcessingWindow m_PostProcessingWindow;
 		QuickSearch m_QuickSearch;
 
 		std::vector<Ref<ViewportWindow>> m_ViewportWindows;
