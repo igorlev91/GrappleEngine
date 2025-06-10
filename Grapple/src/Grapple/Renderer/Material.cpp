@@ -6,6 +6,7 @@
 #include "Grapple/Renderer/Texture.h"
 #include "Grapple/Renderer/RendererAPI.h"
 #include "Grapple/Renderer/Renderer.h"
+#include "Grapple/Renderer/Texture.h"
 
 #include "Grapple/Platform/Vulkan/VulkanMaterial.h"
 
@@ -14,33 +15,6 @@
 
 namespace Grapple
 {
-	void TexturePropertyValue::SetTexture(const Ref<Grapple::Texture>& texture)
-	{
-		ValueType = Type::Texture;
-		Texture = texture;
-		FrameBuffer = nullptr;
-		FrameBufferAttachmentIndex = UINT32_MAX;
-	}
-
-	void TexturePropertyValue::SetFrameBuffer(const Ref<Grapple::FrameBuffer>& frameBuffer, uint32_t attachment)
-	{
-		Grapple_CORE_ASSERT(frameBuffer);
-		Grapple_CORE_ASSERT(attachment < frameBuffer->GetAttachmentsCount());
-
-		ValueType = Type::FrameBufferAttachment;
-		Texture = nullptr;
-		FrameBuffer = frameBuffer;
-		FrameBufferAttachmentIndex = attachment;
-	}
-
-	void TexturePropertyValue::Clear()
-	{
-		ValueType = Type::Texture;
-		Texture = nullptr;
-		FrameBuffer = nullptr;
-		FrameBufferAttachmentIndex = UINT32_MAX;
-	}
-
 	Grapple_IMPL_ASSET(Material);
 	Grapple_IMPL_TYPE(Material);
 
@@ -136,7 +110,7 @@ namespace Grapple
 			}
 		}
 
-		m_Textures.resize(samplers, TexturePropertyValue());
+		m_Textures.resize(samplers, nullptr);
 
 		if (m_BufferSize != 0)
 		{
@@ -171,39 +145,27 @@ namespace Grapple
 		Grapple_CORE_ASSERT((size_t)index < properties.size());
 		memcpy_s(m_Buffer + properties[index].Offset, properties[index].Size, values, sizeof(*values) * count);
 	}
-
-	template<>
-	Grapple_API TexturePropertyValue& Material::GetPropertyValue(uint32_t index)
+	
+	const Ref<Texture>& Material::GetTextureProperty(uint32_t propertyIndex) const
 	{
 		const ShaderProperties& properties = m_Shader->GetProperties();
-		Grapple_CORE_ASSERT((size_t)index < properties.size());
-		Grapple_CORE_ASSERT(properties[index].Type == ShaderDataType::Sampler);
-		Grapple_CORE_ASSERT(properties[index].SamplerIndex < (uint32_t)m_Textures.size());
-
-		m_IsDirty = true;
-		return m_Textures[properties[index].SamplerIndex];
+		Grapple_CORE_ASSERT((size_t)propertyIndex < properties.size());
+		Grapple_CORE_ASSERT(properties[propertyIndex].Type == ShaderDataType::Sampler);
+		
+		return m_Textures[properties[propertyIndex].SamplerIndex];
 	}
 
-	template<>
-	Grapple_API TexturePropertyValue Material::ReadPropertyValue(uint32_t index) const
+	void Material::SetTextureProperty(uint32_t propertyIndex, Ref<Texture> texture)
 	{
 		const ShaderProperties& properties = m_Shader->GetProperties();
-		Grapple_CORE_ASSERT((size_t)index < properties.size());
-		Grapple_CORE_ASSERT(properties[index].Type == ShaderDataType::Sampler);
-		Grapple_CORE_ASSERT(properties[index].SamplerIndex < (uint32_t)m_Textures.size());
+		Grapple_CORE_ASSERT((size_t)propertyIndex < properties.size());
+		Grapple_CORE_ASSERT(properties[propertyIndex].Type == ShaderDataType::Sampler);
+		
+		const Ref<Texture>& oldTexture = m_Textures[properties[propertyIndex].SamplerIndex];
+		if (oldTexture.get() == texture.get())
+			return;
 
-		return m_Textures[properties[index].SamplerIndex];
-	}
-
-	template<>
-	Grapple_API void Material::WritePropertyValue(uint32_t index, const TexturePropertyValue& value)
-	{
-		const ShaderProperties& properties = m_Shader->GetProperties();
-		Grapple_CORE_ASSERT((size_t)index < properties.size());
-		Grapple_CORE_ASSERT(properties[index].Type == ShaderDataType::Sampler);
-		Grapple_CORE_ASSERT(properties[index].SamplerIndex < (uint32_t)m_Textures.size());
-
+		m_Textures[properties[propertyIndex].SamplerIndex] = texture;
 		m_IsDirty = true;
-		m_Textures[properties[index].SamplerIndex] = value;
 	}
 }

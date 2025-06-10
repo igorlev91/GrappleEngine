@@ -6,34 +6,11 @@
 #include "Grapple/Renderer/Shader.h"
 #include "Grapple/Renderer/RendererAPI.h"
 #include "Grapple/Renderer/ShaderMetadata.h"
-#include "Grapple/Renderer/FrameBuffer.h"
 
 namespace Grapple
 {
-	struct Grapple_API TexturePropertyValue
-	{
-		enum class Type : uint8_t
-		{
-			Texture,
-			FrameBufferAttachment,
-		};
-
-		TexturePropertyValue()
-		{
-			Clear();
-		}
-
-		void SetTexture(const Ref<Texture>& texture);
-		void SetFrameBuffer(const Ref<FrameBuffer>& frameBuffer, uint32_t attachment);
-		void Clear();
-
-		Type ValueType = Type::Texture;
-
-		Ref<Texture> Texture = nullptr;
-		Ref<FrameBuffer> FrameBuffer = nullptr;
-		uint32_t FrameBufferAttachmentIndex = UINT32_MAX;
-	};
-
+	class Texture;
+	class FrameBuffer;
 	class Grapple_API Material : public Asset
 	{
 	public:
@@ -93,6 +70,9 @@ namespace Grapple
 			m_IsDirty = true;
 		}
 
+		const Ref<Texture>& GetTextureProperty(uint32_t propertyIndex) const;
+		void SetTextureProperty(uint32_t propertyIndex, Ref<Texture> texture);
+
 		inline uint8_t* GetPropertiesBuffer() { return m_Buffer; }
 		inline const uint8_t* GetPropertiesBuffer() const { return m_Buffer; }
 	public:
@@ -104,20 +84,11 @@ namespace Grapple
 	protected:
 		Ref<Shader> m_Shader;
 
-		std::vector<TexturePropertyValue> m_Textures;
+		std::vector<Ref<Texture>> m_Textures;
 
 		size_t m_BufferSize;
 		uint8_t* m_Buffer;
 
 		bool m_IsDirty = false;
 	};
-
-	template<>
-	Grapple_API TexturePropertyValue& Material::GetPropertyValue(uint32_t index);
-
-	template<>
-	Grapple_API TexturePropertyValue Material::ReadPropertyValue(uint32_t index) const;
-
-	template<>
-	Grapple_API void Material::WritePropertyValue(uint32_t index, const TexturePropertyValue& value);
 }
