@@ -246,12 +246,7 @@ namespace Grapple
 
 	void Renderer::ClearStatistics()
 	{
-		s_RendererData.Statistics.DrawCallsCount = 0;
-		s_RendererData.Statistics.DrawCallsSavedByInstancing = 0;
-		s_RendererData.Statistics.ObjectsCulled = 0;
-		s_RendererData.Statistics.ObjectsSubmitted = 0;
-		s_RendererData.Statistics.GeometryPassTime = 0.0f;
-		s_RendererData.Statistics.ShadowPassTime = 0.0f;
+		s_RendererData.Statistics = {};
 	}
 
 	void Renderer::SetMainViewport(Viewport& viewport)
@@ -576,6 +571,11 @@ namespace Grapple
 
 		viewport.Graph.AddPass(shadowPassSpec, shadowPass);
 
+		if (!viewport.IsShadowMappingEnabled())
+		{
+			return shadowPass;
+		}
+
 		Ref<UniformBuffer> shadowDataBuffer = shadowPass->GetShadowDataBuffer();
 
 		uint32_t textureResolution = GetShadowMapResolution(s_RendererData.ShadowMappingSettings.Quality);
@@ -645,25 +645,29 @@ namespace Grapple
 		geometryPass.AddOutput(viewport.NormalsTexture, 1);
 		geometryPass.AddOutput(viewport.DepthTexture, 2);
 
-		for (size_t i = 0; i < cascadeTextures.size(); i++)
+		if (viewport.IsShadowMappingEnabled())
 		{
-			geometryPass.AddInput(cascadeTextures[i]);
+			for (size_t i = 0; i < cascadeTextures.size(); i++)
+			{
+				if (cascadeTextures[i] == nullptr)
+					break;
 
-			if (cascadeTextures[i] == nullptr)
-				break;
-		}
+				geometryPass.AddInput(cascadeTextures[i]);
+			}
 
-		// Fill first cascades with textures from shadow casacde passes,
-		// the rest of cascades were filled with white textures when setting up the descriptor set
-		for (uint32_t i = 0; i < (uint32_t)s_RendererData.ShadowMappingSettings.Cascades; i++)
-		{
-			primarySet->WriteImage(cascadeTextures[i], (uint32_t)(28 + i));
+			// Fill first cascades with textures from shadow casacde passes,
+			// the rest of cascades were filled with white textures when setting up the descriptor set
+			for (uint32_t i = 0; i < (uint32_t)s_RendererData.ShadowMappingSettings.Cascades; i++)
+			{
+				primarySet->WriteImage(cascadeTextures[i], (uint32_t)(28 + i));
+			}
 		}
 
 		primarySet->FlushWrites();
 
 		viewport.Graph.AddPass(geometryPass, CreateRef<GeometryPass>(
 			s_RendererData.OpaqueQueue,
+			s_RendererData.Statistics,
 			primarySet,
 			primarySetWithoutShadows,
 			s_RendererData.PrimaryDescriptorPool));

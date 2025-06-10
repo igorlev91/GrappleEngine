@@ -18,6 +18,7 @@ namespace Grapple
 		const DebugRendererSettings& settings)
 		: m_Shader(debugShader), m_FrameData(frameData), m_Settings(settings), m_IndexBuffer(indexBuffer)
 	{
+		Grapple_PROFILE_FUNCTION();
 		size_t bufferSize = sizeof(DebugRendererFrameData::Vertex) * DebugRendererSettings::VerticesPerRay * m_Settings.MaxRays;
 		m_VertexBuffer = VertexBuffer::Create(bufferSize, GPUBufferUsage::Static);
 		As<VulkanVertexBuffer>(m_VertexBuffer)->GetBuffer().EnsureAllocated(); // HACk: To avoid binding NULL buffer
@@ -55,6 +56,7 @@ namespace Grapple
 
 	void DebugRaysPass::CreatePipeline(const RenderGraphContext& context)
 	{
+		Grapple_PROFILE_FUNCTION();
 		PipelineSpecifications rayPipelineSpecifications{};
 		rayPipelineSpecifications.Blending = BlendMode::Opaque;
 		rayPipelineSpecifications.Culling = CullingMode::None;

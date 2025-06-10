@@ -1,8 +1,8 @@
 #include "VulkanSampler.h"
 
-#include "Flare/Platform/Vulkan/VulkanContext.h"
+#include "Grapple/Platform/Vulkan/VulkanContext.h"
 
-namespace Flare
+namespace Grapple
 {
 	VulkanSampler::VulkanSampler(const SamplerSpecifications& specifications)
 		: m_Specifications(specifications)
@@ -42,7 +42,7 @@ namespace Flare
 			samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_NEAREST;
 			break;
 		default:
-			FLARE_CORE_ASSERT(false);
+			Grapple_CORE_ASSERT(false);
 		}
 
 		switch (m_Specifications.Filter)
@@ -56,7 +56,7 @@ namespace Flare
 			samplerInfo.magFilter = VK_FILTER_LINEAR;
 			break;
 		default:
-			FLARE_CORE_ASSERT(false);
+			Grapple_CORE_ASSERT(false);
 		}
 
 		VK_CHECK_RESULT(vkCreateSampler(VulkanContext::GetInstance().GetDevice(), &samplerInfo, nullptr, &m_Sampler));
@@ -64,11 +64,11 @@ namespace Flare
 	
 	VulkanSampler::~VulkanSampler()
 	{
-		FLARE_CORE_ASSERT(VulkanContext::GetInstance().IsValid());
+		Grapple_CORE_ASSERT(VulkanContext::GetInstance().IsValid());
 		vkDestroySampler(VulkanContext::GetInstance().GetDevice(), m_Sampler, nullptr);
 	}
 
-	const SamplerSpecifications& Flare::VulkanSampler::GetSpecifications() const
+	const SamplerSpecifications& Grapple::VulkanSampler::GetSpecifications() const
 	{
 		return m_Specifications;
 	}

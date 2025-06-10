@@ -12,6 +12,7 @@ namespace Grapple
 	DebugLinesPass::DebugLinesPass(Ref<Shader> debugShader, const DebugRendererSettings& settings, const DebugRendererFrameData& frameData)
 		: m_Shader(debugShader), m_Settings(settings), m_FrameData(frameData)
 	{
+		Grapple_PROFILE_FUNCTION();
 		m_VertexBuffer = VertexBuffer::Create(sizeof(DebugRendererFrameData::Vertex) * 2 * m_Settings.MaxLines, GPUBufferUsage::Static);
 		As<VulkanVertexBuffer>(m_VertexBuffer)->GetBuffer().EnsureAllocated(); // HACk: To avoid binding NULL buffer
 	}
@@ -22,6 +23,7 @@ namespace Grapple
 
 	void DebugLinesPass::OnRender(const RenderGraphContext& context, Ref<CommandBuffer> commandBuffer)
 	{
+		Grapple_PROFILE_FUNCTION();
 		using Vertex = DebugRendererFrameData::Vertex;
 
 		m_VertexBuffer->SetData(
@@ -48,6 +50,7 @@ namespace Grapple
 
 	void DebugLinesPass::CreatePipeline(const RenderGraphContext& context)
 	{
+		Grapple_PROFILE_FUNCTION();
 		PipelineSpecifications linePipelineSpecifications{};
 		linePipelineSpecifications.Blending = BlendMode::Opaque;
 		linePipelineSpecifications.Culling = CullingMode::None;

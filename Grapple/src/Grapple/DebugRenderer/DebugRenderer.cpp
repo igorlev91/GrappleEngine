@@ -5,18 +5,9 @@
 #include "Grapple/AssetManager/AssetManager.h"
 
 #include "Grapple/Renderer/Renderer.h"
-#include "Grapple/Renderer/CommandBuffer.h"
-#include "Grapple/Renderer/GraphicsContext.h"
 
-#include "Grapple/Renderer/Buffer.h"
 #include "Grapple/Renderer/ShaderLibrary.h"
 #include "Grapple/Renderer/Shader.h"
-
-#include "Grapple/Platform/Vulkan/VulkanCommandBuffer.h"
-#include "Grapple/Platform/Vulkan/VulkanPipeline.h"
-#include "Grapple/Platform/Vulkan/VulkanRenderPass.h"
-
-#include "Grapple/Renderer/Pipeline.h"
 
 #include "Grapple/Project/Project.h"
 
@@ -44,12 +35,9 @@ namespace Grapple
 
 	DebugRendererData s_DebugRendererData;
 
-	constexpr uint32_t VerticesPerLine = 2;
-	constexpr uint32_t VerticesPerRay = 7;
-	constexpr uint32_t IndicesPerRay = 9;
-
 	static void ReloadShader()
 	{
+		Grapple_PROFILE_FUNCTION();
 		s_DebugRendererData.DebugShader = nullptr;
 
 		AssetHandle debugShaderHandle = ShaderLibrary::FindShader("Debug").value_or(NULL_ASSET_HANDLE);
@@ -61,15 +49,16 @@ namespace Grapple
 
 	void DebugRenderer::Initialize()
 	{
+		Grapple_PROFILE_FUNCTION();
 		s_DebugRendererData.Settings.MaxRays = 10000;
 		s_DebugRendererData.Settings.MaxLines = 40000;
 		s_DebugRendererData.Settings.RayThickness = 0.07f;
 
-		size_t indexBufferSize = s_DebugRendererData.Settings.MaxRays * IndicesPerRay;
+		size_t indexBufferSize = s_DebugRendererData.Settings.MaxRays * DebugRendererSettings::IndicesPerRay;
 		uint32_t* indices = new uint32_t[indexBufferSize];
 		uint32_t vertexIndex = 0;
 
-		for (uint32_t index = 0; index < s_DebugRendererData.Settings.MaxRays * IndicesPerRay; index += IndicesPerRay)
+		for (uint32_t index = 0; index < indexBufferSize; index += DebugRendererSettings::IndicesPerRay)
 		{
 			indices[index + 0] = vertexIndex + 0;
 			indices[index + 1] = vertexIndex + 1;
@@ -82,14 +71,14 @@ namespace Grapple
 			indices[index + 7] = vertexIndex + 5;
 			indices[index + 8] = vertexIndex + 6;
 
-			vertexIndex += VerticesPerRay;
+			vertexIndex += DebugRendererSettings::VerticesPerRay;
 		}
 
 		s_DebugRendererData.RaysIndexBuffer = IndexBuffer::Create(IndexBuffer::IndexFormat::UInt32, MemorySpan(indices, indexBufferSize));
 
 		delete[] indices;
 
-		s_DebugRendererData.LinesBufferBase = new Vertex[s_DebugRendererData.Settings.MaxLines * VerticesPerLine];
+		s_DebugRendererData.LinesBufferBase = new Vertex[s_DebugRendererData.Settings.MaxLines * DebugRendererSettings::VerticesPerLine];
 		s_DebugRendererData.LinesBuffer = s_DebugRendererData.LinesBufferBase;
 
 		Project::OnProjectOpen.Bind(ReloadShader);
@@ -107,6 +96,7 @@ namespace Grapple
 
 	void DebugRenderer::Begin()
 	{
+		Grapple_PROFILE_FUNCTION();
 		s_DebugRendererData.LinesBuffer = s_DebugRendererData.LinesBufferBase;
 		s_DebugRendererData.LineCount = 0;
 
@@ -115,6 +105,7 @@ namespace Grapple
 
 	void DebugRenderer::End()
 	{
+		Grapple_PROFILE_FUNCTION();
 		s_DebugRendererData.FrameData.LineVertices = Span(s_DebugRendererData.LinesBufferBase, s_DebugRendererData.LineCount);
 	}
 
@@ -254,6 +245,7 @@ namespace Grapple
 
 	void DebugRenderer::ConfigurePasses(Viewport& viewport)
 	{
+		Grapple_PROFILE_FUNCTION();
 		if (!viewport.IsDebugRenderingEnabled())
 			return;
 

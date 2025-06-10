@@ -2,6 +2,7 @@
 
 #include "Grapple/Renderer/RenderPass.h"
 #include "Grapple/Renderer/RendererSubmitionQueue.h"
+#include "Grapple/Renderer/RendererStatistics.h"
 
 #include "Grapple/Renderer/RenderGraph/RenderGraphPass.h"
 
@@ -18,6 +19,7 @@ namespace Grapple
 	{
 	public:
 		GeometryPass(const RendererSubmitionQueue& opaqueObjects,
+			RendererStatistics& statistics,
 			Ref<DescriptorSet> primarySet,
 			Ref<DescriptorSet> primarySetWithoutShadows,
 			Ref<DescriptorSetPool> pool);
@@ -49,6 +51,7 @@ namespace Grapple
 
 		Ref<DescriptorSetPool> m_Pool = nullptr;
 
+		RendererStatistics& m_Statistics;
 		const RendererSubmitionQueue& m_OpaqueObjects;
 		std::vector<uint32_t> m_VisibleObjects;
 		std::vector<InstanceData> m_InstanceBuffer;
