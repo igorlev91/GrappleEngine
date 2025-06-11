@@ -3,11 +3,6 @@
 #include "Grapple/Renderer/Renderer.h"
 #include "Grapple/Renderer/Passes/BlitPass.h"
 
-#include "Grapple/Renderer/PostProcessing/SSAO.h"
-#include "Grapple/Renderer/PostProcessing/ToneMapping.h"
-#include "Grapple/Renderer/PostProcessing/Vignette.h"
-#include "Grapple/Renderer/PostProcessing/AtmospherePass.h"
-
 #include "Grapple/DebugRenderer/DebugRenderer.h"
 
 #include "Grapple/Platform/Vulkan/VulkanContext.h"
@@ -66,6 +61,10 @@ namespace Grapple
 				commandBuffer->TransitionDepthImageLayout(As<VulkanTexture>(m_Viewport.DepthTexture)->GetImageHandle(), true, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 			}
 		}
+	}
+
+	void ViewportWindow::OnAddRenderPasses()
+	{
 	}
 
 	void ViewportWindow::PrepareViewport()
@@ -263,7 +262,6 @@ namespace Grapple
 
 		Renderer::ConfigurePasses(m_Viewport);
 		Renderer2D::ConfigurePasses(m_Viewport);
-		DebugRenderer::ConfigurePasses(m_Viewport);
 
 		if (scene && m_Viewport.IsPostProcessingEnabled())
 		{
@@ -271,6 +269,9 @@ namespace Grapple
 			postProcessing.MarkAsDirty(); // HACK
 			postProcessing.RegisterRenderPasses(m_Viewport.Graph, m_Viewport);
 		}
+
+		OnAddRenderPasses();
+		DebugRenderer::ConfigurePasses(m_Viewport);
 
 		m_Viewport.Graph.Build();
 	}

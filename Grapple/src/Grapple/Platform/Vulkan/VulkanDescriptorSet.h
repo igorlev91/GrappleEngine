@@ -10,7 +10,7 @@ namespace Grapple
 {
 	class VulkanDescriptorSetPool;
 
-	class VulkanDescriptorSetLayout : public DescriptorSetLayout
+	class Grapple_API VulkanDescriptorSetLayout : public DescriptorSetLayout
 	{
 	public:
 		VulkanDescriptorSetLayout(const Span<VkDescriptorSetLayoutBinding>& bindings);
@@ -25,7 +25,7 @@ namespace Grapple
 		uint32_t m_BufferBindings = 0;
 	};
 
-	class VulkanDescriptorSet : public DescriptorSet
+	class Grapple_API VulkanDescriptorSet : public DescriptorSet
 	{
 	public:
 		VulkanDescriptorSet(VulkanDescriptorSetPool* pool, VkDescriptorSet set);
@@ -56,7 +56,7 @@ namespace Grapple
 		std::vector<VkDescriptorBufferInfo> m_Buffers;
 	};
 
-	class VulkanDescriptorSetPool : public DescriptorSetPool
+	class Grapple_API VulkanDescriptorSetPool : public DescriptorSetPool
 	{
 	public:
 		VulkanDescriptorSetPool(size_t maxSets, const Span<VkDescriptorSetLayoutBinding>& bindings);

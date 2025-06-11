@@ -59,7 +59,7 @@ namespace Grapple
 		DepthComparisonFunction DepthFunction = DepthComparisonFunction::Less;
 	};
 
-	class Pipeline
+	class Grapple_API Pipeline
 	{
 	public:
 		virtual const PipelineSpecifications& GetSpecifications() const = 0;

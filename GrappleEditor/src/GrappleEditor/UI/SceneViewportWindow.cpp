@@ -15,12 +15,14 @@
 
 #include "Grapple/Input/InputManager.h"
 
+#include "GrappleEditor/Rendering/SceneViewGridPass.h"
+
 #include "GrappleEditor/AssetManager/EditorAssetManager.h"
 #include "GrappleEditor/ImGui/ImGuiLayer.h"
 #include "GrappleEditor/EditorLayer.h"
 #include "GrappleEditor/UI/EditorGUI.h"
 
-#include "GrapplePlatform//Events.h"
+#include "GrapplePlatform/Events.h"
 
 #include <ImGuizmo.h>
 
@@ -258,6 +260,20 @@ namespace Grapple
 
 	void SceneViewportWindow::OnEvent(Event& event)
 	{
+	}
+
+	void SceneViewportWindow::OnAddRenderPasses()
+	{
+		if (EditorLayer::GetInstance().GetSceneViewSettings().ShowGrid)
+		{
+			RenderGraphPassSpecifications gridPass{};
+			gridPass.AddOutput(m_Viewport.ColorTexture, 0);
+			gridPass.AddOutput(m_Viewport.DepthTexture, 1);
+			gridPass.SetDebugName("SceneViewGridPass");
+			gridPass.SetType(RenderGraphPassType::Graphics);
+
+			m_Viewport.Graph.AddPass(gridPass, CreateRef<SceneViewGridPass>());
+		}
 	}
 
 	void SceneViewportWindow::CreateFrameBuffer()

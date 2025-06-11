@@ -8,7 +8,7 @@
 
 namespace Grapple
 {
-	class VulkanPipeline : public Pipeline
+	class Grapple_API VulkanPipeline : public Pipeline
 	{
 	public:
 		VulkanPipeline(const PipelineSpecifications& specifications,

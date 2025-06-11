@@ -26,6 +26,8 @@ namespace Grapple
 		virtual void OnRenderViewport();
 		virtual void OnEvent(Event& event) {}
 
+		virtual void OnAddRenderPasses();
+
 		Viewport& GetViewport() { return m_Viewport; }
 		const Viewport& GetViewport() const { return m_Viewport; }
 
