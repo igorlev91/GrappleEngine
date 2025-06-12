@@ -3,13 +3,13 @@
 #include "GrappleCore/Serialization/TypeSerializer.h"
 #include "GrappleCore//Serialization/SerializationStream.h"
 
-#include "Grapple/Renderer/RenderPass.h"
-#include "Grapple/Renderer/Material.h"
 #include "Grapple/Renderer/RenderGraph/RenderGraphPass.h"
 #include "Grapple/Renderer/PostProcessing/PostProcessingEffect.h"
 
 namespace Grapple
 {
+	class Material;
+
 	class Grapple_API SSAO : public PostProcessingEffect
 	{
 	public:

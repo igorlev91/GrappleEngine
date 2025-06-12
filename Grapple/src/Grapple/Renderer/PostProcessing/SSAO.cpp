@@ -7,6 +7,8 @@
 #include "Grapple/Renderer/CommandBuffer.h"
 #include "Grapple/Renderer/ShaderLibrary.h"
 #include "Grapple/Renderer/GraphicsContext.h"
+#include "Grapple/Renderer/Material.h"
+
 #include "Grapple/Renderer/Passes/BlitPass.h"
 
 #include "Grapple/Platform/Vulkan/VulkanCommandBuffer.h"

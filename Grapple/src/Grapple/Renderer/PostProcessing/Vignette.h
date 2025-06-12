@@ -3,15 +3,13 @@
 #include "GrappleCore/Serialization/Serialization.h"
 #include "GrappleCore/Serialization/SerializationStream.h"
 
-#include "Grapple/Renderer/RenderPass.h"
-#include "Grapple/Renderer/Shader.h"
-#include "Grapple/Renderer/Material.h"
-
 #include "Grapple/Renderer/PostProcessing/PostProcessingEffect.h"
 #include "Grapple/Renderer/RenderGraph/RenderGraphPass.h"
 
 namespace Grapple
 {
+	class Material;
+
 	class Grapple_API Vignette : public PostProcessingEffect
 	{
 	public:

@@ -7,6 +7,7 @@
 #include "Grapple/Renderer/Renderer.h"
 #include "Grapple/Renderer/ShaderLibrary.h"
 #include "Grapple/Renderer/RendererPrimitives.h"
+#include "Grapple/Renderer/Material.h"
 
 #include "Grapple/Platform/Vulkan/VulkanCommandBuffer.h"
 #include "Grapple/Platform/Vulkan/VulkanContext.h"

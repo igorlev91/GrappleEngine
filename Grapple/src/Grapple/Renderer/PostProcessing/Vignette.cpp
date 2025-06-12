@@ -9,6 +9,7 @@
 #include "Grapple/Renderer/GraphicsContext.h"
 #include "Grapple/Renderer/CommandBuffer.h"
 #include "Grapple/Renderer/RendererPrimitives.h"
+#include "Grapple/Renderer/Material.h"
 
 #include "GrappleCore/Profiler/Profiler.h"
 

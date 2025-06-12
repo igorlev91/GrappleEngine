@@ -3,7 +3,6 @@
 #include "GrappleCore/Serialization/TypeSerializer.h"
 #include "GrappleCore//Serialization/SerializationStream.h"
 
-#include "Grapple/Renderer/Material.h"
 #include "Grapple/Renderer/RenderGraph/RenderGraphPass.h"
 #include "Grapple/Renderer/PostProcessing/PostProcessingEffect.h"
 
@@ -12,6 +11,8 @@ namespace Grapple
 {
 	class AtmospherePass;
 	class CommandBuffer;
+	class Material;
+
 	class Grapple_API Atmosphere : public PostProcessingEffect
 	{
 	public:

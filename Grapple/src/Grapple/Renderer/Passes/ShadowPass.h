@@ -1,7 +1,6 @@
 #pragma once
 
 #include "GrappleCore/Core.h"
-#include "Grapple/Renderer/RenderPass.h"
 #include "Grapple/Renderer/RendererSubmitionQueue.h"
 #include "Grapple/Renderer/RenderData.h"
 

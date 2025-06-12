@@ -3,7 +3,6 @@
 #include "GrappleCore/Core.h"
 #include "Grapple/Renderer/RenderData.h"
 #include "Grapple/Renderer/Viewport.h"
-#include "Grapple/Renderer/RenderPass.h"
 #include "Grapple/Renderer/RendererSubmitionQueue.h"
 #include "Grapple/Renderer/RendererStatistics.h"
 
@@ -162,9 +161,6 @@ namespace Grapple
 
 		static void SubmitDecal(const Ref<const Material>& material, const glm::mat4& transform, int32_t entityIndex);
 
-		static void AddRenderPass(Ref<RenderPass> pass);
-		static void RemoveRenderPass(Ref<RenderPass> pass);
-
 		static RendererSubmitionQueue& GetOpaqueSubmitionQueue();
 
 		static Viewport& GetMainViewport();
@@ -184,6 +180,5 @@ namespace Grapple
 	private:
 		static void ExecuteDecalsPass();
 		static void ReloadShaders();
-		static void ExecuteRenderPasses(std::vector<Ref<RenderPass>>& passes);
 	};
 }
