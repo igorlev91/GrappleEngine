@@ -55,7 +55,9 @@ namespace Grapple
 
 
 	VulkanContext::VulkanContext(Ref<Window> window)
-		: m_Window(window), m_VSyncEnabled(window->GetProperties().VSyncEnabled)
+		: m_Window(window),
+		m_VSyncEnabled(window->GetProperties().VSyncEnabled),
+		m_StagingBufferPool(1024 * 32, 4)
 	{
 	}
 
@@ -178,6 +180,7 @@ namespace Grapple
 		WaitForDevice();
 
 		m_RenderPassCache.Clear();
+		m_StagingBufferPool.Release();
 
 		DestroyStagingBuffers();
 
@@ -238,6 +241,7 @@ namespace Grapple
 		m_PrimaryCommandBuffer->Reset();
 
 		DestroyStagingBuffers();
+		m_StagingBufferPool.Reset();
 
 		m_PrimaryCommandBuffer->Begin();
 	}
@@ -246,6 +250,8 @@ namespace Grapple
 	{
 		Grapple_PROFILE_FUNCTION();
 		m_PrimaryCommandBuffer->End();
+
+		m_StagingBufferPool.FlushMemory();
 
 		{
 			Grapple_PROFILE_SCOPE("Submit");

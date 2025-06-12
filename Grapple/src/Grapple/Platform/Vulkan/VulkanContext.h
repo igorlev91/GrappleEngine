@@ -9,6 +9,7 @@
 #include "Grapple/Platform/Vulkan/VulkanTexture.h"
 #include "Grapple/Platform/Vulkan/VulkanAllocation.h"
 #include "Grapple/Platform/Vulkan/VulkanRenderPassCache.h"
+#include "Grapple/Platform/Vulkan/VulkanStagingBufferPool.h"
 
 #include <vulkan/vulkan.h>
 #include <vk_mem_alloc.h>
@@ -133,6 +134,8 @@ namespace Grapple
 		Ref<Pipeline> GetDefaultPipelineForShader(Ref<Shader> shader, Ref<VulkanRenderPass> renderPass);
 
 		VulkanRenderPassCache& GetRenderPassCache();
+		VulkanStagingBufferPool& GetStagingBufferPool() { return m_StagingBufferPool; }
+		const VulkanStagingBufferPool& GetStagingBufferPool() const { return m_StagingBufferPool; }
 
 		// Gets the pipeline stages and corrisponding access flags when transitioning from a given image layout
 		static void GetSourcePipelineStagesAndAccessFlags(VkImageLayout imageLayout, VkPipelineStageFlags& stages, VkAccessFlags& access);
@@ -236,5 +239,6 @@ namespace Grapple
 
 		// Stating buffers
 		std::vector<StagingBuffer> m_CurrentFrameStagingBuffers;
+		VulkanStagingBufferPool m_StagingBufferPool;
 	};
 }
