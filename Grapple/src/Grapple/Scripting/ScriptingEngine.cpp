@@ -78,11 +78,7 @@ namespace Grapple
 
 	void ScriptingEngine::RegisterSystems()
 	{
-		std::string_view defaultGroupName = "Scripting Update";
-		std::optional<SystemGroupId> defaultGroup = s_ScriptingData.CurrentWorld->GetSystemsManager().FindGroup(defaultGroupName);
-		Grapple_CORE_ASSERT(defaultGroup.has_value());
-
-		s_ScriptingData.CurrentWorld->GetSystemsManager().RegisterSystems(defaultGroup.value());
+		s_ScriptingData.CurrentWorld->GetSystemsManager().RegisterSystems();
 	}
 
 	ScriptingEngine::Data& ScriptingEngine::GetData()

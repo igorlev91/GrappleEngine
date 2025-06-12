@@ -15,7 +15,10 @@ namespace Grapple
 
 	void CameraFrustumRenderer::OnConfig(World& world, SystemConfig& config)
 	{
-		config.Group = world.GetSystemsManager().FindGroup("Debug Rendering");
+		std::optional<uint32_t> groupId = world.GetSystemsManager().FindGroup("Debug Rendering");
+		Grapple_CORE_ASSERT(groupId.has_value());
+		config.Group = *groupId;
+
 		m_Query = world.NewQuery().All().With<CameraComponent, TransformComponent>().Build();
 	}
 

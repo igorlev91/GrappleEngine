@@ -1,10 +1,12 @@
 #pragma once
 
+#include "GrappleCore/Core.h"
+
 #include "GrappleECS/System/System.h"
 
 namespace Grapple
 {
-	class GrappleECS_API SystemsManager;
+	class SystemsManager;
 	struct GrappleECS_API SystemInitializer
 	{
 		using CreateSystemFunction = System*(*)();
