@@ -179,7 +179,6 @@ namespace Grapple
 
 		static void ConfigurePasses(Viewport& viewport);
 	private:
-		static void ExecuteDecalsPass();
 		static void ReloadShaders();
 	};
 }
