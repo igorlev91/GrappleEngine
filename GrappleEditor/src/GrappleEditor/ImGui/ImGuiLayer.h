@@ -47,6 +47,9 @@ namespace Grapple
 		virtual void Begin() = 0;
 		virtual void End() = 0;
 
+		void BeginDockSpace();
+		void EndDockSpace();
+
 		virtual void RenderCurrentWindow() = 0;
 		virtual void UpdateWindows() = 0;
 
