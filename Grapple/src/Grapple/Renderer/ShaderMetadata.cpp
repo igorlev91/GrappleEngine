@@ -8,6 +8,7 @@ namespace Grapple
 		{
 		case ShaderType::_2D:
 			return 2;
+		case ShaderType::Decal:
 		case ShaderType::Surface:
 			return 2;
 		case ShaderType::FullscreenQuad:

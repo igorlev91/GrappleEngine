@@ -17,6 +17,7 @@ namespace Grapple
 		Surface,
 		FullscreenQuad,
 		Debug,
+		Decal,
 	};
 
 	Grapple_API uint32_t GetMaterialDescriptorSetIndex(ShaderType type);

@@ -175,6 +175,7 @@ namespace Grapple
 
 		static Ref<DescriptorSet> GetPrimaryDescriptorSet();
 		static Ref<const DescriptorSetLayout> GetPrimaryDescriptorSetLayout();
+		static Ref<const DescriptorSetLayout> GetDecalsDescriptorSetLayout();
 
 		static void ConfigurePasses(Viewport& viewport);
 	private:
