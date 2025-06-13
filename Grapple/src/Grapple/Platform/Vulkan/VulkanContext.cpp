@@ -217,25 +217,28 @@ namespace Grapple
 	{
 		Grapple_PROFILE_FUNCTION();
 
+		if (!m_Window->GetProperties().IsMinimized)
 		{
-			Grapple_PROFILE_SCOPE("WaitForFence");
-			VK_CHECK_RESULT(vkWaitForFences(m_Device, 1, &m_FrameFence, VK_TRUE, UINT64_MAX));
-			VK_CHECK_RESULT(vkResetFences(m_Device, 1, &m_FrameFence));
-		}
-
-		{
-			Grapple_PROFILE_SCOPE("AcquireNextImage");
-			VkResult acquireResult = vkAcquireNextImageKHR(m_Device, m_SwapChain, UINT64_MAX, m_ImageAvailableSemaphore, VK_NULL_HANDLE, &m_CurrentFrameInFlight);
-
-			if (acquireResult == VK_ERROR_OUT_OF_DATE_KHR)
 			{
-				RecreateSwapChain();
-				return;
+				Grapple_PROFILE_SCOPE("WaitForFence");
+				VK_CHECK_RESULT(vkWaitForFences(m_Device, 1, &m_FrameFence, VK_TRUE, UINT64_MAX));
+				VK_CHECK_RESULT(vkResetFences(m_Device, 1, &m_FrameFence));
 			}
-			else if (acquireResult != VK_SUCCESS && acquireResult != VK_SUBOPTIMAL_KHR)
+
 			{
-				Grapple_CORE_ERROR("Failed to acquire swap chain image");
-				return;
+				Grapple_PROFILE_SCOPE("AcquireNextImage");
+				VkResult acquireResult = vkAcquireNextImageKHR(m_Device, m_SwapChain, UINT64_MAX, m_ImageAvailableSemaphore, VK_NULL_HANDLE, &m_CurrentFrameInFlight);
+
+				if (acquireResult == VK_ERROR_OUT_OF_DATE_KHR)
+				{
+					RecreateSwapChain();
+					return;
+				}
+				else if (acquireResult != VK_SUCCESS && acquireResult != VK_SUBOPTIMAL_KHR)
+				{
+					Grapple_CORE_ERROR("Failed to acquire swap chain image");
+					return;
+				}
 			}
 		}
 
@@ -250,6 +253,11 @@ namespace Grapple
 	{
 		Grapple_PROFILE_FUNCTION();
 		m_PrimaryCommandBuffer->End();
+
+		if (m_Window->GetProperties().IsMinimized)
+		{
+			return;
+		}
 
 		m_StagingBufferPool.FlushMemory();
 
