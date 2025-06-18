@@ -65,6 +65,8 @@ namespace Grapple
 		Ref<DescriptorSet> AllocateSet() override;
 		void ReleaseSet(Ref<DescriptorSet> set) override;
 
+		Ref<DescriptorSet> AllocateSet(Ref<const DescriptorSetLayout> layout);
+
 		Ref<const DescriptorSetLayout> GetLayout() const override;
 	private:
 		Ref<VulkanDescriptorSetLayout> m_Layout = nullptr;
