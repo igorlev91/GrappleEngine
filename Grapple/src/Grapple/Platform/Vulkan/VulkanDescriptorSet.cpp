@@ -226,6 +226,7 @@ namespace Grapple
 
 
 	VulkanDescriptorSetPool::VulkanDescriptorSetPool(size_t maxSets, const Span<VkDescriptorSetLayoutBinding>& bindings)
+		: m_MaxSets(maxSets)
 	{
 		std::vector<VkDescriptorPoolSize> sizes(bindings.GetSize());
 		for (size_t i = 0; i < bindings.GetSize(); i++)
@@ -249,11 +250,14 @@ namespace Grapple
 
 	VulkanDescriptorSetPool::~VulkanDescriptorSetPool()
 	{
+		Grapple_CORE_ASSERT(m_AllocatedSets == 0);
 		vkDestroyDescriptorPool(VulkanContext::GetInstance().GetDevice(), m_Pool, nullptr);
 	}
 
 	Ref<DescriptorSet> VulkanDescriptorSetPool::AllocateSet()
 	{
+		Grapple_CORE_ASSERT(m_AllocatedSets < m_MaxSets, "Out of descriptor pool memory");
+
 		VkDescriptorSetLayout layout = m_Layout->GetHandle();
 		VkDescriptorSetAllocateInfo info{};
 		info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
@@ -261,6 +265,8 @@ namespace Grapple
 		info.descriptorSetCount = 1;
 		info.pNext = nullptr;
 		info.pSetLayouts = &layout;
+
+		m_AllocatedSets++;
 
 		VkDescriptorSet set = VK_NULL_HANDLE;
 
@@ -270,8 +276,12 @@ namespace Grapple
 
 	void VulkanDescriptorSetPool::ReleaseSet(Ref<DescriptorSet> set)
 	{
+		Grapple_CORE_ASSERT(m_AllocatedSets > 0);
+
 		VkDescriptorSet setHandles[] = { As<VulkanDescriptorSet>(set)->GetHandle() };
 		VK_CHECK_RESULT(vkFreeDescriptorSets(VulkanContext::GetInstance().GetDevice(), m_Pool, 1, setHandles));
+
+		m_AllocatedSets--;
 	}
 
 	Ref<const DescriptorSetLayout> VulkanDescriptorSetPool::GetLayout() const
