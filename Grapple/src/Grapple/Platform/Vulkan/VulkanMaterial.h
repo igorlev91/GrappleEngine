@@ -9,7 +9,7 @@ namespace Grapple
 	class VulkanDescriptorSet;
 	class VulkanRenderPass;
 
-	class VulkanMaterial : public Material
+	class Grapple_API VulkanMaterial : public Material
 	{
 	public:
 		virtual ~VulkanMaterial();
