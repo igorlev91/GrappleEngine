@@ -1,6 +1,11 @@
 #include "Project.h"
 
 #include "GrappleCore/Assert.h"
+
+#include "Grapple/Core/Application.h"
+
+#include "Grapple/Renderer/GraphicsContext.h"
+
 #include "Grapple/Project/ProjectSerializer.h"
 #include "Grapple/Scripting/ScriptingEngine.h"
 
@@ -9,6 +14,7 @@ namespace Grapple
 	Ref<Project> s_Active;
 	Signal<> Project::OnProjectOpen;
 	Signal<> Project::OnUnloadActiveProject;
+	bool Project::s_ProjectReloadScheduled = false;
 
 	std::filesystem::path Project::s_ProjectFileExtension = ".Grappleproj";
 
@@ -36,17 +42,27 @@ namespace Grapple
 		Grapple_CORE_ASSERT(!std::filesystem::is_directory(path));
 		Grapple_CORE_ASSERT(path.extension() == s_ProjectFileExtension);
 
-		if (s_Active != nullptr)
-			Project::OnUnloadActiveProject.Invoke();
+		Grapple_CORE_ASSERT(!s_ProjectReloadScheduled);
 
-		ScriptingEngine::UnloadAllModules();
+		s_ProjectReloadScheduled = true;
+		Application::GetInstance().ExecuteAfterEndOfFrame([path]()
+		{
+			GraphicsContext::GetInstance().WaitForDevice();
 
-		Ref<Project> project = CreateRef<Project>(path.parent_path());
-		ProjectSerializer::Deserialize(project, path);
+			if (s_Active != nullptr)
+				Project::OnUnloadActiveProject.Invoke();
 
-		s_Active = project;
+			ScriptingEngine::UnloadAllModules();
 
-		Project::OnProjectOpen.Invoke();
+			Ref<Project> project = CreateRef<Project>(path.parent_path());
+			ProjectSerializer::Deserialize(project, path);
+
+			s_Active = project;
+
+			Project::OnProjectOpen.Invoke();
+
+			s_ProjectReloadScheduled = false;
+		});
 	}
 
 	const std::filesystem::path& Project::GetProjectFileExtension()
