@@ -97,7 +97,7 @@ namespace Grapple
 		specifications.Wrap = importSettings.WrapMode;
 		specifications.GenerateMipMaps = importSettings.GenerateMipMaps;
 
-		TextureData textureData{};
+		TexturePixelData textureData{};
 		if (!Texture::ReadDataFromFile(metadata.Path, specifications, textureData))
 		{
 			Grapple_CORE_ASSERT("Failed to load texture: {}", metadata.Path.string());
