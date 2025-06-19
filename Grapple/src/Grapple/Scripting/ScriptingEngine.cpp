@@ -2,21 +2,20 @@
 
 #include "GrappleCore/Log.h"
 
-#include "Grapple/Scene/Components.h"
 #include "Grapple/Project/Project.h"
 
 #include "GrapplePlatform/Platform.h"
 
-#include "GrappleECS/System/SystemInitializer.h"
-
-#include "GrappleECS.h"
+#include <vector>
 
 namespace Grapple
 {
-	const std::string s_ModuleLoaderFunctionName = "OnModuleLoaded";
-	const std::string s_ModuleUnloaderFunctionName = "OnModuleUnloaded";
+	struct ScriptingEngineData
+	{
+		std::vector<void*> LoadedSharedLibraries;
+	};
 
-	ScriptingEngine::Data s_ScriptingData;
+	ScriptingEngineData s_ScriptingData;
 
 	void ScriptingEngine::Initialize()
 	{
@@ -25,11 +24,6 @@ namespace Grapple
 	void ScriptingEngine::Shutdown()
 	{
 		UnloadAllModules();
-	}
-
-	void ScriptingEngine::SetCurrentECSWorld(World& world)
-	{
-		s_ScriptingData.CurrentWorld = &world;
 	}
 
 	void ScriptingEngine::LoadModules()
@@ -74,15 +68,5 @@ namespace Grapple
 		for (void* lib : s_ScriptingData.LoadedSharedLibraries)
 			Platform::FreeSharedLibrary(lib);
 		s_ScriptingData.LoadedSharedLibraries.clear();
-	}
-
-	void ScriptingEngine::RegisterSystems()
-	{
-		s_ScriptingData.CurrentWorld->GetSystemsManager().RegisterSystems();
-	}
-
-	ScriptingEngine::Data& ScriptingEngine::GetData()
-	{
-		return s_ScriptingData;
 	}
 }

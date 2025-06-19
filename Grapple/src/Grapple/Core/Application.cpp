@@ -74,9 +74,6 @@ namespace Grapple
 				return true;
 			});
 
-			if (RendererAPI::GetAPI() == RendererAPI::API::Vulkan)
-				return;
-
 			auto& layer = m_LayersStack.GetLayers();
 			for (auto it = layer.end(); it != layer.begin();)
 			{
