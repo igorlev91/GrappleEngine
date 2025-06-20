@@ -26,6 +26,18 @@ namespace Grapple
 		return nullptr;
 	}
 
+	Ref<Texture> Texture::Create(const TextureSpecifications& specifications, MemorySpan pixelData)
+	{
+		switch (RendererAPI::GetAPI())
+		{
+		case RendererAPI::API::Vulkan:
+			return CreateRef<VulkanTexture>(specifications, pixelData);
+		}
+
+		Grapple_CORE_ASSERT(false);
+		return nullptr;
+	}
+
 	Ref<Texture> Texture::Create(const std::filesystem::path& path, const TextureSpecifications& specifications)
 	{
 		TexturePixelData data;

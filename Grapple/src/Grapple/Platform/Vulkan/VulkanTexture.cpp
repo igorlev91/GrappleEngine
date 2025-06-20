@@ -9,6 +9,11 @@
 
 namespace Grapple
 {
+	uint32_t CalculateMipCount(uint32_t width, uint32_t height)
+	{
+		return (uint32_t)glm::floor(glm::log2((float)glm::max(width, height))) + 1u;
+	}
+
 	VkFormat TextureFormatToVulkanFormat(TextureFormat format)
 	{
 		switch (format)
@@ -72,6 +77,14 @@ namespace Grapple
 		CreateResources();
 	}
 
+	VulkanTexture::VulkanTexture(const TextureSpecifications& specifications, MemorySpan pixelData)
+		: m_Specifications(specifications)
+	{
+		Grapple_PROFILE_FUNCTION();
+		CreateResources();
+		UploadPixelData(Span<const MemorySpan>(&pixelData, 1));
+	}
+
 	VulkanTexture::VulkanTexture(uint32_t width, uint32_t height, const void* data, TextureFormat format, TextureFiltering filtering)
 	{
 		Grapple_PROFILE_FUNCTION();
@@ -82,7 +95,7 @@ namespace Grapple
 
 		if (m_Specifications.GenerateMipMaps)
 		{
-			m_MipLevels = (uint32_t)glm::floor(glm::log2((float)glm::max(m_Specifications.Width, m_Specifications.Height))) + 1u;
+			m_MipLevels = CalculateMipCount(m_Specifications.Width, m_Specifications.Height);
 		}
 
 		MemorySpan mipData = MemorySpan::FromRawBytes(data, m_Specifications.Width * m_Specifications.Height * GetImagePixelSizeInBytes());
@@ -98,7 +111,7 @@ namespace Grapple
 
 		if (m_Specifications.GenerateMipMaps)
 		{
-			m_MipLevels = (uint32_t)glm::floor(glm::log2((float)glm::max(m_Specifications.Width, m_Specifications.Height))) + 1u;
+			m_MipLevels = CalculateMipCount(m_Specifications.Width, m_Specifications.Height);
 		}
 
 		MemorySpan mipData = MemorySpan::FromRawBytes(data, m_Specifications.Width * m_Specifications.Height * GetImagePixelSizeInBytes());
@@ -111,7 +124,13 @@ namespace Grapple
 		: m_Specifications(specifications)
 	{
 		Grapple_PROFILE_FUNCTION();
-		m_MipLevels = (uint32_t)data.Mips.size();
+
+		Grapple_CORE_ASSERT(m_Specifications.GenerateMipMaps && data.Mips.size() == 1 || !m_Specifications.GenerateMipMaps);
+
+		if (m_Specifications.GenerateMipMaps)
+			m_MipLevels = CalculateMipCount(m_Specifications.Width, m_Specifications.Height);
+		else
+			m_MipLevels = (uint32_t)data.Mips.size();
 
 		CreateResources();
 		UploadPixelData(Span(data.Mips.data(), data.Mips.size()));
