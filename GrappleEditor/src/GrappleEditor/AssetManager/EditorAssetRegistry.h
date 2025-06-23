@@ -41,6 +41,7 @@ namespace Grapple
 
 		inline AssetRegistryEntry& Insert(AssetHandle handle)
 		{
+			m_IsDirty = true;
 			return m_Entries.emplace(handle, AssetRegistryEntry{}).first->second;
 		}
 
