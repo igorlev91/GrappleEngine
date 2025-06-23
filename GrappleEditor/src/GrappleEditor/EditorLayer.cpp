@@ -61,6 +61,8 @@ namespace Grapple
         Project::OnProjectOpen.Bind(Grapple_BIND_EVENT_CALLBACK(OnOpenProject));
         Project::OnUnloadActiveProject.Bind([this]()
         {
+			EditorAssetManager::GetInstance()->SerializeRegistry();
+
             m_ProjectFilesWacher.reset();
             if (Scene::GetActive() == nullptr)
                 return;
@@ -175,6 +177,8 @@ namespace Grapple
     void EditorLayer::OnDetach()
     {
         Grapple_PROFILE_FUNCTION();
+        EditorAssetManager::GetInstance()->SerializeRegistry();
+
         m_AssetManagerWindow.Uninitialize();
         m_AssetEditorWindows.clear();
 
