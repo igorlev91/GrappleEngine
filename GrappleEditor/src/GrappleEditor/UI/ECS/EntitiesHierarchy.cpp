@@ -1,5 +1,7 @@
 #include "EntitiesHierarchy.h"
 
+#include "GrappleCore/Profiler/Profiler.h"
+
 #include "Grapple/Scene/Components.h"
 #include "Grapple/Scene/Hierarchy.h"
 
@@ -21,6 +23,7 @@ namespace Grapple
 
 	bool EntitiesHierarchy::OnRenderImGui(Entity& selectedEntity)
 	{
+		Grapple_PROFILE_FUNCTION();
 		Grapple_CORE_ASSERT(m_World);
 
 		bool result = false;
@@ -119,6 +122,7 @@ namespace Grapple
 
 	bool EntitiesHierarchy::RenderEntityItem(Entity entity, Entity& selectedEntity)
 	{
+		Grapple_PROFILE_FUNCTION();
 		bool result = false;
 		ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow
 			| ImGuiTreeNodeFlags_FramePadding
@@ -176,6 +180,7 @@ namespace Grapple
 
 	bool EntitiesHierarchy::RenderEntityContextMenu(Entity entity, Entity& selectedEntity)
 	{
+		Grapple_PROFILE_FUNCTION();
 		bool result = false;
 		if (ImGui::BeginPopupContextItem())
 		{

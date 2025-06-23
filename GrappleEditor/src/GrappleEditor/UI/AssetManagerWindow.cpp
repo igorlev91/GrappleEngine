@@ -1,6 +1,7 @@
 #include "AssetManagerWindow.h"
 
 #include "GrappleCore/Assert.h"
+#include "GrappleCore/Profiler/Profiler.h"
 
 #include "Grapple/Project/Project.h"
 
@@ -22,6 +23,7 @@ namespace Grapple
 {
     void AssetManagerWindow::OnImGuiRender()
     {
+        Grapple_PROFILE_FUNCTION();
         ImGui::Begin("Asset Manager");
 
         if (ImGui::Button("Refresh"))
@@ -55,6 +57,7 @@ namespace Grapple
 
     void AssetManagerWindow::RebuildAssetTree()
     {
+        Grapple_PROFILE_FUNCTION();
         if (m_AssetManager == nullptr)
             m_AssetManager = As<EditorAssetManager>(AssetManager::GetInstance());
 
@@ -69,6 +72,7 @@ namespace Grapple
 
     void AssetManagerWindow::Uninitialize()
     {
+        Grapple_PROFILE_FUNCTION();
         m_AssetManager = nullptr;
         m_AssetTree.clear();
         m_FileOpenActions.clear();
@@ -87,6 +91,7 @@ namespace Grapple
 
     void AssetManagerWindow::RenderDirectory()
     {
+        Grapple_PROFILE_FUNCTION();
         const AssetTreeNode& node = m_AssetTree[m_NodeRenderIndex];
         ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow
             | ImGuiTreeNodeFlags_FramePadding
@@ -147,6 +152,7 @@ namespace Grapple
 
     void AssetManagerWindow::RenderFile()
     {
+        Grapple_PROFILE_FUNCTION();
         AssetTreeNode& node = m_AssetTree[m_NodeRenderIndex];
 
         if (node.IsImported)
@@ -192,6 +198,7 @@ namespace Grapple
 
     void AssetManagerWindow::RenderAssetItem(AssetTreeNode* node, AssetHandle handle)
     {
+        Grapple_PROFILE_FUNCTION();
         ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow
             | ImGuiTreeNodeFlags_FramePadding
             | ImGuiTreeNodeFlags_SpanFullWidth;
@@ -276,7 +283,7 @@ namespace Grapple
 
     void AssetManagerWindow::BuildDirectory(uint32_t parentIndex, const std::filesystem::path& path)
     {
-        static uint32_t index = 1;
+        Grapple_PROFILE_FUNCTION();
         Grapple_CORE_ASSERT(std::filesystem::is_directory(path));
 
         for (std::filesystem::path child : std::filesystem::directory_iterator(path))
@@ -301,6 +308,7 @@ namespace Grapple
 
     void AssetManagerWindow::OnOpenFile(AssetHandle handle)
     {
+        Grapple_PROFILE_FUNCTION();
         if (AssetManager::IsAssetHandleValid(handle))
         {
             const AssetMetadata* metadata = AssetManager::GetAssetMetadata(handle);
@@ -315,6 +323,7 @@ namespace Grapple
 
     void AssetManagerWindow::ShowCreateNewFilePopup(const FileNameCallback& callback)
     {
+        Grapple_PROFILE_FUNCTION();
         std::memset(m_TextInputBuffer, 0, sizeof(m_TextInputBuffer));
 
         m_ShowNewFilePopup = true;
@@ -323,6 +332,7 @@ namespace Grapple
 
     void AssetManagerWindow::RenderCreateNewFilePopup()
     {
+        Grapple_PROFILE_FUNCTION();
         bool createNewFile = false;
 
         ImVec2 center = ImGui::GetMainViewport()->GetCenter();
@@ -390,6 +400,7 @@ namespace Grapple
 
     void AssetManagerWindow::RenderCreateAssetMenuItems(const AssetTreeNode& rootNode)
     {
+        Grapple_PROFILE_FUNCTION();
         if (ImGui::MenuItem("Prefab"))
         {
             ShowCreateNewFilePopup([this, nodeIndex = m_NodeRenderIndex](std::string_view name)

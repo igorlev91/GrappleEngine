@@ -1,5 +1,7 @@
 #include "EditorTitleBar.h"
 
+#include "GrappleCore/Profiler/Profiler.h"
+
 #include "Grapple/Core/Application.h"
 #include "Grapple/Project/Project.h"
 
@@ -26,6 +28,7 @@ namespace Grapple
 
 	void EditorTitleBar::OnRenderImGui()
 	{
+		Grapple_PROFILE_FUNCTION();
 		Ref<Window> window = Application::GetInstance().GetWindow();
 
 		if (window->GetProperties().CustomTitleBar)
@@ -42,6 +45,7 @@ namespace Grapple
 
 	void EditorTitleBar::RenderTitleBar()
 	{
+		Grapple_PROFILE_FUNCTION();
 		ImGuiWindow* window = ImGui::GetCurrentWindow();
 		auto prevLayout = window->DC.LayoutType;
 
@@ -175,6 +179,7 @@ namespace Grapple
 
 	bool EditorTitleBar::RenderButton(const char* id, glm::ivec2 iconPosition)
 	{
+		Grapple_PROFILE_FUNCTION();
 		const auto& style = ImGui::GetStyle();
 		const auto& icons = EditorGUI::GetIcons();
 		float buttonSize = ImGui::GetFontSize() + style.FramePadding.y * 2.0f;
