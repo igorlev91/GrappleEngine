@@ -327,6 +327,7 @@ namespace Grapple
 
 	void Renderer::EndScene()
 	{
+		Grapple_PROFILE_FUNCTION();
 		s_RendererData.PointLights.clear();
 		s_RendererData.SpotLights.clear();
 		s_RendererData.Decals.clear();

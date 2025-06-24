@@ -1,5 +1,7 @@
 #include "CameraFrustumRenderer.h"
 
+#include "GrappleCore/Profiler/Profiler.h"
+
 #include "Grapple/Scene/Components.h"
 #include "Grapple/Scene/Transform.h"
 
@@ -15,6 +17,7 @@ namespace Grapple
 
 	void CameraFrustumRenderer::OnConfig(World& world, SystemConfig& config)
 	{
+		Grapple_PROFILE_FUNCTION();
 		std::optional<uint32_t> groupId = world.GetSystemsManager().FindGroup("Debug Rendering");
 		Grapple_CORE_ASSERT(groupId.has_value());
 		config.Group = *groupId;
@@ -24,6 +27,7 @@ namespace Grapple
 
 	void CameraFrustumRenderer::OnUpdate(World& world, SystemExecutionContext& context)
 	{
+		Grapple_PROFILE_FUNCTION();
 		if (!EditorLayer::GetInstance().GetSceneViewSettings().ShowCameraFrustum)
 			return;
 

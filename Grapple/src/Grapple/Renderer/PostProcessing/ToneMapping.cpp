@@ -61,6 +61,7 @@ namespace Grapple
 	ToneMappingPass::ToneMappingPass(Ref<Texture> colorTexture)
 		: m_ColorTexture(colorTexture)
 	{
+		Grapple_PROFILE_FUNCTION();
 		std::optional<AssetHandle> shaderHandle = ShaderLibrary::FindShader("AcesToneMapping");
 		if (!shaderHandle || !AssetManager::IsAssetHandleValid(shaderHandle.value()))
 		{

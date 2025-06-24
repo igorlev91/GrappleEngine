@@ -1,15 +1,15 @@
 #include "LightVisualizer.h"
 
+#include "GrappleCore/Profiler/Profiler.h"
+
 #include "GrappleECS/World.h"
 
 #include "Grapple/Scene/Components.h"
 #include "Grapple/Scene/Transform.h"
+#include "Grapple/Project/Project.h"
 
 #include "Grapple/Renderer/ShaderLibrary.h"
-
 #include "Grapple/DebugRenderer/DebugRenderer.h"
-
-#include "Grapple/Project/Project.h"
 
 #include "GrapplePlatform/Event.h"
 
@@ -23,6 +23,7 @@ namespace Grapple
 
 	void LightVisualizer::OnConfig(World& world, SystemConfig& config)
 	{
+		Grapple_PROFILE_FUNCTION();
 		std::optional<uint32_t> groupId = world.GetSystemsManager().FindGroup("Debug Rendering");
 		Grapple_CORE_ASSERT(groupId.has_value());
 		config.Group = *groupId;
@@ -34,6 +35,7 @@ namespace Grapple
 
 	void LightVisualizer::OnUpdate(World& world, SystemExecutionContext& context)
 	{
+		Grapple_PROFILE_FUNCTION();
 		if (!EditorLayer::GetInstance().GetSceneViewSettings().ShowLights)
 			return;
 
@@ -163,6 +165,7 @@ namespace Grapple
 
 	void LightVisualizer::ReloadShaders()
 	{
+		Grapple_PROFILE_FUNCTION();
 		std::optional<AssetHandle> shaderHandle = ShaderLibrary::FindShader("DebugIcon");
 
 		if (!shaderHandle || !AssetManager::IsAssetHandleValid(shaderHandle.value()))

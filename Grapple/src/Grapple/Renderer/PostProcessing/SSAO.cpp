@@ -30,6 +30,8 @@ namespace Grapple
 
 	void SSAO::RegisterRenderPasses(RenderGraph& renderGraph, const Viewport& viewport)
 	{
+		Grapple_PROFILE_FUNCTION();
+
 		if (!IsEnabled())
 			return;
 
@@ -88,6 +90,7 @@ namespace Grapple
 	SSAOMainPass::SSAOMainPass(Ref<Texture> normalsTexture, Ref<Texture> depthTexture)
 		: m_NormalsTexture(normalsTexture), m_DepthTexture(depthTexture)
 	{
+		Grapple_PROFILE_FUNCTION();
 		std::optional<AssetHandle> shaderHandle = ShaderLibrary::FindShader("SSAO");
 		if (shaderHandle && AssetManager::IsAssetHandleValid(shaderHandle.value()))
 		{
@@ -105,6 +108,7 @@ namespace Grapple
 
 	void SSAOMainPass::OnRender(const RenderGraphContext& context, Ref<CommandBuffer> commandBuffer)
 	{
+		Grapple_PROFILE_FUNCTION();
 		if (RendererAPI::GetAPI() == RendererAPI::API::Vulkan)
 		{
 			Ref<VulkanCommandBuffer> vulkanCommandBuffer = As<VulkanCommandBuffer>(commandBuffer);
@@ -138,6 +142,7 @@ namespace Grapple
 	SSAOComposingPass::SSAOComposingPass(Ref<Texture> colorTexture, Ref<Texture> aoTexture)
 		: m_ColorTexture(colorTexture), m_AOTexture(aoTexture)
 	{
+		Grapple_PROFILE_FUNCTION();
 		std::optional<AssetHandle> shaderHandle = ShaderLibrary::FindShader("SSAOBlur");
 		if (shaderHandle && AssetManager::IsAssetHandleValid(shaderHandle.value()))
 		{
@@ -155,6 +160,7 @@ namespace Grapple
 
 	void SSAOComposingPass::OnRender(const RenderGraphContext& context, Ref<CommandBuffer> commandBuffer)
 	{
+		Grapple_PROFILE_FUNCTION();
 		commandBuffer->BeginRenderTarget(context.GetRenderTarget());
 
 		commandBuffer->SetViewportAndScisors(Math::Rect(glm::vec2(0.0f, 0.0f), (glm::vec2)context.GetViewport().GetSize()));

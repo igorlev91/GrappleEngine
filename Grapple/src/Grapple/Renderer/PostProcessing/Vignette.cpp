@@ -56,6 +56,7 @@ namespace Grapple
 
 	VignettePass::VignettePass()
 	{
+		Grapple_PROFILE_FUNCTION();
 		auto vignette = Scene::GetActive()->GetPostProcessingManager().GetEffect<Vignette>();
 		Grapple_CORE_ASSERT(vignette);
 
@@ -74,6 +75,7 @@ namespace Grapple
 
 	void VignettePass::OnRender(const RenderGraphContext& context, Ref<CommandBuffer> commandBuffer)
 	{
+		Grapple_PROFILE_FUNCTION();
 		commandBuffer->BeginRenderTarget(context.GetRenderTarget());
 
 		Ref<Shader> shader = m_Material->GetShader();

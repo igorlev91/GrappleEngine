@@ -80,6 +80,7 @@ namespace Grapple
 		std::optional<Entity> selectedEntity = EditorLayer::GetInstance().Selection.TryGetEntity();
 		if (debugRenderingGroup.has_value())
 		{
+			Grapple_PROFILE_SCOPE("DebugRendering");
 			DebugRenderer::Begin();
 
 			scene->GetECSWorld().GetSystemsManager().ExecuteGroup(debugRenderingGroup.value());
