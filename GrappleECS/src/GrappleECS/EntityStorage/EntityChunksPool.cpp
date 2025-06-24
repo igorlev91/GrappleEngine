@@ -1,6 +1,7 @@
 #include "EntityChunksPool.h"
 
 #include "GrappleCore/Assert.h"
+#include "GrappleCore/Profiler/Profiler.h"
 
 namespace Grapple
 {
@@ -9,11 +10,13 @@ namespace Grapple
 	EntityChunksPool::EntityChunksPool(size_t capacity)
 		: m_Capacity(capacity), m_Count(0)
 	{
+		Grapple_PROFILE_FUNCTION();
 		m_Chunks = new EntityStorageChunk[capacity];
 	}
 
 	EntityStorageChunk EntityChunksPool::GetOrCreate()
 	{
+		Grapple_PROFILE_FUNCTION();
 		if (m_Count == 0)
 		{
 			EntityStorageChunk chunk = EntityStorageChunk();
@@ -28,6 +31,7 @@ namespace Grapple
 
 	void EntityChunksPool::Add(EntityStorageChunk& chunk)
 	{
+		Grapple_PROFILE_FUNCTION();
 		if (m_Count == m_Capacity)
 		{
 			chunk.~EntityStorageChunk();
@@ -39,6 +43,7 @@ namespace Grapple
 
 	void EntityChunksPool::Initialize(size_t capacity)
 	{
+		Grapple_PROFILE_FUNCTION();
 		if (s_Instance == nullptr)
 			s_Instance = CreateScope<EntityChunksPool>(capacity);
 	}

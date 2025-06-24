@@ -1,6 +1,7 @@
 #include "CommandsStorage.h"
 
 #include "GrappleCore/Assert.h"
+#include "GrappleCore/Profiler/Profiler.h"
 
 namespace Grapple
 {
@@ -17,6 +18,7 @@ namespace Grapple
 
 	std::optional<size_t> CommandsStorage::Allocate(size_t size)
 	{
+		Grapple_PROFILE_FUNCTION();
 		if (m_Buffer == nullptr || m_Size + size > m_Capacity)
 			Reallocate();
 
@@ -77,6 +79,7 @@ namespace Grapple
 
 	void CommandsStorage::Reallocate()
 	{
+		Grapple_PROFILE_FUNCTION();
 		m_Capacity *= 2;
 		uint8_t* newBuffer = new uint8_t[m_Capacity];
 

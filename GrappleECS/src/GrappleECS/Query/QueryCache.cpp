@@ -1,6 +1,7 @@
 #include "QueryCache.h"
 
 #include "GrappleCore/Core.h"
+#include "GrappleCore/Profiler/Profiler.h"
 
 #include "GrappleECS/Entities.h"
 #include "GrappleECS/Query/Query.h"
@@ -12,6 +13,7 @@ namespace Grapple
 {
 	QueryCache::~QueryCache()
 	{
+		Grapple_PROFILE_FUNCTION();
 		for (const QueryData& query : m_Queries)
 		{
 			if (query.Target == QueryTarget::DeletedEntities)
@@ -35,6 +37,8 @@ namespace Grapple
 
 	QueryId QueryCache::CreateQuery(QueryCreationData& creationData)
 	{
+		Grapple_PROFILE_FUNCTION();
+
 		QueryId id = m_Queries.size();
 		QueryData& query = m_Queries.emplace_back();
 		query.Id = id;
@@ -75,6 +79,7 @@ namespace Grapple
 
 	void QueryCache::OnArchetypeCreated(ArchetypeId archetype)
 	{
+		Grapple_PROFILE_FUNCTION();
 		const ArchetypeRecord& archetypeRecord = m_Archetypes[archetype];
 
 		for (ComponentId component : archetypeRecord.Components)
@@ -106,6 +111,7 @@ namespace Grapple
 
 	bool QueryCache::CompareComponentSets(const std::vector<ComponentId>& archetypeComponents, const std::vector<ComponentId>& queryComponents)
 	{
+		Grapple_PROFILE_FUNCTION();
 		size_t queryComponentIndex = 0;
 		size_t i = 0;
 		while (i < archetypeComponents.size() && queryComponentIndex < queryComponents.size())

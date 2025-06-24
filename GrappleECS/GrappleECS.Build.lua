@@ -21,6 +21,7 @@ project "GrappleECS"
 		"%{wks.location}/GrappleCore/src/",
 		INCLUDE_DIRS.spdlog,
 		INCLUDE_DIRS.glm,
+		INCLUDE_DIRS.tracy
 	}
 
 	links
@@ -37,7 +38,7 @@ project "GrappleECS"
 		symbols "on"
 
 	filter "configurations:Release"
-		defines "Grapple_RELEASE"
+		defines { "Grapple_RELEASE", "TRACY_ENABLE", "TRACY_IMPORTS" }
 		runtime "Release"
 		optimize "on"
 

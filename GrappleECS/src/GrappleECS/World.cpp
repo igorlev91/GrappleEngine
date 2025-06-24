@@ -1,5 +1,7 @@
 #include "World.h"
 
+#include "GrappleCore/Profiler/Profiler.h"
+
 namespace Grapple
 {
 	World* s_CurrentWorld = nullptr;
@@ -11,6 +13,7 @@ namespace Grapple
 		Entities(context.Components, m_Queries, context.Archetypes),
 		m_Queries(Entities, context.Archetypes)
 	{
+		Grapple_PROFILE_FUNCTION();
 	}
 
 	World::~World()

@@ -1,5 +1,7 @@
 #include "SystemsManager.h"
 
+#include "GrappleCore/Profiler/Profiler.h"
+
 #include "GrappleECS/World.h"
 #include "GrappleECS/System/SystemInitializer.h"
 
@@ -46,6 +48,7 @@ namespace Grapple
 
 	void SystemsManager::RegisterSystems()
 	{
+		Grapple_PROFILE_FUNCTION();
 		Grapple_CORE_ASSERT(m_Groups.size() > 0);
 		auto& initializers = SystemInitializer::GetInitializers();
 
@@ -112,6 +115,7 @@ namespace Grapple
 
 	void SystemsManager::AddSystemExecutionSettings(SystemId system, const std::vector<ExecutionOrder>* executionOrder)
 	{
+		Grapple_PROFILE_FUNCTION();
 		SystemData& data = m_Systems[system];
 
 		if (executionOrder == nullptr || executionOrder != nullptr && executionOrder->size() == 0)
@@ -131,6 +135,7 @@ namespace Grapple
 
 	void SystemsManager::ExecuteGroup(SystemGroupId id)
 	{
+		Grapple_PROFILE_FUNCTION();
 		Grapple_CORE_ASSERT(id < (SystemGroupId)m_Groups.size());
 
 		SystemGroup& group = m_Groups[id];
@@ -158,6 +163,7 @@ namespace Grapple
 
 	void SystemsManager::RebuildExecutionGraphs()
 	{
+		Grapple_PROFILE_FUNCTION();
 		for (SystemGroup& group : m_Groups)
 		{
 			if (group.Graph.RebuildGraph() == ExecutionGraph::BuildResult::CircularDependecy)
@@ -200,6 +206,7 @@ namespace Grapple
 
 	void SystemsManager::ConfigureSystem(SystemId id)
 	{
+		Grapple_PROFILE_FUNCTION();
 		Grapple_CORE_ASSERT(IsSystemIdValid(id));
 
 		SystemData& data = m_Systems[id];
@@ -210,13 +217,6 @@ namespace Grapple
 		data.SystemInstance->OnConfig(m_World, config);
 
 		Grapple_CORE_ASSERT(IsGroupIdValid(config.Group));
-
-		const auto& executionOrder = config.GetExecutionOrder();
-		for (auto& order : executionOrder)
-		{
-			Grapple_CORE_ASSERT(order.ItemIndex < 100);
-			Grapple_CORE_ASSERT(IsSystemIdValid(order.ItemIndex));
-		}
 
 		AddSystemToGroup(id, config.Group);
 		AddSystemExecutionSettings(id, &config.GetExecutionOrder());

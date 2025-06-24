@@ -1,5 +1,7 @@
 #include "CommandBuffer.h"
 
+#include "GrappleCore/Profiler/Profiler.h"
+
 #include "GrappleECS/World.h"
 
 namespace Grapple
@@ -22,6 +24,7 @@ namespace Grapple
 
 	void EntitiesCommandBuffer::Execute()
 	{
+		Grapple_PROFILE_FUNCTION();
 		if (!m_Storage.CanRead())
 			return;
 

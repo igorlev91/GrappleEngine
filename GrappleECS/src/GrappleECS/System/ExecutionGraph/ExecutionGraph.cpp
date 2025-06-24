@@ -1,6 +1,7 @@
 #include "ExecutionGraph.h"
 
 #include "GrappleCore/Assert.h"
+#include "GrappleCore/Profiler/Profiler.h"
 
 #include <unordered_set>
 #include <queue>
@@ -40,6 +41,7 @@ namespace Grapple
 
 	ExecutionGraph::BuildResult ExecutionGraph::RebuildGraph()
 	{
+		Grapple_PROFILE_FUNCTION();
 		m_Graph.resize(m_ExecutionSettings.size());
 		for (size_t nodeIndex = 0; nodeIndex < m_Graph.size(); nodeIndex++)
 		{
@@ -136,6 +138,7 @@ namespace Grapple
 
 	bool ExecutionGraph::CheckForCicularDependecies()
 	{
+		Grapple_PROFILE_FUNCTION();
 		if (m_Graph.size() == 0)
 			return false;
 
@@ -153,6 +156,7 @@ namespace Grapple
 
 	bool ExecutionGraph::CheckForCicularDependecies(uint32_t node)
 	{
+		Grapple_PROFILE_FUNCTION();
 		Grapple_CORE_ASSERT(node < (uint32_t)m_Graph.size());
 		m_Visited[node] = VisitedFlag::Visited | VisitedFlag::InCurrentPath;
 
@@ -173,6 +177,7 @@ namespace Grapple
 
 	bool ExecutionGraph::HasIncompleteDependecies(uint32_t index)
 	{
+		Grapple_PROFILE_FUNCTION();
 		Grapple_CORE_ASSERT(index < (uint32_t)m_Graph.size());
 		for (uint32_t depedency : m_Graph[index].Dependecies)
 		{
