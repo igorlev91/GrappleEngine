@@ -80,14 +80,7 @@ namespace Grapple
             bool isShaderAsset = entry.second.Metadata.Type == AssetType::Shader || entry.second.Metadata.Type == AssetType::ComputeShader;
             if (isShaderAsset && entry.second.Metadata.Source == AssetSource::File)
             {
-                std::string shaderFileName = entry.second.Metadata.Path.filename().string();
-                size_t dotPosition = shaderFileName.find_first_of(".");
-
-                std::string_view shaderName = shaderFileName;
-                if (dotPosition != std::string_view::npos)
-                    shaderName = std::string_view(shaderFileName).substr(0, dotPosition);
-
-                ShaderLibrary::AddShader(shaderName, entry.second.Metadata.Handle);
+                ShaderLibrary::AddShader(entry.second.Metadata.Handle);
             }
         }
     }
@@ -213,6 +206,11 @@ namespace Grapple
             }
         }
 
+        if (type == AssetType::Shader || type == AssetType::ComputeShader)
+        {
+            ShaderLibrary::AddShader(handle);
+        }
+
         return handle;
     }
 
@@ -316,8 +314,22 @@ namespace Grapple
     void EditorAssetManager::RemoveFromRegistry(AssetHandle handle)
     {
         Grapple_PROFILE_FUNCTION();
-        RemoveFromRegistryWithoutSerialization(handle);
-        SerializeRegistry();
+
+        if (!IsAssetHandleValid(handle))
+            return;
+
+        const AssetMetadata* metadata = GetAssetMetadata(handle);
+        Grapple_CORE_ASSERT(metadata);
+
+        if (metadata->Type == AssetType::Shader || metadata->Type == AssetType::ComputeShader)
+        {
+            if (metadata->Source == AssetSource::File)
+            {
+                ShaderLibrary::Remove(handle);
+            }
+        }
+
+        m_Registry.Remove(handle);
     }
 
     void EditorAssetManager::SetLoadedAsset(AssetHandle handle, const Ref<Asset>& asset)
@@ -342,11 +354,6 @@ namespace Grapple
     {
         Grapple_CORE_ASSERT(Project::GetActive());
         return Project::GetActive()->Location / "Assets";
-    }
-
-    void EditorAssetManager::RemoveFromRegistryWithoutSerialization(AssetHandle handle)
-    {
-        Grapple_PROFILE_FUNCTION();
     }
 
     void EditorAssetManager::ImportBuiltinAssets()
