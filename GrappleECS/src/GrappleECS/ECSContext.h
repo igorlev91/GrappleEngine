@@ -5,8 +5,10 @@
 
 namespace Grapple
 {
-	struct ECSContext
+	struct GrappleECS_API ECSContext
 	{
+		ECSContext();
+
 		inline void Clear()
 		{
 			Archetypes.Clear();
