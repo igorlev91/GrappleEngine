@@ -24,8 +24,8 @@ workspace "Grapple"
 	}
 
 group "Dependencies"
-    include "Grapple/vendor/GLFW"
-    include "Grapple/vendor/ImGUI"
+    include "Grapple/vendor/GLFW/GLFW.Build.lua"
+    include "Grapple/vendor/ImGUI/ImGUI.Build.lua"
     include "Grapple/vendor/yaml-cpp"
 	include "Grapple/vendor/msdf/MSDF.Build.lua"
 group ""
