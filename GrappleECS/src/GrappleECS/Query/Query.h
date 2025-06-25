@@ -95,15 +95,16 @@ namespace Grapple
 	class QueryChunk
 	{
 	public:
+		QueryChunk() = default;
 		QueryChunk(uint8_t* chunkData, size_t entitiesCount, size_t entitySize)
 			: m_ChunkData(chunkData), m_EntitiesCount(entitiesCount), m_EntitySize(entitySize) {}
 
 		inline QueryChunkIterator begin() const { return QueryChunkIterator(m_ChunkData, m_EntitySize); }
 		inline QueryChunkIterator end() const { return QueryChunkIterator(m_ChunkData + m_EntitySize * m_EntitiesCount, m_EntitySize); }
 	private:
-		uint8_t* m_ChunkData;
-		size_t m_EntitiesCount;
-		size_t m_EntitySize;
+		uint8_t* m_ChunkData = nullptr;
+		size_t m_EntitiesCount = 0;
+		size_t m_EntitySize = 0;
 	};
 
 	class GrappleECS_API EntitiesQuery
@@ -119,7 +120,7 @@ namespace Grapple
 		virtual size_t GetEntitiesCount() const = 0;
 
 		inline QueryId GetId() const { return m_Id; }
-		const std::unordered_set<ArchetypeId> GetMatchingArchetypes() const { return m_Queries->GetQueryData(m_Id).MatchedArchetypes; }
+		const std::unordered_set<ArchetypeId>& GetMatchingArchetypes() const { return m_Queries->GetQueryData(m_Id).MatchedArchetypes; }
 	protected:
 		QueryId m_Id = INVALID_QUERY_ID;
 		const QueryCache* m_Queries = nullptr;
@@ -129,7 +130,7 @@ namespace Grapple
 	template<typename T>
 	struct QueryIterationHelper
 	{
-		static std::tuple<QueryChunk> Get(QueryChunk&& chunk, const size_t* componentOffset)
+		static std::tuple<QueryChunk> Get(QueryChunk chunk, const size_t* componentOffset)
 		{
 			return std::make_tuple(chunk);
 		}
@@ -143,29 +144,37 @@ namespace Grapple
 	template<typename FirstArg, typename... Args>
 	struct QueryIterationHelper<ArgumentsList<FirstArg, Args...>>
 	{
-		static std::tuple<QueryChunk, Args...> Get(QueryChunk&& chunk, const size_t* componentOffsets)
+		static std::tuple<QueryChunk, Args...> Get(QueryChunk chunk, const size_t* componentOffsets)
 		{
 			size_t componentIndex = 0;
-			return std::make_tuple(
-				chunk,
-				[&]() -> decltype(auto)
+
+			std::tuple<QueryChunk, Args...> tuple;
+			std::get<QueryChunk>(tuple) = chunk;
+
+			// NOTE: When generating function arguments for std::make_tuple using a lambda with fold expression,
+			//       the arguments are being generated in reverse order, which results in wrong component offsets for ComponentViews.
+
+			([&]()
 				{
-					return Args(componentOffsets[componentIndex++]);
-				} () ...
-			);
+					static_assert(IsComponentView<Args>);
+					std::get<Args>(tuple) = Args(componentOffsets[componentIndex++]);
+				} (), ...);
+
+			return tuple;
 		}
 
 		static void FillComponentOffsets(size_t* offsets, const ArchetypeRecord& archetype, const Archetypes& archetypes)
 		{
 			size_t index = 0;
 			([&]()
-			{
-				ComponentId componentId = COMPONENT_ID(std::remove_reference_t<typename ComponentViewUnderlyingType<Args>::Type>);
-				std::optional<size_t> componentIndex = archetype.TryGetComponentIndex(componentId);
-				if (componentIndex)
-					offsets[index] = archetype.ComponentOffsets[*componentIndex];
-				index++;
-			} (), ...);
+				{
+					static_assert(IsComponentView<Args>);
+					ComponentId componentId = COMPONENT_ID(std::remove_reference_t<typename ComponentViewUnderlyingType<Args>::Type>);
+					std::optional<size_t> componentIndex = archetype.TryGetComponentIndex(componentId);
+					if (componentIndex)
+						offsets[index] = archetype.ComponentOffsets[*componentIndex];
+					index++;
+				} (), ...);
 		}
 	};
 

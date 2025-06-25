@@ -9,6 +9,7 @@ namespace Grapple
 	class ComponentView
 	{
 	public:
+		ComponentView() = default;
 		constexpr ComponentView(size_t offset)
 			: m_ComponentOffset(offset) {}
 
@@ -17,7 +18,7 @@ namespace Grapple
 			return *(ComponentT*)(entity.GetEntityData() + m_ComponentOffset);
 		}
 	private:
-		size_t m_ComponentOffset;
+		size_t m_ComponentOffset = 0;
 	};
 
 	template<typename T>
@@ -31,6 +32,12 @@ namespace Grapple
 	{
 		using Type = T;
 	};
+
+	template<typename T>
+	constexpr bool IsComponentView = false;
+
+	template<typename T>
+	constexpr bool IsComponentView<ComponentView<T>> = true;
 
 	template<typename T>
 	class OptionalComponentView
