@@ -1,5 +1,7 @@
 #include "VulkanMaterial.h"
 
+#include "GrappleCore/Profiler/Profiler.h"
+
 #include "Grapple/AssetManager/AssetManager.h"
 
 #include "Grapple/Platform/Vulkan/VulkanContext.h"
@@ -19,6 +21,7 @@ namespace Grapple
 
 	void VulkanMaterial::SetShader(const Ref<Shader>& shader)
 	{
+		Grapple_PROFILE_FUNCTION();
 		ReleaseDescriptorSet();
 
 		Material::SetShader(shader);
@@ -48,10 +51,13 @@ namespace Grapple
 				m_Set->SetDebugName(As<VulkanShader>(m_Shader)->GetDebugName());
 			}
 		}
+
+		m_IsDirty = true;
 	}
 
 	Ref<VulkanPipeline> VulkanMaterial::GetPipeline(const Ref<VulkanRenderPass>& renderPass)
 	{
+		Grapple_PROFILE_FUNCTION();
 		if (m_Pipeline != nullptr && m_Pipeline->GetCompatibleRenderPass().get() == renderPass.get())
 			return m_Pipeline;
 
@@ -61,6 +67,7 @@ namespace Grapple
 
 	void VulkanMaterial::UpdateDescriptorSet()
 	{
+		Grapple_PROFILE_FUNCTION();
 		if (!m_IsDirty)
 			return;
 
@@ -90,6 +97,7 @@ namespace Grapple
 
 	void VulkanMaterial::ReleaseDescriptorSet()
 	{
+		Grapple_PROFILE_FUNCTION();
 		if (!m_Shader || !m_Set)
 			return;
 
