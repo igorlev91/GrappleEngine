@@ -28,7 +28,7 @@ namespace Grapple
 		ComponentView<ComponentT> View()
 		{
 			const ArchetypeRecord& archetypeRecord = m_Entities.GetArchetypes()[m_Archetype];
-			std::optional<size_t> index = m_Entities.GetArchetypes().GetArchetypeComponentIndex(m_Archetype, COMPONENT_ID(ComponentT));
+			std::optional<size_t> index = archetypeRecord.TryGetComponentIndex(COMPONENT_ID(ComponentT));
 
 			Grapple_CORE_ASSERT(index.has_value(), "Archetype doesn't have a component");
 
@@ -39,7 +39,7 @@ namespace Grapple
 		OptionalComponentView<T> ViewOptional()
 		{
 			const ArchetypeRecord& archetypeRecord = m_Entities.GetArchetypes()[m_Archetype];
-			std::optional<size_t> index = m_Entities.GetArchetypes().GetArchetypeComponentIndex(m_Archetype, COMPONENT_ID(T));
+			std::optional<size_t> index = archetypeRecord.TryGetComponentIndex(COMPONENT_ID(T));
 
 			if (index.has_value())
 				return OptionalComponentView<T>(archetypeRecord.ComponentOffsets[index.value()]);
