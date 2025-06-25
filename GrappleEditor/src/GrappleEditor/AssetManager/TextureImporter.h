@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Grapple/Renderer/Texture.h"
-#include "Grapple/AssetManager/AssetManager.h"
+#include "Flare/Renderer/Texture.h"
+#include "Flare/AssetManager/AssetManager.h"
 
-namespace Grapple
+namespace Flare
 {
 	struct TextureImportSettings
 	{
