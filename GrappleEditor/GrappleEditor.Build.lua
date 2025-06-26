@@ -65,7 +65,7 @@ project "GrappleEditor"
 
 	debugargs
 	{
-		"%{wks.location}/Sandbox/Sandbox.Grappleproj"
+		"--project=%{wks.location}/Sandbox/Sandbox.Grappleproj --vulkan-debug"
 	}
 
 	targetdir("%{wks.location}/bin/" .. OUTPUT_DIRECTORY)
