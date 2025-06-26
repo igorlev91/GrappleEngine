@@ -9,7 +9,7 @@
 
 namespace Grapple
 {
-	struct SpritesRendererSystem : public System
+	struct SpriteRendererSystem : public System
 	{
 	public:
 		virtual void OnConfig(World& world, SystemConfig& config) override;
@@ -30,13 +30,21 @@ namespace Grapple
 		std::vector<EntityQueueElement> m_SortedEntities;
 	};
 
-	struct MeshesRendererSystem : public System
+	struct MeshRendererSystem : public System
 	{
 	public:
 		void OnConfig(World& world, SystemConfig& config) override;
 		void OnUpdate(World& world, SystemExecutionContext& context) override;
 	private:
 		Query m_Query;
+	};
+
+	struct DecalRendererSystem : public System
+	{
+	public:
+		void OnConfig(World& world, SystemConfig& config) override;
+		void OnUpdate(World& world, SystemExecutionContext& context) override;
+	private:
 		Query m_DecalsQuery;
 	};
 }
