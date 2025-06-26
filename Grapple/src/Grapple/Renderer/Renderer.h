@@ -133,6 +133,7 @@ namespace Grapple
 
 	class DescriptorSet;
 	class DescriptorSetLayout;
+	class DescriptorSetPool;
 	class Grapple_API Renderer
 	{
 	public:
@@ -174,13 +175,15 @@ namespace Grapple
 		static Ref<Material> GetErrorMaterial();
 		static Ref<Material> GetDepthOnlyMaterial();
 
+		static Ref<DescriptorSetPool> GetGlobalDescriptorSetPool();
+		static Ref<DescriptorSetPool> GetCameraDescriptorSetPool();
+		static Ref<DescriptorSetPool> GetInstanceDataDescriptorSetPool();
+
 		static const ShadowSettings& GetShadowSettings();
 		static void SetShadowSettings(const ShadowSettings& settings);
 
 		static bool RequiresRenderGraphRebuild();
 
-		static Ref<DescriptorSet> GetPrimaryDescriptorSet();
-		static Ref<const DescriptorSetLayout> GetPrimaryDescriptorSetLayout();
 		static Ref<const DescriptorSetLayout> GetDecalsDescriptorSetLayout();
 
 		static void ConfigurePasses(Viewport& viewport);

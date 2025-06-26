@@ -615,11 +615,9 @@ namespace Grapple
 					return property.Binding == binding && property.Set == set;
 				});
 
+			// TODO: Handle duplicate descriptors accross different shader stages
 			if (it != descriptorProperties.end())
-			{
-				Grapple_CORE_ASSERT(resource.name == it->Name);
 				continue;
-			}
 
 			ShaderDescriptorProperty& property = descriptorProperties.emplace_back(descriptorType);
 			const spirv_cross::SPIRType& type = compiler.get_type(resource.type_id);

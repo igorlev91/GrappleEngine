@@ -329,6 +329,11 @@ namespace Grapple
             }
         }
 
+		auto it = m_FilepathToAssetHandle.find(metadata->Path);
+        Grapple_CORE_ASSERT(it != m_FilepathToAssetHandle.end());
+
+        m_FilepathToAssetHandle.erase(it);
+
         m_Registry.Remove(handle);
     }
 

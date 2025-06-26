@@ -1,7 +1,6 @@
 #pragma once
 
 #include "GrappleCore/Core.h"
-#include "Grapple/Renderer/FrameBuffer.h"
 #include "Grapple/Renderer/RenderData.h"
 
 #include "Grapple/Renderer/RenderGraph/RenderGraph.h"
@@ -12,9 +11,30 @@
 namespace Grapple
 {
 	class Texture;
+	class UniformBuffer;
+	class DescriptorSet;
+	class FrameBuffer;
+	class ShaderStorageBuffer;
+
+	struct ViewportGlobalResources
+	{
+		Ref<UniformBuffer> CameraBuffer = nullptr;
+		Ref<UniformBuffer> LightBuffer = nullptr;
+		Ref<ShaderStorageBuffer> PointLightsBuffer = nullptr;
+		Ref<ShaderStorageBuffer> SpotLightsBuffer = nullptr;
+		Ref<UniformBuffer> ShadowDataBuffer = nullptr;
+
+		Ref<DescriptorSet> CameraDescriptorSet = nullptr; // Set 0
+		Ref<DescriptorSet> GlobalDescriptorSet = nullptr; // Set 1
+		Ref<DescriptorSet> GlobalDescriptorSetWithoutShadows = nullptr; // Set 1, but with all shadow cascades set to white textures
+	};
+
 	class Grapple_API Viewport
 	{
 	public:
+		Viewport();
+		~Viewport();
+
 		inline glm::ivec2 GetPosition() const { return m_Position; }
 		inline glm::ivec2 GetSize() const { return m_Size; }
 
@@ -39,6 +59,10 @@ namespace Grapple
 		Ref<Texture> ColorTexture = nullptr;
 		Ref<Texture> NormalsTexture = nullptr;
 		Ref<Texture> DepthTexture = nullptr;
+
+		ViewportGlobalResources GlobalResources;
+	private:
+		void SetupGlobalDescriptorSet(Ref<DescriptorSet> set);
 	private:
 		bool m_PostProcessingEnabled = true;
 		bool m_ShadowMappingEnabled = true;

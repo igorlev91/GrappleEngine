@@ -45,7 +45,7 @@ namespace Grapple
 		vulkanCommandBuffer->BindIndexBuffer(m_IndexBuffer);
 
 		vulkanCommandBuffer->BindDescriptorSet(
-			As<VulkanDescriptorSet>(Renderer::GetPrimaryDescriptorSet()),
+			As<VulkanDescriptorSet>(context.GetViewport().GlobalResources.CameraDescriptorSet),
 			As<VulkanPipeline>(m_Pipeline)->GetLayoutHandle(),
 			0);
 

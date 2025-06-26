@@ -23,8 +23,6 @@ namespace Grapple
 	{
 		Grapple_PROFILE_FUNCTION();
 
-		m_ShadowDataBuffer = UniformBuffer::Create(sizeof(ShadowData));
-
 		SamplerSpecifications samplerSpecifications{};
 		samplerSpecifications.ComparisonEnabled = true;
 		samplerSpecifications.ComparisonFunction = DepthComparisonFunction::Less;
@@ -164,7 +162,7 @@ namespace Grapple
 		m_ShadowData.MaxShadowDistance = settings.CascadeSplits[settings.Cascades - 1];
 		m_ShadowData.ShadowFadeStartDistance = m_ShadowData.MaxShadowDistance - settings.FadeDistance;
 
-		m_ShadowDataBuffer->SetData(&m_ShadowData, sizeof(m_ShadowData), 0);
+		context.GetViewport().GlobalResources.ShadowDataBuffer->SetData(&m_ShadowData, sizeof(m_ShadowData), 0);
 	}
 
 	void ShadowPass::ComputeShaderProjectionsAndCullObjects(const RenderGraphContext& context)

@@ -3,6 +3,8 @@
 #include "GrappleCore/Assert.h"
 #include "GrappleCore/Profiler/Profiler.h"
 
+#include "Grapple/Core/Application.h"
+
 #include "Grapple/Project/Project.h"
 
 #include "Grapple/Renderer/Material.h"
@@ -250,9 +252,8 @@ namespace Grapple
                 if (node)
                 {
                     node->Handle = NULL_ASSET_HANDLE;
+					m_AssetManager->RemoveFromRegistry(handle);
                 }
-
-                m_AssetManager->RemoveFromRegistry(handle);
             }
 
             if (ImGui::MenuItem("Reload"))
