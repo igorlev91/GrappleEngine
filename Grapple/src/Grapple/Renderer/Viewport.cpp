@@ -10,6 +10,7 @@
 namespace Grapple
 {
 	Viewport::Viewport()
+		: Graph(*this)
 	{
 		Grapple_PROFILE_FUNCTION();
 		GlobalResources.CameraBuffer = UniformBuffer::Create(sizeof(RenderView));

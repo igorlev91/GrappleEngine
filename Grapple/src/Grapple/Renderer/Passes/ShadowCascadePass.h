@@ -25,8 +25,7 @@ namespace Grapple
 			RendererStatistics& statistics,
 			const ShadowCascadeData& cascadeData,
 			const std::vector<Math::Compact3DTransform>& filteredTransforms,
-			const std::vector<VisibleSubMeshRange>& visibleSubMeshRanges,
-			Ref<Texture> cascadeTexture);
+			const std::vector<VisibleSubMeshRange>& visibleSubMeshRanges);
 
 		~ShadowCascadePass();
 
@@ -55,7 +54,6 @@ namespace Grapple
 		const std::vector<VisibleSubMeshRange>& m_VisibleSubMeshRanges;
 
 		Ref<GPUTimer> m_Timer = nullptr;
-		Ref<Texture> m_CascadeTexture = nullptr;
 
 		Ref<UniformBuffer> m_CameraBuffer = nullptr;
 		Ref<DescriptorSet> m_CameraDescriptor = nullptr;

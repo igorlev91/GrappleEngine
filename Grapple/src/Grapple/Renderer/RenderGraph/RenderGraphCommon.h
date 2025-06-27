@@ -4,20 +4,22 @@
 
 #include "Grapple/Renderer/Texture.h"
 
+#include "Grapple/Renderer/RenderGraph/RenderGraphResourceManager.h"
+
 #include <stdint.h>
 
 namespace Grapple
 {
 	struct LayoutTransition
 	{
-		Ref<Texture> TextureHandle = nullptr;
+		RenderGraphTextureId Texture;
 		ImageLayout InitialLayout = ImageLayout::Undefined;
 		ImageLayout FinalLayout = ImageLayout::Undefined;
 	};
 
 	struct ExternalRenderGraphResource
 	{
-		Ref<Texture> TextureHandle = nullptr;
+		RenderGraphTextureId Texture;
 		ImageLayout InitialLayout = ImageLayout::Undefined;
 		ImageLayout FinalLayout = ImageLayout::Undefined;
 	};

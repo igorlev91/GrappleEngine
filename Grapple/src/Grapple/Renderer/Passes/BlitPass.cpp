@@ -7,7 +7,7 @@
 
 namespace Grapple
 {
-	BlitPass::BlitPass(Ref<Texture> sourceTexture, Ref<Texture> destination, TextureFiltering filter)
+	BlitPass::BlitPass(RenderGraphTextureId sourceTexture, RenderGraphTextureId destination, TextureFiltering filter)
 		: m_SourceTexture(sourceTexture), m_Destination(destination), m_Filter(filter)
 	{
 	}
@@ -15,10 +15,13 @@ namespace Grapple
 	void BlitPass::OnRender(const RenderGraphContext& context, Ref<CommandBuffer> commandBuffer)
 	{
 		Grapple_PROFILE_FUNCTION();
-		commandBuffer->Blit(m_SourceTexture, m_Destination, m_Filter);
+		commandBuffer->Blit(
+			context.GetRenderGraphResourceManager().GetTexture(m_SourceTexture),
+			context.GetRenderGraphResourceManager().GetTexture(m_Destination),
+			m_Filter);
 	}
 
-	void BlitPass::ConfigureSpecifications(RenderGraphPassSpecifications& specifications, Ref<Texture> source, Ref<Texture> destination)
+	void BlitPass::ConfigureSpecifications(RenderGraphPassSpecifications& specifications, RenderGraphTextureId source, RenderGraphTextureId destination)
 	{
 		Grapple_PROFILE_FUNCTION();
 		specifications.SetType(RenderGraphPassType::Other);

@@ -22,14 +22,12 @@ namespace Grapple
 		RendererStatistics& statistics,
 		const ShadowCascadeData& cascadeData,
 		const std::vector<Math::Compact3DTransform>& filteredTransforms,
-		const std::vector<VisibleSubMeshRange>& visibleSubMeshRanges,
-		Ref<Texture> cascadeTexture)
+		const std::vector<VisibleSubMeshRange>& visibleSubMeshRanges)
 		: m_OpaqueObjects(opaqueObjects),
 		m_Statistics(statistics),
 		m_CascadeData(cascadeData),
 		m_FilteredTransforms(filteredTransforms),
-		m_VisibleSubMeshRanges(visibleSubMeshRanges),
-		m_CascadeTexture(cascadeTexture)
+		m_VisibleSubMeshRanges(visibleSubMeshRanges)
 	{
 		Grapple_PROFILE_FUNCTION();
 
