@@ -177,7 +177,7 @@ namespace Grapple
 
 			if (bindings.size() > 0)
 			{
-				constexpr size_t maxShaderDescriptorSets = 256;
+				constexpr size_t maxShaderDescriptorSets = 512;
 				m_SetPool = CreateRef<VulkanDescriptorSetPool>(
 					maxShaderDescriptorSets,
 					Span<VkDescriptorSetLayoutBinding>::FromVector(bindings));
