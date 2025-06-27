@@ -37,6 +37,9 @@ namespace Grapple
 
 	void Viewport::Resize(glm::ivec2 position, glm::ivec2 size)
 	{
+		if (m_Size != size)
+			m_ShouldResizeRenderGraphTextures = true;
+
 		m_Position = position;
 		m_Size = size;
 	}
@@ -47,6 +50,45 @@ namespace Grapple
 
 		SetupGlobalDescriptorSet(GlobalResources.GlobalDescriptorSet);
 		SetupGlobalDescriptorSet(GlobalResources.GlobalDescriptorSetWithoutShadows);
+	}
+
+	void Viewport::OnBuildRenderGraph()
+	{
+		Grapple_PROFILE_FUNCTION();
+
+		ColorTextureId = Graph.CreateTexture(m_ColorTextureFormat, "Color");
+		NormalsTextureId = Graph.CreateTexture(m_NormalsTextureFormat, "Normals");
+		DepthTextureId = Graph.CreateTexture(m_DepthTextureFormat, "Depth");
+
+		ExternalRenderGraphResource colorTextureResource{};
+		colorTextureResource.InitialLayout = ImageLayout::AttachmentOutput;
+		colorTextureResource.FinalLayout = ImageLayout::ReadOnly;
+		colorTextureResource.Texture = ColorTextureId;
+
+		ExternalRenderGraphResource normalsTextureResource{};
+		normalsTextureResource.InitialLayout = ImageLayout::AttachmentOutput;
+		normalsTextureResource.FinalLayout = ImageLayout::ReadOnly;
+		normalsTextureResource.Texture = NormalsTextureId;
+
+		ExternalRenderGraphResource depthTextureResource{};
+		depthTextureResource.InitialLayout = ImageLayout::AttachmentOutput;
+		depthTextureResource.FinalLayout = ImageLayout::ReadOnly;
+		depthTextureResource.Texture = DepthTextureId;
+
+		Graph.AddExternalResource(colorTextureResource);
+		Graph.AddExternalResource(normalsTextureResource);
+		Graph.AddExternalResource(depthTextureResource);
+	}
+
+	void Viewport::PrepareViewport()
+	{
+		Grapple_PROFILE_FUNCTION();
+
+		if (m_ShouldResizeRenderGraphTextures)
+		{
+			Graph.OnViewportResize();
+			m_ShouldResizeRenderGraphTextures = false;
+		}
 	}
 
 	void Viewport::SetPostProcessingEnabled(bool enabled)

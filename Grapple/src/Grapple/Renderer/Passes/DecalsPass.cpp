@@ -13,15 +13,14 @@
 
 namespace Grapple
 {
-	DecalsPass::DecalsPass(const std::vector<DecalSubmitionData>& submitedDecals, Ref<DescriptorSetPool> decalDescriptorPool, Ref<Texture> depthTexture)
+	DecalsPass::DecalsPass(const std::vector<DecalSubmitionData>& submitedDecals, Ref<DescriptorSetPool> decalDescriptorPool, RenderGraphTextureId depthTexture)
 		: m_SubmitedDecals(submitedDecals), m_DepthTexture(depthTexture), m_DecalDescriptorPool(decalDescriptorPool)
 	{
 		const size_t maxDecals = 1000;
 		m_InstanceBuffer = ShaderStorageBuffer::Create(maxDecals * sizeof(InstanceData));
 
 		m_DecalSet = m_DecalDescriptorPool->AllocateSet();
-		m_DecalSet->WriteImage(m_DepthTexture, 0);
-		m_DecalSet->FlushWrites();
+		m_ShouldUpdateDescriptorSet = true;
 
 		m_InstanceDataDescriptor = Renderer::GetInstanceDataDescriptorSetPool()->AllocateSet();
 		m_InstanceDataDescriptor->WriteStorageBuffer(m_InstanceBuffer, 0);
@@ -38,6 +37,14 @@ namespace Grapple
 	void DecalsPass::OnRender(const RenderGraphContext& context, Ref<CommandBuffer> commandBuffer)
 	{
 		Grapple_PROFILE_FUNCTION();
+
+		//if (m_ShouldUpdateDescriptorSet)
+		//{
+			m_DecalSet->WriteImage(context.GetRenderGraph().GetTexture(m_DepthTexture), 0);
+			m_DecalSet->FlushWrites();
+
+			m_ShouldUpdateDescriptorSet = false;
+		//}
 
 		{
 			Grapple_PROFILE_SCOPE("FillInstanceData");

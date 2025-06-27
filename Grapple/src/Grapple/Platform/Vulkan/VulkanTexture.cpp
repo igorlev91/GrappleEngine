@@ -4,6 +4,7 @@
 
 #include "Grapple/Platform/Vulkan/VulkanContext.h"
 
+#include <vk_mem_alloc.h>
 #include <stb_image/stb_image.h>
 #include <glm/gtc/integer.hpp>
 
@@ -138,6 +139,7 @@ namespace Grapple
 
 	VulkanTexture::~VulkanTexture()
 	{
+		Grapple_PROFILE_FUNCTION();
 		Grapple_CORE_ASSERT(VulkanContext::GetInstance().IsValid());
 
 		ReleaseImage();
@@ -205,12 +207,14 @@ namespace Grapple
 
 	void VulkanTexture::CreateResources()
 	{
+		Grapple_PROFILE_FUNCTION();
 		CreateImage();
 		CreateSampler();
 	}
 
 	void VulkanTexture::CreateImage()
 	{
+		Grapple_PROFILE_FUNCTION();
 		VkFormat imageFormat = TextureFormatToVulkanFormat(m_Specifications.Format);
 		Grapple_CORE_ASSERT(imageFormat != VK_FORMAT_UNDEFINED);
 		Grapple_CORE_ASSERT(m_MipLevels > 0);
@@ -290,6 +294,7 @@ namespace Grapple
 
 	void VulkanTexture::CreateSampler()
 	{
+		Grapple_PROFILE_FUNCTION();
 		VkSamplerAddressMode addressMode = VK_SAMPLER_ADDRESS_MODE_REPEAT;
 		switch (m_Specifications.Wrap)
 		{
@@ -352,6 +357,7 @@ namespace Grapple
 
 	void VulkanTexture::UploadPixelData(Span<const MemorySpan> mips)
 	{
+		Grapple_PROFILE_FUNCTION();
 		Grapple_CORE_ASSERT(mips.GetSize() > 0);
 		VkFormat format = TextureFormatToVulkanFormat(m_Specifications.Format);
 
@@ -524,6 +530,7 @@ namespace Grapple
 
 	void VulkanTexture::ReleaseImage()
 	{
+		Grapple_PROFILE_FUNCTION();
 		VkDevice device = VulkanContext::GetInstance().GetDevice();
 		if (m_OwnsImages)
 		{
@@ -532,11 +539,14 @@ namespace Grapple
 
 			vkDestroyImageView(device, m_ImageView, nullptr);
 			vkDestroyImage(device, m_Image, nullptr);
+
+			m_Allocation = {};
 		}
 	}
 
 	void VulkanTexture::UpdateDebugName()
 	{
+		Grapple_PROFILE_FUNCTION();
 		VulkanContext::GetInstance().SetDebugName(VK_OBJECT_TYPE_IMAGE, (uint64_t)m_Image, m_DebugName.c_str());
 		VulkanContext::GetInstance().SetDebugName(VK_OBJECT_TYPE_IMAGE_VIEW, (uint64_t)m_ImageView, m_DebugName.c_str());
 	}

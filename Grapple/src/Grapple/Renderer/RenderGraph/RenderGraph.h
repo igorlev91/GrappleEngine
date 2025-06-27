@@ -30,6 +30,8 @@ namespace Grapple
 			return m_ResourceManager.CreateTexture(format, debugName);
 		}
 
+		inline Ref<Texture> GetTexture(RenderGraphTextureId textureId) const { return m_ResourceManager.GetTexture(textureId); }
+
 		const RenderPassNode* GetRenderPassNode(size_t index) const;
 		std::optional<size_t> FindPassByName(std::string_view name) const;
 
@@ -39,11 +41,15 @@ namespace Grapple
 		void Build();
 		void Clear();
 
+		void OnViewportResize();
+
 		inline bool NeedsRebuilding() const { return m_NeedsRebuilding; }
 		inline void SetNeedsRebuilding() { m_NeedsRebuilding = true; }
 	private:
+		void CreateRenderTargets();
 		void ExecuteLayoutTransitions(Ref<CommandBuffer> commandBuffer, LayoutTransitionsRange range);
 	private:
+		bool m_IsValid = false;
 		const Viewport& m_Viewport;
 
 		std::vector<RenderPassNode> m_Nodes;
