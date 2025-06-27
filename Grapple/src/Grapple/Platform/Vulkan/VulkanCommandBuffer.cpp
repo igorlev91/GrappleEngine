@@ -302,16 +302,11 @@ namespace Grapple
 		vkCmdDraw(m_CommandBuffer, vertexCount, instanceCount, baseVertex, baseInstance);
 	}
 
-	void VulkanCommandBuffer::Blit(Ref<FrameBuffer> source, uint32_t sourceAttachment, Ref<FrameBuffer> destination, uint32_t destinationAttachment, TextureFiltering filter)
-	{
-		Blit(source->GetAttachment(sourceAttachment), destination->GetAttachment(destinationAttachment), filter);
-	}
-
-	void VulkanCommandBuffer::Blit(Ref<Texture> source, Ref<Texture> destination, TextureFiltering filter)
+	void VulkanCommandBuffer::Blit(Ref<const Texture> source, Ref<const Texture> destination, TextureFiltering filter)
 	{
 		Grapple_PROFILE_FUNCTION();
-		VkImage sourceImage = As<VulkanTexture>(source)->GetImageHandle();
-		VkImage destinationImage = As<VulkanTexture>(destination)->GetImageHandle();
+		VkImage sourceImage = As<const VulkanTexture>(source)->GetImageHandle();
+		VkImage destinationImage = As<const VulkanTexture>(destination)->GetImageHandle();
 
 		TextureFormat sourceFormat = source->GetSpecifications().Format;
 		TextureFormat destinationFormat = destination->GetSpecifications().Format;
