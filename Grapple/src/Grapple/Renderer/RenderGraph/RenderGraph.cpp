@@ -58,7 +58,7 @@ namespace Grapple
 		m_ExternalResources.push_back(resource);
 	}
 
-	void RenderGraph::Execute(Ref<CommandBuffer> commandBuffer)
+	void RenderGraph::Execute(Ref<CommandBuffer> commandBuffer, const SceneSubmition& sceneSubmition, const RenderView& view)
 	{
 		Grapple_PROFILE_FUNCTION();
 		Grapple_CORE_ASSERT(m_IsValid);
@@ -67,7 +67,7 @@ namespace Grapple
 
 		for (const auto& node : m_Nodes)
 		{
-			RenderGraphContext context(Renderer::GetCurrentViewport(), node.RenderTarget, *this, m_ResourceManager);
+			RenderGraphContext context(m_Viewport, node.RenderTarget, *this, m_ResourceManager, sceneSubmition, view);
 
 			ExecuteLayoutTransitions(commandBuffer, node.Transitions);
 
@@ -129,11 +129,14 @@ namespace Grapple
 
 			Ref<VulkanRenderPass> compatibleRenderPass = As<VulkanFrameBuffer>(node.RenderTarget)->GetCompatibleRenderPass();
 
+			std::string debugName = node.RenderTarget->GetDebugName();
+
 			node.RenderTarget = CreateRef<VulkanFrameBuffer>(attachmentTextures[0]->GetWidth(),
 				attachmentTextures[0]->GetHeight(),
 				compatibleRenderPass,
 				Span<Ref<Texture>>::FromVector(attachmentTextures),
 				false);
+			node.RenderTarget->SetDebugName(debugName);
 		}
 	}
 

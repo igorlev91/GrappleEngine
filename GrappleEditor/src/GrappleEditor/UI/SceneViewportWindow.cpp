@@ -66,7 +66,7 @@ namespace Grapple
 		editorCameraView.Far = m_Camera.GetSettings().Far;
 		editorCameraView.FOV = m_Camera.GetSettings().FOV;
 
-		m_SceneRenderer->RenderViewport(m_Viewport);
+		m_SceneRenderer->RenderViewport(m_Viewport, &editorCameraView);
 
 		return;
 
