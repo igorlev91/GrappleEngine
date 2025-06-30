@@ -1,14 +1,42 @@
 #pragma once
 
-#include "Grapple/Renderer2D/Renderer2D.h"
-#include "Grapple/AssetManager/AssetManager.h"
-#include "Grapple/Scene/Components.h"
+#include "Grapple/Renderer/SceneSubmition.h"
 
 #include "GrappleECS/World.h"
 #include "GrappleECS/System/SystemInitializer.h"
 
 namespace Grapple
 {
+	class Viewport;
+	class Scene;
+	class Grapple_API SceneRenderer
+	{
+	public:
+		SceneRenderer(Ref<Scene> scene);
+
+		inline Ref<Scene> GetScene() const { return m_Scene; }
+
+		void CollectSceneData();
+
+		// Renders the scene to a given viewport.
+		// In case the given view is null, uses the one given by SceneSubmition.
+		void RenderViewport(Viewport& viewport, RenderView* viewOverride = nullptr);
+	private:
+		void InitializeQueries();
+
+		void PrepareViewportForRendering(Viewport& viewport, const RenderView& view);
+	private:
+		Query m_CameraQuery;
+		Query m_EnvironmentQuery;
+		Query m_DirectionalLightQuery;
+		Query m_PointLightsQuery;
+		Query m_SpotLightsQuery;
+
+		Ref<Scene> m_Scene = nullptr;
+
+		SceneSubmition m_SceneSubmition;
+	};
+
 	struct SpriteRendererSystem : public System
 	{
 	public:

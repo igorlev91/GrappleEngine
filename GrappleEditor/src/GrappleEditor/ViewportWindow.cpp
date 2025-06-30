@@ -3,6 +3,7 @@
 #include "Grapple/Renderer/Renderer.h"
 #include "Grapple/Renderer/Passes/BlitPass.h"
 
+#include "Grapple/Renderer2D/Renderer2D.h"
 #include "Grapple/DebugRenderer/DebugRenderer.h"
 
 #include "Grapple/Platform/Vulkan/VulkanContext.h"
@@ -16,8 +17,9 @@
 
 namespace Grapple
 {
-	ViewportWindow::ViewportWindow(std::string_view name)
+	ViewportWindow::ViewportWindow(const Scope<SceneRenderer>& sceneRenderer, std::string_view name)
 		: m_Name(name),
+		m_SceneRenderer(sceneRenderer),
 		m_IsFocused(false),
 		m_IsVisible(true),
 		m_PreviousFocusState(false),
@@ -43,14 +45,7 @@ namespace Grapple
 
 		if (m_Viewport.GetSize() != glm::ivec2(0))
 		{
-			scene->OnBeforeRender(m_Viewport);
-
-			Renderer::BeginScene(m_Viewport);
-
-			OnClear();
-
-			scene->OnRender(m_Viewport);
-			Renderer::EndScene();
+			m_SceneRenderer->RenderViewport(m_Viewport);
 		}
 	}
 

@@ -4,6 +4,7 @@
 #include "Grapple/Renderer/UniformBuffer.h"
 #include "Grapple/Renderer/ShaderStorageBuffer.h"
 #include "Grapple/Renderer/DescriptorSet.h"
+#include "Grapple/Renderer/GraphicsContext.h"
 
 #include "Grapple/Renderer/Passes/ShadowPass.h"
 
@@ -89,6 +90,14 @@ namespace Grapple
 			Graph.OnViewportResize();
 			m_ShouldResizeRenderGraphTextures = false;
 		}
+
+		Ref<CommandBuffer> commandBuffer = GraphicsContext::GetInstance().GetCommandBuffer();
+
+		const auto& resourceManager = Graph.GetResourceManager();
+
+		commandBuffer->ClearColor(resourceManager.GetTexture(ColorTextureId), glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+		commandBuffer->ClearColor(resourceManager.GetTexture(NormalsTextureId), glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+		commandBuffer->ClearDepth(resourceManager.GetTexture(DepthTextureId), 1.0f);
 	}
 
 	void Viewport::SetPostProcessingEnabled(bool enabled)

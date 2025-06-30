@@ -1,6 +1,7 @@
 #include "Renderer.h"
 
 #include "Grapple/Renderer/RendererPrimitives.h"
+#include "Grapple/Renderer/SceneSubmition.h"
 
 #include "Grapple/AssetManager/AssetManager.h"
 
@@ -34,6 +35,8 @@ namespace Grapple
 
 	struct RendererData
 	{
+		SceneSubmition* Submition = nullptr;
+
 		Viewport* MainViewport = nullptr;
 		Viewport* CurrentViewport = nullptr;
 
@@ -244,71 +247,21 @@ namespace Grapple
 	{
 	}
 
+	SceneSubmition& Renderer::GetCurrentSceneSubmition()
+	{
+		Grapple_CORE_ASSERT(s_RendererData.Submition);
+		return *s_RendererData.Submition;
+	}
+
+	void Renderer::BeginScene(SceneSubmition& sceneSubmition)
+	{
+		Grapple_CORE_ASSERT(s_RendererData.Submition == nullptr);
+
+		s_RendererData.Submition = &sceneSubmition;
+	}
+
 	void Renderer::BeginScene(Viewport& viewport)
 	{
-		Grapple_PROFILE_FUNCTION();
-
-		viewport.PrepareViewport();
-
-		s_RendererData.CurrentViewport = &viewport;
-		s_RendererData.OpaqueQueue.SetCameraPosition(viewport.FrameData.Camera.Position);
-
-		Ref<CommandBuffer> commandBuffer = GraphicsContext::GetInstance().GetCommandBuffer();
-
-		{
-			Grapple_PROFILE_SCOPE("UpdateLightUniformBuffer");
-			s_RendererData.CurrentViewport->FrameData.Light.PointLightsCount = (uint32_t)s_RendererData.PointLights.size();
-			s_RendererData.CurrentViewport->FrameData.Light.SpotLightsCount = (uint32_t)s_RendererData.SpotLights.size();
-			s_RendererData.CurrentViewport->GlobalResources.LightBuffer->SetData(&viewport.FrameData.Light, sizeof(viewport.FrameData.Light), 0);
-		}
-
-		{
-			Grapple_PROFILE_SCOPE("UpdateCameraUniformBuffer");
-			viewport.FrameData.Camera.ViewportSize = (glm::ivec2)viewport.GetSize();
-			s_RendererData.CurrentViewport->GlobalResources.CameraBuffer->SetData(&viewport.FrameData.Camera, sizeof(RenderView), 0);
-		}
-
-		bool updateViewportDescriptorSets = false;
-
-		{
-			Grapple_PROFILE_SCOPE("UploadPointLightsData");
-			MemorySpan pointLightsData = MemorySpan::FromVector(s_RendererData.PointLights);
-
-			if (pointLightsData.GetSize() > s_RendererData.CurrentViewport->GlobalResources.PointLightsBuffer->GetSize())
-			{
-				s_RendererData.CurrentViewport->GlobalResources.PointLightsBuffer->Resize(pointLightsData.GetSize());
-				updateViewportDescriptorSets = true;
-			}
-
-			s_RendererData.CurrentViewport->GlobalResources.PointLightsBuffer->SetData(pointLightsData, 0, commandBuffer);
-		}
-
-		{
-			Grapple_PROFILE_SCOPE("UploadSpotLightsData");
-
-			MemorySpan spotLightsData = MemorySpan::FromVector(s_RendererData.SpotLights);
-
-			if (spotLightsData.GetSize() > s_RendererData.CurrentViewport->GlobalResources.SpotLightsBuffer->GetSize())
-			{
-				s_RendererData.CurrentViewport->GlobalResources.SpotLightsBuffer->Resize(spotLightsData.GetSize());
-				updateViewportDescriptorSets = true;
-			}
-
-			s_RendererData.CurrentViewport->GlobalResources.SpotLightsBuffer->SetData(spotLightsData, 0, commandBuffer);
-		}
-
-		s_RendererData.CurrentViewport->UpdateGlobalDescriptorSets();
-
-		{
-			// Generate camera frustum planes
-			Grapple_PROFILE_SCOPE("CalculateFrustumPlanes");
-
-			auto& frameData = s_RendererData.CurrentViewport->FrameData;
-			frameData.CameraFrustumPlanes.SetFromViewAndProjection(
-				frameData.Camera.View,
-				frameData.Camera.InverseViewProjection,
-				frameData.Camera.ViewDirection);
-		}
 	}
 
 	void Renderer::Flush()
@@ -322,6 +275,10 @@ namespace Grapple
 	void Renderer::EndScene()
 	{
 		Grapple_PROFILE_FUNCTION();
+
+		Grapple_CORE_ASSERT(s_RendererData.Submition);
+		s_RendererData.Submition = nullptr;
+
 		s_RendererData.PointLights.clear();
 		s_RendererData.SpotLights.clear();
 		s_RendererData.Decals.clear();

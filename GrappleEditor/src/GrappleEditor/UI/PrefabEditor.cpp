@@ -1,6 +1,9 @@
 #include "PrefabEditor.h"
 
 #include "Grapple/AssetManager/AssetManager.h"
+
+#include "Grapple/Scene/SceneRenderer.h"
+
 #include "GrappleEditor/AssetManager/PrefabImporter.h"
 
 #include <imgui.h>
@@ -11,8 +14,9 @@ namespace Grapple
         : m_PreviewScene(CreateRef<Scene>(context)),
         m_Entities(GetWorld(), EntitiesHierarchyFeatures::None),
         m_Properties(GetWorld()), m_SelectedEntity(Entity()),
-        m_ViewportWindow(m_EditorCamera, "Prefab Preview")
+        m_ViewportWindow(m_EditorCamera, m_SceneRenderer, "Prefab Preview")
     {
+        m_SceneRenderer.reset(new SceneRenderer(m_PreviewScene));
         m_ViewportWindow.SetScene(m_PreviewScene);
 
         EditorCameraSettings& settings = m_EditorCamera.GetSettings();
