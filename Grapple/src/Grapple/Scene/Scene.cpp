@@ -87,17 +87,6 @@ namespace Grapple
 		m_World.GetSystemsManager().ExecuteGroup(m_OnRuntimeEndGroup);
 	}
 
-	void Scene::OnRender(const Viewport& viewport)
-	{
-		Grapple_PROFILE_FUNCTION();
-
-		Renderer2D::Begin();
-
-		m_World.GetSystemsManager().ExecuteGroup(m_RenderingGroup);
-
-		Renderer2D::End();
-	}
-
 	void Scene::OnUpdateRuntime()
 	{
 		m_World.GetSystemsManager().ExecuteGroup(m_OnFrameStart);

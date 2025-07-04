@@ -8,6 +8,7 @@
 #include "Grapple/Renderer/ShaderStorageBuffer.h"
 #include "Grapple/Renderer/Sampler.h"
 #include "Grapple/Renderer/GPUTimer.h"
+#include "Grapple/Renderer/SceneSubmition.h"
 
 #include "Grapple/Math/SIMD.h"
 
@@ -18,8 +19,7 @@
 
 namespace Grapple
 {
-	ShadowPass::ShadowPass(const RendererSubmitionQueue& opaqueObjects)
-		: m_OpaqueObjects(opaqueObjects)
+	ShadowPass::ShadowPass()
 	{
 		Grapple_PROFILE_FUNCTION();
 
@@ -53,13 +53,13 @@ namespace Grapple
 	}
 
 	static void CalculateShadowFrustumParamsAroundCamera(ShadowCascadeData& cascadeData,
+		const RenderView& cameraView,
 		glm::vec3 lightDirection,
 		const Viewport& viewport,
 		float nearPlaneDistance,
 		float farPlaneDistance)
 	{
 		Grapple_PROFILE_FUNCTION();
-		const RenderView& camera = viewport.FrameData.Camera;
 
 		std::array<glm::vec4, 8> frustumCorners =
 		{
@@ -75,12 +75,12 @@ namespace Grapple
 
 		for (size_t i = 0; i < frustumCorners.size(); i++)
 		{
-			frustumCorners[i] = viewport.FrameData.Camera.InverseViewProjection * frustumCorners[i];
+			frustumCorners[i] = cameraView.InverseViewProjection * frustumCorners[i];
 			frustumCorners[i] /= frustumCorners[i].w;
 		}
 
-		Math::Plane farPlane = Math::Plane::TroughPoint(camera.Position + camera.ViewDirection * farPlaneDistance, camera.ViewDirection);
-		Math::Plane nearPlane = Math::Plane::TroughPoint(camera.Position + camera.ViewDirection * nearPlaneDistance, camera.ViewDirection);
+		Math::Plane farPlane = Math::Plane::TroughPoint(cameraView.Position + cameraView.ViewDirection * farPlaneDistance, cameraView.ViewDirection);
+		Math::Plane nearPlane = Math::Plane::TroughPoint(cameraView.Position + cameraView.ViewDirection * nearPlaneDistance, cameraView.ViewDirection);
 		for (size_t i = 0; i < frustumCorners.size() / 2; i++)
 		{
 			Math::Ray ray;
@@ -208,8 +208,7 @@ namespace Grapple
 		Grapple_PROFILE_FUNCTION();
 
 		const Viewport& viewport = context.GetViewport();
-		glm::vec3 lightDirection = viewport.FrameData.Light.Direction;
-		const Math::Basis& lightBasis = viewport.FrameData.LightBasis;
+		const DirectionalLightSubmition& directionalLight = context.GetSceneSubmition().DirectionalLight;
 		const ShadowSettings& shadowSettings = Renderer::GetShadowSettings();
 
 		{
@@ -219,15 +218,17 @@ namespace Grapple
 			for (size_t i = 0; i < shadowSettings.Cascades; i++)
 			{
 				// 1. Calculate a fit frustum around camera's furstum
-				CalculateShadowFrustumParamsAroundCamera(m_CascadeData[i], lightDirection,
+				CalculateShadowFrustumParamsAroundCamera(m_CascadeData[i],
+					context.GetRenderView(),
+					directionalLight.Direction,
 					viewport, currentNearPlane,
 					shadowSettings.CascadeSplits[i]);
 
 				// 2. Calculate projection frustum planes (except near and far)
 				CalculateShadowProjectionFrustum(
 					m_CascadeData[i],
-					lightDirection,
-					lightBasis);
+					directionalLight.Direction,
+					directionalLight.LightBasis);
 
 				currentNearPlane = shadowSettings.CascadeSplits[i];
 
@@ -235,7 +236,7 @@ namespace Grapple
 			}
 		}
 
-		FilterSubmitions();
+		FilterSubmitions(context);
 
 		{
 			float currentNearPlane = viewport.FrameData.Light.Near;
@@ -283,7 +284,7 @@ namespace Grapple
 
 				glm::mat4 view = glm::scale(
 					glm::lookAt(
-						cascadeData.BoundingSphereCenter + lightDirection * nearPlaneDistance,
+						cascadeData.BoundingSphereCenter + directionalLight.Direction * nearPlaneDistance,
 						cascadeData.BoundingSphereCenter, glm::vec3(0.0f, 1.0f, 0.0f)),
 					glm::vec3(texelsPerUnit));
 
@@ -294,7 +295,7 @@ namespace Grapple
 				cascadeData.BoundingSphereCenter = glm::inverse(view) * glm::vec4((glm::vec3)projectedCenter, 1.0f);
 
 				view = glm::lookAt(
-					cascadeData.BoundingSphereCenter + lightDirection * nearPlaneDistance,
+					cascadeData.BoundingSphereCenter + directionalLight.Direction * nearPlaneDistance,
 					cascadeData.BoundingSphereCenter, glm::vec3(0.0f, 1.0f, 0.0f));
 
 				glm::mat4 projection;
@@ -320,11 +321,11 @@ namespace Grapple
 		}
 	}
 
-	void ShadowPass::FilterSubmitions()
+	void ShadowPass::FilterSubmitions(const RenderGraphContext& context)
 	{
 		Grapple_PROFILE_FUNCTION();
 		const ShadowSettings& shadowSettings = Renderer::GetShadowSettings();
-		const auto& submitedBatches = m_OpaqueObjects.GetShadowPassBatches();
+		const auto& submitedBatches = context.GetSceneSubmition().OpaqueGeometrySubmitions.GetShadowPassBatches();
 
 		for (size_t batchIndex = 0; batchIndex < submitedBatches.size(); batchIndex++)
 		{
